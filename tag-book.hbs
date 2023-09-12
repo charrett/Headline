@@ -41,12 +41,35 @@
             {{/unless}}
         {{/tag}}
 
-        <div class="gh-topic gh-topic-grid">
+        {{!--<div class="gh-topic gh-topic-grid">
             <div class="gh-topic-content gh-feed">
                 {{#foreach posts limit="all"}}
                     {{> "loop-grid" has_large_post=false}}
                 {{/foreach}}
             </div>
-        </div> 
+        </div> --}}
+        {{#if @custom.enter_tag_slugs_for_secondary_sections}}
+            {{#get "tags" filter="slug:[{{@custom.enter_tag_slugs_for_secondary_sections}}]"}}
+                {{#if tags}}
+                    <div class="gh-topic-list">
+                        {{#foreach tags}}
+                            {{> "topic-minimal"}}
+                        {{/foreach}}
+                    </div>
+                {{/if}}
+            {{/get}}
+        {{else}}
+            {{#match posts.length ">" 1}}
+                {{#get "tags" include="count.posts" order="count.posts desc"}}
+                    {{#if tags.[3]}}
+                        <div class="gh-topic-list">
+                            {{#foreach tags from="4" limit="3"}}
+                                {{> "topic-minimal"}}
+                            {{/foreach}}
+                        </div>
+                    {{/if}}
+                {{/get}}
+            {{/match}}
+        {{/if}}
     </div>
 </main>
