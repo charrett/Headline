@@ -1,45 +1,35 @@
 {{!< default}}
-
-<header class="site-header">
-  <div class="outer site-nav-main">
-    <div class="inner">
-      {{> "site-nav"}}
-    </div>
-  </div>
-</header>
-
 {{#post}}
-
-<main id="site-main" class="site-main outer" role="main">
-  <div class="inner">
-    <header class="post-full-header">
-      <h1 class="post-full-title">{{title}}</h1>
-    </header>
-
-    {{#get 'authors' limit='all' include='count.posts' order='count.posts desc'}}
-      <div class="post-feed">
-        {{#foreach authors}}
-          <article class="post-card {{#unless profile_image}} no-image{{/unless}}">
-            {{#if profile_image}}
-              <a class="post-card-image-link" href="">
-                <div class="post-card-image" style="background-image: url({{profile_image}})"></div>
-              </a>
+<main class="gh-main gh-outer">
+    <div class="gh-inner">
+    <section class="gh-pagehead">
+        <h1 class="gh-pagehead-title">{{name}}</h1>
+            {{#if description}}
+                div class="gh-pagehead-description">{{description}}</div>
             {{/if}}
-            <div class="post-card-content">
-              <a class="post-card-content-link" href="{% raw %}{{url}}">
-                <header class="post-card-header">
-                  <h2 class="post-card-title">{{name}}</h2>
-                </header>
-                <section class="post-card-excerpt">
-                  <p>{{bio}}</p>
-                </section>
-              </a>
-            </div>
-          </article>
+    </section>
+    {{#get 'authors' limit='all' include='count.posts' order='count.posts desc'}}
+      <div class="gh-topic-grid">
+        {{#foreach authors}}
+                <div class="gh-author-image">
+                    {{#if profile_image}}
+                        <img src="{{profile_image}}" alt="{{name}}">
+                    {{else}}
+                        <div class="gh-author-icon">{{> icons/avatar}}</div>
+                    {{/if}}
+                </div>
+                <div class="gh-pagehead-content">
+                    <h1 class="gh-pagehead-title">{{name}}</h1>
+
+                    {{#if bio}}
+                        <div class="gh-author-bio gh-pagehead-description">{{bio}}</div>
+                    {{/if}}
+                </div>
         {{/foreach}}
       </div>
     {{/get}}
-  </div>
+    </section>
+    </div>
 </main>
 
 {{/post}}
