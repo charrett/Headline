@@ -1,4 +1,6 @@
 {{#is "post"}}
+
+{{!--expressions original code 
     {{#get "posts" include="authors" filter="tags:[{{post.tags}}]+id:-{{post.id}}" limit="3" as |next|}}
         {{#if next}}
             <div class="gh-read-next gh-canvas">
@@ -15,5 +17,17 @@
                 </div>
             </div>
         {{/if}}
-    {{/get}}
+    {{/get}} --}}
+
+{{#get "posts" include="tags,authors" limit="12" filter="id:-{{id}}+tag:{{id}}" as |more_posts|}}
+    {{#if more_posts}}
+        <aside class="read-more-wrap">
+            <div class="read-more inner">
+                {{#foreach more_posts}}
+                    {{> "post-card"}}
+                {{/foreach}}
+            </div>
+        </aside>
+    {{/if}}
+{{/get}}
 {{/is}}
