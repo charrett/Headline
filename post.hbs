@@ -11,11 +11,11 @@
 
                 <h1 class="gh-article-title">{{title}}</h1>
 
+                {{> "post-meta"}}
+
                 {{#if custom_excerpt}}
                     <p class="gh-article-excerpt">{{custom_excerpt}}</p>
                 {{/if}}
-
-                {{> "post-meta"}}
 
                 {{> "feature-image"}}
             </header>
@@ -23,13 +23,15 @@
             <section class="gh-content gh-canvas">
                 {{content}}
             </section>
-
+            <section>{{> "comments"}}</section>
         </article>
     {{/post}}
 
+    {{!-- {{#post}}
+        {{> "comments"}}
+    {{/post}} --}}
+
     {{> "related-posts"}}
 
-    {{#post}}
-        {{> "comments"}}
-    {{/post}}
+
 </main>

@@ -1,7 +1,27 @@
 {{!< default}}
-
 <main class="gh-main gh-outer">
+    {{!-- charrett added extra stuff --}}
+    <section class="p-outer">
+    <div class="p-inner p-hero">
+        <div class="p-hero-left">
+            <div>
+                <h2>Engineering, Leadership and Quality</h2>
+                <p></p>
+                <p>Enjoy a eclectic mix of writing on Leadership, Quality and Women in Tech. Plus the occasional rant!</p>
+                <p>It's also the home of the <a href="/tag/book/"> Quality Coach Book.</a></p>
+                <p>The Quality Coach book uses the book as a service model. Each month, a new chapter is added to the book.</p> 
+                <p>The book explains the quality coach role, quality coach workshops with instructions and templates plus ideas on how to think about quality in modern engineering companies. While many articles focus on team level, there is also advice for managing quality coaching within an organisation.</p> 
+            </div>
+        </div>
+        <div class="p-hero-right">
+          {{! Loads the your cover image as defined in Ghost admin }}
+          <img src="{{img_url @site.cover_image size="m"}}" alt="Anne-Marie Charrett" />
+        </div>
+    </div>
+    </section>
+    {{!-- Original Stuff starts here --}}
     <div class="gh-inner">
+        <br></br>
         <section class="gh-topic gh-topic-grid">
             <h2 class="gh-topic-name">
                 {{#match pagination.pages ">" 1}}
@@ -40,7 +60,7 @@
             {{/match}}
         {{/if}}
 
-        {{#if @custom.enter_tag_slugs_for_secondary_sections}}
+        {{!--{{#if @custom.enter_tag_slugs_for_secondary_sections}}
             {{#get "tags" filter="slug:[{{@custom.enter_tag_slugs_for_secondary_sections}}]"}}
                 {{#if tags}}
                     <div class="gh-topic-list">
@@ -62,6 +82,6 @@
                     {{/if}}
                 {{/get}}
             {{/match}}
-        {{/if}}
+        {{/if}} --}}
     </div>
 </main>

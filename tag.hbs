@@ -10,8 +10,9 @@
                         {{img_url feature_image size="l"}} 960w,
                         {{img_url feature_image size="xl"}} 1200w,
                         {{img_url feature_image size="xxl"}} 2000w"
-                sizes="100vw"
-                src="{{img_url feature_image size="xl"}}"
+                sizes="(max-width: 1000px) 400px, 800px"
+                {{!--sizes="100vw"--}}
+                src="{{img_url feature_image size="m"}}"
                 alt="{{name}}"
             >
 
@@ -43,9 +44,9 @@
         <div class="gh-topic gh-topic-grid">
             <div class="gh-topic-content gh-feed">
                 {{#foreach posts limit="all"}}
-                    {{> "loop-grid"}}
+                    {{> "loop-grid" has_large_post=false}}
                 {{/foreach}}
             </div>
-        </div>
+        </div> 
     </div>
 </main>
