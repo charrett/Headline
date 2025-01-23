@@ -30,8 +30,8 @@ coverage/
 bower_components/
 
 # Compiled source
-dist/
-build/
+# dist/
+# build/
 
 # Optional npm cache directory
 .npm/
@@ -40,7 +40,7 @@ build/
 .eslintcache
 
 # Optional REPL history
-.node_repl_history
+.node_repl_historys
 
 # dotenv environment variables file
 .env
