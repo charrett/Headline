@@ -31,7 +31,7 @@
   
   .p-hero-left {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* row  */
     justify-content: space-between; /* Was space-between; Ensures buttons are at the bottom of the container */
   }
   
@@ -63,6 +63,7 @@
     display: flex;
     gap: 1.6rem;
     margin-block-start: 8vmin;
+    margin-bottom: 2rem; /* Add bottom margin to create space */
   }
   
   .p-hero-buttons button,

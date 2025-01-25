@@ -30,8 +30,8 @@ coverage/
 bower_components/
 
 # Compiled source
-# dist/
-# build/
+dist/
+build/
 
 # Optional npm cache directory
 .npm/
