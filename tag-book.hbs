@@ -33,30 +33,32 @@
     <div class="gh-inner">
         {{#tag}}
             {{#unless feature_image}}
-                <section class="gh-pagehead">
-                    <div class="p-hero">
+                <section class="p-outer">
+                    <div class="p-inner p-hero">
                         <div class="p-hero-left">
-                            <h1 class="gh-pagehead-title">{{name}}</h1>
+                            <div>
+                                <h1 class="gh-pagehead-title">{{name}}</h1>
 
-                            {{#if description}}
-                                <div class="gh-pagehead-description">{{description}}</div>
-                            {{/if}}
-                            
-                            <div class="p-hero-buttons" style="margin-block-start: 0; margin-bottom: 6rem;">
-                                {{! Launches the yearly signup 
-                                <button data-portal="signup/yearly">Subscribe to Quality Coach Book</button>}}
-                                {{! Launches the Ghost membership portal 
-                                <button data-portal="signup/yearly">Subscribe to Quality Coach Book</button>}}
-                                {{! Link to a faq page }}
-                                <a href="https://leanpub.com/qc">Buy the Quality Coach ebook</a> 
-                                {{!<button data-senja-collector-open="qualitycoachbook" data-project="qualitycoachbook" data-form="uVm11c">Give a Testimonial</button>}}
+                                {{#if description}}
+                                    <div class="gh-pagehead-description">{{description}}</div>
+                                {{/if}}
+                                
+                                <div class="p-hero-buttons" style="margin-block-start: 0; margin-bottom: 6rem;">
+                                    {{! Launches the yearly signup 
+                                    <button data-portal="signup/yearly">Subscribe to Quality Coach Book</button>}}
+                                    {{! Launches the Ghost membership portal 
+                                    <button data-portal="signup/yearly">Subscribe to Quality Coach Book</button>}}
+                                    {{! Link to a faq page }}
+                                    <a href="https://leanpub.com/qc">Buy the Quality Coach ebook</a> 
+                                    {{!<button data-senja-collector-open="qualitycoachbook" data-project="qualitycoachbook" data-form="uVm11c">Give a Testimonial</button>}}
+                                </div>
                             </div>
                         </div>
                         
                         <div class="p-hero-right">
                             {{! Loads the your cover image as defined in Ghost admin }}
                             <a href="https://leanpub.com/qc" target="_blank" rel="noopener">
-                                <img src="{{asset "images/qualitycoachbook.svg"}}" alt="Anne-Marie Charrett" style="max-height: 450px;" />
+                               <img src="{{img_url @site.cover_image size="m"}}" alt="Quality Coach Book by Anne-Marie Charrett" />
                             </a>
                         </div>
                     </div>

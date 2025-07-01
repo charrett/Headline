@@ -37,7 +37,7 @@
   
   .p-hero-right img {
     width: 100%;
-    max-height: 300px;
+    max-height: 450px;
     object-fit: cover; /* Fills the container with the image */
     transform: translateY(24px); /* Move the image slightly to create an offset effect */
   }
