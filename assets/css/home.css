@@ -128,7 +128,7 @@
   /* Change layout at larger viewport sizes */
   @media (min-width: 768px) {
     .p-hero {
-      grid-template-columns: 1fr 1fr; /* Hero section has 2 columns */
+      grid-template-columns: 2fr 1fr; /* Hero section has 2 columns - left is 2x wider than right */
     }
   
     .p-hero-buttons {
