@@ -33,21 +33,22 @@
     <div class="gh-inner">
         {{#tag}}
             {{#unless feature_image}}
-                <section class="p-outer">
+                <section class="p-outer" style="padding-top: 2rem;">
                     <div class="p-inner p-hero">
                         <div class="p-hero-left">
                             <div>
-                                <h1 class="gh-pagehead-title">{{name}}</h1>
+                                <h1 class="gh-pagehead-title" style="margin-top: 0; margin-bottom: 2rem;">{{name}}</h1>
 
                                 {{#if description}}
-                                    <div class="gh-pagehead-description">{{description}}</div>
+                                    <p style="color: #333; font-size: 1.6rem; line-height: 1.6; margin-bottom: 1rem;">{{description}}</p>
                                 {{/if}}
-                                
-                                <div class="p-hero-buttons" style="margin-block-start: 0; margin-bottom: 4rem;">
+
+                                <div class="p-hero-buttons" style="margin-block-start: 0; margin-bottom: 3rem;">
                                     <a href="https://leanpub.com/qc">Buy Ebook</a>
                                     <a href="https://www.amazon.com/dp/B0FGYF6DG6">Buy Paperback or Hardback</a>
                                 </div>
-                                <p class="gh-pagehead-description" style="margin-bottom: 4rem;">Want immediate access to its content? You can sign up for a premium subscription, which provides access to the book's original materials.</p>
+                                
+                                <p style="margin-bottom: 2rem; color: #333; font-size: 1.6rem; line-height: 1.6;">Want immediate access to its content? You can sign up for a premium subscription, which provides access to the book's original materials.</p>
                             </div>
                         </div>
                         
