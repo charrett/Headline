@@ -44,18 +44,12 @@
                                 {{/if}}
                                 
                                 <div class="p-hero-buttons" style="margin-block-start: 0; margin-bottom: 6rem;">
-                                    {{! Launches the yearly signup 
-                                    <button data-portal="signup/yearly">Subscribe to Quality Coach Book</button>}}
-                                    {{! Launches the Ghost membership portal 
-                                    <button data-portal="signup/yearly">Subscribe to Quality Coach Book</button>}}
-                                    {{! Link to a faq page }}
-                                    <a href="https://leanpub.com/qc">Buy Ebook</a> 
-                                    {{!<button data-senja-collector-open="qualitycoachbook" data-project="qualitycoachbook" data-form="uVm11c">Give a Testimonial</button>}}
+                                    <a href="https://leanpub.com/qc">Buy Ebook</a>                                 
                                 </div>
-                                <div class="p-hero-buttons" style="margin-block-start: 0; margin-bottom: 6rem;">
+                                <div class="p-hero-buttons" style="margin-block-start: 0; margin-bottom: 2rem;">
                                     <a href="https://www.amazon.com/dp/B0FGYF6DG6">Buy Paperback or Hardback</a> 
-                                
                                 </div>
+                                <p style="margin-bottom: 4rem;">Want immediate access to its content? You can sign up for a premium subscription, which provides access to the book's original materials.</p>
                             </div>
                         </div>
                         
@@ -70,13 +64,6 @@
             {{/unless}}
         {{/tag}}
 
-        {{!--<div class="gh-topic gh-topic-grid">
-            <div class="gh-topic-content gh-feed">
-                {{#foreach posts limit="all"}}
-                    {{> "loop-grid" has_large_post=false}}
-                {{/foreach}}
-            </div>
-        </div> --}}
         {{#if @custom.enter_tag_slugs_for_secondary_sections}}
             {{#get "tags" filter="slug:[{{@custom.enter_tag_slugs_for_secondary_sections}}]"}}
                 {{#if tags}}
