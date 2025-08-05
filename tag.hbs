@@ -43,8 +43,8 @@
 
         <div class="gh-topic gh-topic-grid">
             <div class="gh-topic-content gh-feed">
-                {{#foreach posts limit="all"}}
-                    {{> "loop-grid" has_large_post=false}}
+                {{#foreach posts}}
+                    {{> "loop-grid"}}
                 {{/foreach}}
             </div>
         </div> 
