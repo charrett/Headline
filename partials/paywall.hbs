@@ -1,0 +1,30 @@
+{{!-- 
+  Pay-per-article paywall matching Ghost's native style
+--}}
+
+{{#unless @member.paid}}
+<div class="gh-post-upgrade-cta">
+    <div class="gh-post-upgrade-cta-content" style="background-color: var(--ghost-accent-color);">
+        <h2>This post is for paying subscribers only</h2>
+        <p>Subscribe to keep reading this post and get full access to all articles.</p>
+        
+        <div class="gh-paywall-buttons">
+            <a class="gh-btn gh-btn-upgrade" href="#/portal/signup" data-portal="signup">Subscribe</a>
+            
+            <a 
+                id="buy-article-btn"
+                class="gh-btn gh-btn-outline buy-article-btn" 
+                href="#"
+                data-post-id="{{id}}"
+                data-post-title="{{title}}"
+                data-post-url="{{url absolute="true"}}">
+                Buy this article for $5
+            </a>
+        </div>
+        
+        <p class="gh-signin-link">
+            Already have an account? <a href="#/portal/signin" data-portal="signin">Sign in</a>
+        </p>
+    </div>
+</div>
+{{/unless}}

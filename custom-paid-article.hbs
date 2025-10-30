@@ -1,0 +1,51 @@
+{{!< default}}
+
+{{#post}}
+<main class="gh-main">
+    <article class="gh-article {{post_class}}">
+
+        <header class="gh-article-header gh-canvas">
+            {{#if primary_tag}}
+                <a class="gh-article-tag" href="{{primary_tag.url}}">{{primary_tag.name}}</a>
+            {{/if}}
+
+            <h1 class="gh-article-title">{{title}}</h1>
+
+            {{> "post-meta"}}
+
+            {{#if custom_excerpt}}
+                <p class="gh-article-excerpt">{{custom_excerpt}}</p>
+            {{/if}}
+
+            {{> "feature-image"}}
+        </header>
+
+        {{!-- Check if user should see paywall --}}
+        {{#unless @member.paid}}
+            <section class="gh-content gh-canvas">
+                {{!-- Show preview excerpt --}}
+                <div class="gh-excerpt-wrapper">
+                    {{excerpt words="300"}}
+                </div>
+                
+                {{!-- Custom paywall matching Ghost's native style --}}
+                {{> "paywall"}}
+            </section>
+        {{else}}
+            {{!-- Paid member sees full content --}}
+            <section class="gh-content gh-canvas">
+                <div class="gh-member-badge">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    Included with your subscription
+                </div>
+                {{content}}
+            </section>
+        {{/unless}}        <section>{{> "comments"}}</section>
+    </article>
+{{/post}}
+
+{{> "related-posts"}}
+
+</main>
