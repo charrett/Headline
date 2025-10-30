@@ -6,15 +6,15 @@
   // Check for purchase success on page load
   const urlParams = new URLSearchParams(window.location.search);
   const purchaseSuccess = urlParams.get('purchase');
-  const sessionId = urlParams.get('session_id');
   
-  if (purchaseSuccess === 'success' && sessionId) {
-    // Get email from session and show success message
-    getSessionEmailAndShowMessage(sessionId);
-    
+  if (purchaseSuccess === 'success') {
     // Clean URL (remove query parameters)
     const cleanUrl = window.location.pathname;
     history.replaceState({}, '', cleanUrl);
+    
+    // Show success message and immediately open sign-in portal
+    showPurchaseSuccessMessage();
+    openSigninPortal();
   }
   
   // Buy article button handler
@@ -46,22 +46,6 @@
       }
     });
   });
-  
-  async function getSessionEmailAndShowMessage(sessionId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/checkout-session/${sessionId}`);
-      const data = await response.json();
-      
-      if (data.email) {
-        showPurchaseSuccessMessage(data.email);
-      } else {
-        showPurchaseSuccessMessage();
-      }
-    } catch (error) {
-      console.error('Error fetching session email:', error);
-      showPurchaseSuccessMessage();
-    }
-  }
   
   async function handleBuyArticle(e) {
     e.preventDefault(); // Prevent default anchor navigation
@@ -102,71 +86,38 @@
     }
   }
   
-  function showPurchaseSuccessMessage(email) {
-    // Create and show success message overlay
+  function showPurchaseSuccessMessage() {
+    // Create success message overlay using CSS classes
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;';
+    overlay.className = 'gh-purchase-success-overlay';
     
     const message = document.createElement('div');
-    message.style.cssText = 'background: white; padding: 40px; border-radius: 8px; max-width: 500px; text-align: center;';
-    
-    const emailText = email ? 
-      `Your purchase is complete! Sign in with <strong>${email}</strong> to access this article.` : 
-      `Your purchase is complete! Sign in to access this article.`;
+    message.className = 'gh-purchase-success-message';
     
     message.innerHTML = `
-      <h2 style="margin: 0 0 16px; font-size: 2.4rem; color: #15171A;">✅ Purchase Complete!</h2>
-      <p style="margin: 0 0 24px; font-size: 1.6rem; line-height: 1.5; color: #738a94;">
-        ${emailText}
-      </p>
-      <button 
-        id="success-signin-btn"
-        style="background: var(--ghost-accent-color); color: white; border: none; padding: 12px 24px; font-size: 1.6rem; font-weight: 600; border-radius: 6px; cursor: pointer; margin-right: 12px;"
-      >
-        Sign In Now
-      </button>
-      <button 
-        onclick="this.parentElement.parentElement.remove()"
-        style="background: transparent; color: #738a94; border: 1px solid #e1e8ed; padding: 12px 24px; font-size: 1.6rem; font-weight: 600; border-radius: 6px; cursor: pointer;"
-      >
-        Close
-      </button>
+      <h2>✅ Purchase Complete!</h2>
+      <p>Your member account has been created. Please sign in to access this article.</p>
+      <p>Opening sign-in portal...</p>
     `;
     
     overlay.appendChild(message);
     document.body.appendChild(overlay);
     
-    // Add sign-in button handler
-    const signinBtn = overlay.querySelector('#success-signin-btn');
-    if (signinBtn) {
-      signinBtn.addEventListener('click', function() {
-        overlay.remove();
-        openSigninPortal();
-      });
-    }
+    // Auto-close after portal opens
+    setTimeout(() => {
+      overlay.remove();
+    }, 3000);
   }
   
   function openSigninPortal() {
-    console.log('openSigninPortal called');
-    const tryOpen = () => {
-      console.log('Checking for GhostMembers:', !!window.GhostMembers);
-      if (window.GhostMembers) {
-        console.log('Opening Ghost portal...');
-        window.GhostMembers.openPortal('signin');
-        // Reload page after successful sign-in to show purchased content
-        window.addEventListener('message', function(event) {
-          console.log('Received message:', event.data);
-          if (event.data && event.data.type === 'member-signin-success') {
-            console.log('Sign-in successful, reloading...');
-            window.location.reload();
-          }
-        });
-      } else {
-        // Ghost Members not loaded yet, wait 100ms and retry
-        console.log('Ghost Members not available yet, retrying in 100ms...');
-        setTimeout(tryOpen, 100);
-      }
-    };
-    tryOpen();
+    // Find existing signin link and click it - Ghost's script handles the rest
+    const signinLink = document.querySelector('[data-portal="signin"]');
+    
+    if (signinLink) {
+      console.log('Opening Ghost signin portal...');
+      signinLink.click();
+    } else {
+      console.error('No signin link found - Ghost portal may not be configured');
+    }
   }
 })();

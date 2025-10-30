@@ -147,3 +147,44 @@
         width: 100%;
     }
 }
+
+/* Purchase success modal */
+.gh-purchase-success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.gh-purchase-success-message {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    max-width: 500px;
+    text-align: center;
+}
+
+.gh-purchase-success-message h2 {
+    margin: 0 0 16px;
+    font-size: 2.4rem;
+    color: #15171A;
+}
+
+.gh-purchase-success-message p {
+    margin: 0 0 24px;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    color: #738a94;
+}
+
+.gh-purchase-success-message p:last-child {
+    margin: 0;
+    font-size: 1.4rem;
+}
