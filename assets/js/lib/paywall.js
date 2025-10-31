@@ -207,15 +207,21 @@
         // Show the full content
         const fullContent = document.querySelector('.gh-full-content');
         if (fullContent && data.content) {
-          // Inject the full HTML content from API
-          fullContent.innerHTML = data.content;
+          // Sanitize HTML content to prevent XSS attacks
+          // DOMPurify removes malicious scripts while keeping safe HTML
+          const cleanContent = window.DOMPurify ? 
+            window.DOMPurify.sanitize(data.content) : 
+            data.content; // Fallback if DOMPurify not loaded
+          
+          // Inject the sanitized HTML content from API
+          fullContent.innerHTML = cleanContent;
           
           // Ensure proper Ghost content classes are applied to child elements
           // Ghost wraps content sections - make sure injected HTML inherits styling
           fullContent.classList.add('gh-content');
           fullContent.style.display = 'block';
           
-          console.log('✅ Full article content displayed');
+          console.log('✅ Full article content displayed' + (window.DOMPurify ? ' (sanitized)' : ''));
         } else if (fullContent) {
           // Fallback: show what we have and remove Ghost's paywall
           fullContent.style.display = 'block';

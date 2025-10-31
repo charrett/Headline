@@ -56,6 +56,11 @@ function getJsFiles(version) {
         src(`node_modules/@tryghost/shared-theme-assets/assets/js/${version}/main.js`),
     ];
 
+    // Include DOMPurify for XSS protection
+    if (fs.existsSync('node_modules/dompurify/dist/purify.min.js')) {
+        jsFiles.push(src('node_modules/dompurify/dist/purify.min.js'));
+    }
+
     if (fs.existsSync(`assets/js/lib`)) {
         jsFiles.push(src(`assets/js/lib/*.js`));
     }
