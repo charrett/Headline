@@ -1,8 +1,8 @@
 {{!-- 
   Pay-per-article paywall matching Ghost's native style
+  Note: Parent template handles @member.paid check, this partial is only rendered when needed
 --}}
 
-{{#unless @member.paid}}
 <div class="gh-post-upgrade-cta">
     <div class="gh-post-upgrade-cta-content" style="background-color: var(--ghost-accent-color);">
         <h2>This post is for paying subscribers only</h2>
@@ -31,4 +31,3 @@
         </p>
     </div>
 </div>
-{{/unless}}

@@ -20,29 +20,30 @@
             {{> "feature-image"}}
         </header>
 
-        {{!-- Check if user should see paywall --}}
-        {{#unless @member.paid}}
+        {{!-- Paid subscribers get full content --}}
+        {{#if @member.paid}}
             <section class="gh-content gh-canvas">
-                {{!-- Show preview excerpt --}}
+                {{{content}}}
+            </section>
+        {{else}}
+            {{!-- Free members: show excerpt + custom paywall --}}
+            {{!-- JS will check for per-article purchase and show full content if verified --}}
+            <section class="gh-content gh-canvas">
+                {{!-- Preview excerpt --}}
                 <div class="gh-excerpt-wrapper">
                     {{excerpt words="300"}}
                 </div>
                 
-                {{!-- Custom paywall matching Ghost's native style --}}
+                {{!-- Custom paywall (hidden by JS if member purchased) --}}
                 {{> "paywall"}}
-            </section>
-        {{else}}
-            {{!-- Paid member sees full content --}}
-            <section class="gh-content gh-canvas">
-                <div class="gh-member-badge">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
-                        <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                    </svg>
-                    Included with your subscription
+                
+                {{!-- Full content (hidden by default, shown by JS if purchased) --}}
+                {{!-- Ghost's injected paywall will be removed by JS --}}
+                <div class="gh-full-content" style="display: none;">
+                    {{{content}}}
                 </div>
-                {{content}}
             </section>
-        {{/unless}}        <section>{{> "comments"}}</section>
+        {{/if}}        <section>{{> "comments"}}</section>
     </article>
 {{/post}}
 

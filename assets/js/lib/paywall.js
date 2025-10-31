@@ -12,17 +12,28 @@
     const cleanUrl = window.location.pathname;
     history.replaceState({}, '', cleanUrl);
     
-    // Check if user is signed in by looking for member cookie
-    const isSignedIn = document.cookie.includes('ghost-members-ssr');
+    // Check if user is signed in - multiple methods for reliability
+    const hasMemberCookie = document.cookie.includes('ghost-members-ssr');
+    const buyBtn = document.getElementById('buy-article-btn');
+    const hasMemberEmail = buyBtn && buyBtn.dataset.memberEmail;
+    const isSignedIn = hasMemberCookie || hasMemberEmail;
     
-    // Show success message
-    showPurchaseSuccessMessage(isSignedIn);
+    console.log('Purchase success - signed in:', isSignedIn);
     
-    // Only open signin portal if user is NOT already signed in
-    if (!isSignedIn) {
+    if (isSignedIn) {
+      // User already signed in - just reload to show purchased content
+      console.log('Reloading for signed-in user');
+      window.location.reload();
+    } else {
+      // User is anonymous - show message and open signin portal  
+      console.log('Opening signin portal for anonymous user');
+      showPurchaseSuccessMessage();
       openSigninPortal();
     }
   }
+  
+  // For free members who purchased this article: check database and hide paywall
+  checkArticleAccess();
   
   // Buy article button handler
   const buyBtn = document.getElementById('buy-article-btn');
@@ -105,42 +116,27 @@
     }
   }
   
-  function showPurchaseSuccessMessage(isSignedIn) {
-    // Create success message overlay using CSS classes
+  function showPurchaseSuccessMessage() {
+    // Create success message overlay for anonymous users
     const overlay = document.createElement('div');
     overlay.className = 'gh-purchase-success-overlay';
     
     const message = document.createElement('div');
     message.className = 'gh-purchase-success-message';
     
-    if (isSignedIn) {
-      // User is already signed in - just needs to reload to see content
-      message.innerHTML = `
-        <h2>✅ Purchase Complete!</h2>
-        <p>Thank you for your purchase! You now have access to this article.</p>
-        <button class="gh-btn gh-primary-btn" onclick="window.location.reload()">View Article</button>
-      `;
-      
-      // Auto-reload after 3 seconds
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
-    } else {
-      // User is anonymous - needs to sign in
-      message.innerHTML = `
-        <h2>✅ Purchase Complete!</h2>
-        <p>Your member account has been created. Please sign in to access this article.</p>
-        <p>Opening sign-in portal...</p>
-      `;
-      
-      // Auto-close after portal opens
-      setTimeout(() => {
-        overlay.remove();
-      }, 3000);
-    }
+    message.innerHTML = `
+      <h2>✅ Purchase Complete!</h2>
+      <p>Your member account has been created. Please sign in to access this article.</p>
+      <p>Opening sign-in portal...</p>
+    `;
     
     overlay.appendChild(message);
     document.body.appendChild(overlay);
+    
+    // Auto-close after portal opens
+    setTimeout(() => {
+      overlay.remove();
+    }, 3000);
   }
   
   function openSigninPortal() {
@@ -152,6 +148,90 @@
       signinLink.click();
     } else {
       console.error('No signin link found - Ghost portal may not be configured');
+    }
+  }
+  
+  /**
+   * Check if free member has purchased this specific article
+   * If yes, hide paywall and show full content
+   */
+  async function checkArticleAccess() {
+    // Only run if there's a paywall visible (meaning user is not a paid subscriber)
+    const paywall = document.querySelector('.gh-post-upgrade-cta');
+    if (!paywall) {
+      return; // No paywall = paid subscriber or public post, nothing to check
+    }
+    
+    // Get member email from buy button (only present if signed in)
+    const buyBtn = document.getElementById('buy-article-btn');
+    if (!buyBtn) {
+      return; // No buy button = something's wrong, bail out
+    }
+    
+    const memberEmail = buyBtn.dataset.memberEmail;
+    if (!memberEmail) {
+      return; // Not signed in, can't check access
+    }
+    
+    // Get post ID
+    const postId = buyBtn.dataset.postId;
+    if (!postId) {
+      return;
+    }
+    
+    try {
+      // Check if this member has access to this article
+      // Request full content to be included in response
+      const response = await fetch(`${API_BASE_URL}/verify-access`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          postId, 
+          memberEmail,
+          includeContent: true // Request full HTML content
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.hasAccess) {
+        console.log('✅ Free member has access to this article - showing full content');
+        
+        // Hide the excerpt and paywall
+        const excerptWrapper = document.querySelector('.gh-excerpt-wrapper');
+        if (excerptWrapper) {
+          excerptWrapper.style.display = 'none';
+        }
+        paywall.style.display = 'none';
+        
+        // Show the full content
+        const fullContent = document.querySelector('.gh-full-content');
+        if (fullContent && data.content) {
+          // Inject the full HTML content from API
+          fullContent.innerHTML = data.content;
+          
+          // Ensure proper Ghost content classes are applied to child elements
+          // Ghost wraps content sections - make sure injected HTML inherits styling
+          fullContent.classList.add('gh-content');
+          fullContent.style.display = 'block';
+          
+          console.log('✅ Full article content displayed');
+        } else if (fullContent) {
+          // Fallback: show what we have and remove Ghost's paywall
+          fullContent.style.display = 'block';
+          
+          const ghostPaywall = fullContent.querySelector('.gh-post-upgrade-cta');
+          if (ghostPaywall) {
+            console.log('🗑️ Removing Ghost\'s injected paywall from content');
+            ghostPaywall.remove();
+          }
+          
+          console.log('✅ Full article content displayed (fallback)');
+        }
+      }
+    } catch (error) {
+      console.error('Error checking article access:', error);
+      // Fail gracefully - leave paywall visible on error
     }
   }
 })();
