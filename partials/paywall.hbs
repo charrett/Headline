@@ -17,7 +17,11 @@
                 href="#"
                 data-post-id="{{id}}"
                 data-post-title="{{title}}"
-                data-post-url="{{url absolute="true"}}">
+                data-post-url="{{url absolute="true"}}"
+                {{#if @member}}
+                data-member-email="{{@member.email}}"
+                data-member-name="{{@member.name}}"
+                {{/if}}>
                 Buy this article for $5
             </a>
         </div>
