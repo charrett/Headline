@@ -20,12 +20,43 @@
     ? 'http://localhost:4000/api'
     : 'https://ppa.fly.dev/api';
 
-  log('🎯 PPA: Initialized');
+  log('🎯 PPA: Script loaded');
 
-  // Initialize on page load
-  init();
+  // Wait for DOM to be ready AND give Code Injection scripts time to run
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      // Small delay to ensure Code Injection scripts have executed
+      setTimeout(init, 100);
+    });
+  } else {
+    // DOM already loaded, still give a moment for Code Injection
+    setTimeout(init, 100);
+  }
 
   function init() {
+    log('🎯 PPA: Initialized');
+    // FEATURE FLAG - Check if PPA is enabled globally
+    // Set window.PPA_ENABLED = true in Ghost Admin > Settings > Code Injection > Site Header
+    // to enable PPA feature without redeploying theme
+    // OR set window.PPA_ENABLED = 'check-post-id' and window.PPA_TEST_POST_ID to test on one post
+    
+    let PPA_ENABLED = false;
+    
+    if (window.PPA_ENABLED === true) {
+      PPA_ENABLED = true;
+      log('🎯 PPA: Feature enabled globally');
+    } else if (window.PPA_ENABLED === 'check-post-id' && window.PPA_TEST_POST_ID) {
+      const currentPostId = document.querySelector('article[data-post-id]')?.dataset.postId;
+      PPA_ENABLED = (currentPostId === window.PPA_TEST_POST_ID);
+      log('🎯 PPA: Checking post ID:', currentPostId, '===', window.PPA_TEST_POST_ID, '?', PPA_ENABLED);
+    } else {
+      log('🎯 PPA: Feature disabled globally (set window.PPA_ENABLED = true to enable)');
+    }
+    
+    if (!PPA_ENABLED) {
+      return; // Exit early if PPA is not enabled
+    }
+    
     // Handle return from Stripe checkout
     if (window.location.search.includes('purchase=success')) {
       log('🎯 PPA: Purchase successful, reloading to check access');
