@@ -2,7 +2,12 @@
 
 <main class="gh-main">
     {{#post}}
-        <article class="gh-article {{post_class}}">
+        <article class="gh-article {{post_class}}" 
+                 data-post-id="{{id}}" 
+                 data-post-title="{{title}}" 
+                 data-post-url="{{url absolute="true"}}" 
+                 data-member-email="{{@member.email}}" 
+                 data-member-name="{{@member.name}}">
 
             <header class="gh-article-header gh-canvas">
                 {{#if primary_tag}}

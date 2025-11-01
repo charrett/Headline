@@ -2,6 +2,34 @@
 @import "fonts.css";
 @import "home.css";
 
+/* Pay-per-article paywall styling */
+.gh-post-upgrade-cta {
+    padding: 60px 0;
+    text-align: center;
+}
+
+.gh-post-upgrade-cta-content {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px;
+    background: #f6f6f6;
+    border-radius: 8px;
+}
+
+.gh-post-upgrade-cta h2 {
+    margin: 0 0 12px;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--color-darkgrey);
+}
+
+.gh-post-upgrade-cta p {
+    margin: 0 0 24px;
+    font-size: 1.7rem;
+    line-height: 1.5;
+    color: var(--color-midgrey);
+}
+
 :root {
     --font-sans: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif; /* stylelint-disable-line value-keyword-case */
     --font-serif: Lora, Georgia, Times, serif; /* stylelint-disable-line value-keyword-case */
@@ -891,5 +919,67 @@ body:not(.home-template) .gh-topic-grid .gh-card {
     .gh-article-meta {
         margin-top: -6px;
         line-height: 1;
+    }
+}
+
+/* Pay-per-article paywall */
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding: 60px 0;
+}
+
+.gh-post-upgrade-cta-content {
+    background: var(--ghost-accent-color);
+    border-radius: 8px;
+    padding: 40px;
+    max-width: 640px;
+    width: 100%;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: var(--color-white);
+    font-size: 2.8rem;
+    letter-spacing: -0.02em;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+    color: var(--color-white);
+    font-size: 1.7rem;
+    line-height: 1.5;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    margin-top: 8px;
+    background: var(--color-white);
+    color: var(--ghost-accent-color);
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 767px) {
+    .gh-post-upgrade-cta {
+        padding: 40px 0;
+    }
+    
+    .gh-post-upgrade-cta-content {
+        padding: 32px 24px;
+    }
+    
+    .gh-post-upgrade-cta h2 {
+        font-size: 2.4rem;
+    }
+    
+    .gh-post-upgrade-cta p {
+        font-size: 1.6rem;
     }
 }
