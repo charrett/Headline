@@ -5,12 +5,22 @@
 (function() {
   'use strict';
   
+  // DEBUG MODE - Auto-detect or force with ?ppa_debug=true in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const DEBUG = urlParams.get('ppa_debug') === 'true' || 
+                window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1';
+  
+  // Debug logger - only logs when DEBUG is true
+  const log = (...args) => DEBUG && console.log(...args);
+  const logError = (...args) => DEBUG && console.error(...args);
+  
   // API URL - auto-detect environment
   const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:4000/api'
     : 'https://ppa.fly.dev/api';
 
-  console.log('🎯 PPA: Initialized');
+  log('🎯 PPA: Initialized');
 
   // Initialize on page load
   init();
@@ -18,7 +28,7 @@
   function init() {
     // Handle return from Stripe checkout
     if (window.location.search.includes('purchase=success')) {
-      console.log('🎯 PPA: Purchase successful, reloading to check access');
+      log('🎯 PPA: Purchase successful, reloading to check access');
       history.replaceState({}, '', window.location.pathname);
       window.location.reload();
       return;
@@ -27,14 +37,14 @@
     // Find Ghost's native paywall
     const ghostPaywall = document.querySelector('.gh-post-upgrade-cta');
     if (!ghostPaywall) {
-      console.log('🎯 PPA: No paywall found (public post or paid member)');
+      log('🎯 PPA: No paywall found (public post or paid member)');
       return; // No paywall = public post or paid member
     }
 
     // Get article metadata
     const article = document.querySelector('article[data-post-id]');
     if (!article) {
-      console.log('🎯 PPA: No article metadata found');
+      log('🎯 PPA: No article metadata found');
       return;
     }
 
@@ -42,13 +52,13 @@
 
     if (!memberEmail) {
       // Anonymous user - customize Ghost's paywall message
-      console.log('🎯 PPA: Anonymous user - customizing paywall');
+      log('🎯 PPA: Anonymous user - customizing paywall');
       customizeAnonymousPaywall(ghostPaywall);
       return;
     }
 
     // Free member - check if they purchased this article
-    console.log('🎯 PPA: Free member detected - checking purchase status');
+    log('🎯 PPA: Free member detected - checking purchase status');
     checkPurchaseAndSwapPaywall(ghostPaywall, article);
   }
 
@@ -70,7 +80,7 @@
       subscribeBtn.textContent = 'Sign up free';
     }
 
-    console.log('🎯 PPA: Anonymous paywall customized');
+    log('🎯 PPA: Anonymous paywall customized');
   }
 
   async function checkPurchaseAndSwapPaywall(ghostPaywall, article) {
@@ -79,7 +89,7 @@
 
     try {
       // Step 1: Verify access and get token
-      console.log('🎯 PPA: Step 1 - Verifying access');
+      log('🎯 PPA: Step 1 - Verifying access');
       const verifyResponse = await fetch(`${API_URL}/verify-access`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,39 +102,39 @@
       const verifyData = await verifyResponse.json();
 
       if (!verifyData.hasAccess) {
-        console.log('🎯 PPA: No access - showing buy option');
+        log('🎯 PPA: No access - showing buy option');
         showBuyOption(ghostPaywall, article);
         return;
       }
 
       if (!verifyData.accessToken) {
-        console.error('🎯 PPA: Access granted but no token received');
+        logError('🎯 PPA: Access granted but no token received');
         showBuyOption(ghostPaywall, article);
         return;
       }
 
-      console.log('🎯 PPA: Access verified, token received');
+      log('🎯 PPA: Access verified, token received');
 
       // Step 2: Fetch content with token
-      console.log('🎯 PPA: Step 2 - Fetching content with token');
+      log('🎯 PPA: Step 2 - Fetching content with token');
       const contentResponse = await fetch(
         `${API_URL}/get-content/${postId}?token=${verifyData.accessToken}`
       );
 
       if (!contentResponse.ok) {
         const errorData = await contentResponse.json();
-        console.error('🎯 PPA: Content fetch failed:', errorData);
+        logError('🎯 PPA: Content fetch failed:', errorData);
         
         // Handle specific error cases
         if (contentResponse.status === 403) {
           if (errorData.reason === 'expired') {
-            console.error('🎯 PPA: Token expired, please refresh');
+            logError('🎯 PPA: Token expired, please refresh');
             alert('Session expired. Please refresh the page.');
           } else if (errorData.reason === 'invalid_signature') {
-            console.error('🎯 PPA: Invalid token signature');
+            logError('🎯 PPA: Invalid token signature');
           }
         } else if (contentResponse.status === 429) {
-          console.error('🎯 PPA: Rate limit exceeded');
+          logError('🎯 PPA: Rate limit exceeded');
           alert('Too many requests. Please wait a moment and refresh.');
         }
         
@@ -135,7 +145,7 @@
       const contentData = await contentResponse.json();
 
       if (contentData.html) {
-        console.log('🎯 PPA: Access granted - removing paywall and showing content');
+        log('🎯 PPA: Access granted - removing paywall and showing content');
         
         // Remove the paywall
         ghostPaywall.remove();
@@ -144,22 +154,22 @@
         const contentDiv = document.querySelector('.gh-content');
         if (contentDiv) {
           contentDiv.innerHTML = contentData.html;
-          console.log('🎯 PPA: Full content injected');
+          log('🎯 PPA: Full content injected');
         }
       } else {
-        console.error('🎯 PPA: No content in response');
+        logError('🎯 PPA: No content in response');
         showBuyOption(ghostPaywall, article);
       }
 
     } catch (error) {
-      console.error('🎯 PPA: Access check failed:', error);
+      logError('🎯 PPA: Access check failed:', error);
       // On error, fall through to show buy button
       showBuyOption(ghostPaywall, article);
     }
   }
 
   function showBuyOption(ghostPaywall, article) {
-    console.log('🎯 PPA: Replacing Ghost paywall with buy option');
+    log('🎯 PPA: Replacing Ghost paywall with buy option');
     
     // Replace Ghost's paywall content
     ghostPaywall.innerHTML = `
@@ -196,7 +206,7 @@
     e.preventDefault();
     const btn = e.currentTarget;
 
-    console.log('🎯 PPA: Buy button clicked');
+    log('🎯 PPA: Buy button clicked');
     
     btn.disabled = true;
     btn.textContent = 'Loading...';
@@ -215,20 +225,20 @@
       });
 
       const data = await response.json();
-      console.log('🎯 PPA: API response:', response.status, data);
+      log('🎯 PPA: API response:', response.status, data);
 
       if (!response.ok) {
         throw new Error(data.error || data.message || 'API request failed');
       }
 
       if (data.checkoutUrl) {
-        console.log('🎯 PPA: Redirecting to Stripe checkout');
+        log('🎯 PPA: Redirecting to Stripe checkout');
         window.location.href = data.checkoutUrl;
       } else {
         throw new Error('No checkout URL received');
       }
     } catch (error) {
-      console.error('🎯 PPA: Checkout creation failed:', error);
+      logError('🎯 PPA: Checkout creation failed:', error);
       alert('Failed to create checkout. Please try again.');
       btn.disabled = false;
       btn.textContent = 'Buy this article for $5';
