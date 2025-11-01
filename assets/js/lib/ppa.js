@@ -1,5 +1,7 @@
-// PPA (Pay-Per-Article) - Simplified Implementation
-// Strategy: Let Ghost handle everything, just swap the paywall for free members
+// PPA (Pay-Per-Article) - Secure Token-Based Implementation
+// Strategy: Two-step content access flow
+// 1. Verify purchase and receive time-limited access token
+// 2. Fetch content with token (prevents exposure in network logs)
 (function() {
   'use strict';
   
@@ -76,45 +78,84 @@
     const memberEmail = article.dataset.memberEmail;
 
     try {
-      // Check if member purchased this article
-      const response = await fetch(`${API_URL}/verify-access`, {
+      // Step 1: Verify access and get token
+      console.log('🎯 PPA: Step 1 - Verifying access');
+      const verifyResponse = await fetch(`${API_URL}/verify-access`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           postId, 
-          memberEmail,
-          includeContent: true 
+          memberEmail
         })
       });
 
-      const data = await response.json();
+      const verifyData = await verifyResponse.json();
 
-      if (data.hasAccess) {
+      if (!verifyData.hasAccess) {
+        console.log('🎯 PPA: No access - showing buy option');
+        showBuyOption(ghostPaywall, article);
+        return;
+      }
+
+      if (!verifyData.accessToken) {
+        console.error('🎯 PPA: Access granted but no token received');
+        showBuyOption(ghostPaywall, article);
+        return;
+      }
+
+      console.log('🎯 PPA: Access verified, token received');
+
+      // Step 2: Fetch content with token
+      console.log('🎯 PPA: Step 2 - Fetching content with token');
+      const contentResponse = await fetch(
+        `${API_URL}/get-content/${postId}?token=${verifyData.accessToken}`
+      );
+
+      if (!contentResponse.ok) {
+        const errorData = await contentResponse.json();
+        console.error('🎯 PPA: Content fetch failed:', errorData);
+        
+        // Handle specific error cases
+        if (contentResponse.status === 403) {
+          if (errorData.reason === 'expired') {
+            console.error('🎯 PPA: Token expired, please refresh');
+            alert('Session expired. Please refresh the page.');
+          } else if (errorData.reason === 'invalid_signature') {
+            console.error('🎯 PPA: Invalid token signature');
+          }
+        } else if (contentResponse.status === 429) {
+          console.error('🎯 PPA: Rate limit exceeded');
+          alert('Too many requests. Please wait a moment and refresh.');
+        }
+        
+        showBuyOption(ghostPaywall, article);
+        return;
+      }
+
+      const contentData = await contentResponse.json();
+
+      if (contentData.html) {
         console.log('🎯 PPA: Access granted - removing paywall and showing content');
         
         // Remove the paywall
         ghostPaywall.remove();
         
-        // If we have full content, inject it
-        if (data.content) {
-          const contentDiv = document.querySelector('.gh-content');
-          if (contentDiv) {
-            contentDiv.innerHTML = data.content;
-            console.log('🎯 PPA: Full content injected');
-          }
+        // Inject full content
+        const contentDiv = document.querySelector('.gh-content');
+        if (contentDiv) {
+          contentDiv.innerHTML = contentData.html;
+          console.log('🎯 PPA: Full content injected');
         }
-        
-        return;
+      } else {
+        console.error('🎯 PPA: No content in response');
+        showBuyOption(ghostPaywall, article);
       }
 
-      console.log('🎯 PPA: No access - showing buy option');
     } catch (error) {
       console.error('🎯 PPA: Access check failed:', error);
       // On error, fall through to show buy button
+      showBuyOption(ghostPaywall, article);
     }
-
-    // Not purchased - swap Ghost's paywall for our buy option
-    showBuyOption(ghostPaywall, article);
   }
 
   function showBuyOption(ghostPaywall, article) {
