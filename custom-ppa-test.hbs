@@ -1,0 +1,41 @@
+{{!< default}}
+{{!-- 
+  Template: PPA Test
+  Use this template to test pay-per-article on individual posts
+  Apply to posts via Settings > Template dropdown
+--}}
+
+<main class="gh-main">
+    {{#post}}
+        <article class="gh-article {{post_class}}" 
+                 data-post-id="{{id}}" 
+                 data-post-title="{{title}}" 
+                 data-post-url="{{url absolute="true"}}" 
+                 data-member-email="{{@member.email}}" 
+                 data-member-name="{{@member.name}}">
+
+            <header class="gh-article-header gh-canvas">
+                {{#if primary_tag}}
+                    <a class="gh-article-tag" href="{{primary_tag.url}}">{{primary_tag.name}}</a>
+                {{/if}}
+
+                <h1 class="gh-article-title">{{title}}</h1>
+
+                {{> "post-meta"}}
+
+                {{#if custom_excerpt}}
+                    <p class="gh-article-excerpt">{{custom_excerpt}}</p>
+                {{/if}}
+
+                {{> "feature-image"}}
+            </header>
+
+            <section class="gh-content gh-canvas">
+                {{content}}
+            </section>
+            <section>{{> "comments"}}</section>
+        </article>
+    {{/post}}
+
+    {{> "related-posts"}}
+</main>
