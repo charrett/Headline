@@ -1,27 +1,26 @@
-/* Pay-per-article paywall - matches Ghost's native style */
+/* Pay-per-article paywall - Simplified MVP version (Nov 1, 2025) */
 
-/* Match Ghost's native paywall structure */
-.gh-post-upgrade-cta-content,
 .gh-post-upgrade-cta {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     text-align: center;
     width: 100%;
-    color: #ffffff;
-    font-size: 16px;
+    padding: 60px 0;
 }
 
 .gh-post-upgrade-cta-content {
+    background: var(--ghost-accent-color);
     border-radius: 8px;
-    padding: 40px 4vw;
+    padding: 40px;
+    max-width: 640px;
+    width: 100%;
 }
 
 .gh-post-upgrade-cta h2 {
-    color: #ffffff;
-    font-size: 28px;
-    letter-spacing: -0.2px;
+    color: var(--color-white);
+    font-size: 2.8rem;
+    letter-spacing: -0.02em;
     margin: 0;
     padding: 0;
 }
@@ -29,162 +28,35 @@
 .gh-post-upgrade-cta p {
     margin: 20px 0 0;
     padding: 0;
-    color: #ffffff;
-}
-
-.gh-post-upgrade-cta small {
-    font-size: 16px;
-    letter-spacing: -0.2px;
-}
-
-.gh-post-upgrade-cta a {
-    color: #ffffff;
-    cursor: pointer;
-    font-weight: 500;
-    box-shadow: none;
-    text-decoration: none;
-}
-
-.gh-post-upgrade-cta a:hover {
-    color: #ffffff;
-    opacity: 0.8;
-    box-shadow: none;
-    text-decoration: none;
-}
-
-/* Button container for side-by-side layout */
-.gh-paywall-buttons {
-    display: flex;
-    gap: 16px;
-    margin-top: 28px;
-    width: 100%;
-    max-width: 500px;
-    flex-wrap: wrap;
-    justify-content: center;
+    color: var(--color-white);
+    font-size: 1.7rem;
+    line-height: 1.5;
 }
 
 .gh-post-upgrade-cta a.gh-btn {
-    flex: 1;
-    min-width: 200px;
-    background: #ffffff;
-    text-decoration: none;
-    margin: 0;
-    padding: 12px 24px;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #ff6600;
+    margin-top: 8px;
+    background: var(--color-white);
+    color: var(--ghost-accent-color);
 }
 
 .gh-post-upgrade-cta a.gh-btn:hover {
-    opacity: 0.92;
-    color: #ff6600;
+    background: rgba(255, 255, 255, 0.9);
 }
 
-/* Outline button for "Buy Article" */
-.gh-post-upgrade-cta a.gh-btn-outline {
-    background: transparent;
-    border: 2px solid #ffffff;
-    color: #ff6600;
-}
-
-.gh-post-upgrade-cta a.gh-btn-outline:hover {
-    background: #ffffff;
-    color: #ff6600;
-}
-
-/* Divider between options - hidden when buttons are side by side */
-.gh-paywall-divider {
-    display: none;
-}
-
-/* Sign in link */
-.gh-signin-link {
-    font-size: 14px;
-    margin-top: 20px;
-    color: #ffffff;
-}
-
-.gh-signin-link a {
-    font-weight: 600;
-    color: #ffffff;
-    text-decoration: none;
-}
-
-/* Member badge for paid subscribers */
-.gh-member-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: var(--ghost-accent-color);
-    color: #fff;
-    border-radius: 6px;
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 32px;
-}
-
-.gh-member-badge svg {
-    flex-shrink: 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
+    .gh-post-upgrade-cta {
+        padding: 40px 0;
+    }
+    
     .gh-post-upgrade-cta-content {
         padding: 32px 24px;
     }
     
     .gh-post-upgrade-cta h2 {
-        font-size: 24px;
+        font-size: 2.4rem;
     }
     
-    .gh-paywall-buttons {
-        flex-direction: column;
+    .gh-post-upgrade-cta p {
+        font-size: 1.6rem;
     }
-    
-    .gh-post-upgrade-cta a.gh-btn {
-        width: 100%;
-    }
-}
-
-/* Purchase success modal */
-.gh-purchase-success-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.gh-purchase-success-message {
-    background: white;
-    padding: 40px;
-    border-radius: 8px;
-    max-width: 500px;
-    text-align: center;
-}
-
-.gh-purchase-success-message h2 {
-    margin: 0 0 16px;
-    font-size: 2.4rem;
-    color: #15171A;
-}
-
-.gh-purchase-success-message p {
-    margin: 0 0 24px;
-    font-size: 1.6rem;
-    line-height: 1.5;
-    color: #738a94;
-}
-
-.gh-purchase-success-message p:last-child {
-    margin: 0;
-    font-size: 1.4rem;
 }
