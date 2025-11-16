@@ -1,0 +1,98 @@
+{{!-- Quality Coach AI Assistant Widget - Only shown to paid members --}}
+{{#if @member.paid}}
+    {{!-- PAID MEMBERS: Show full widget --}}
+    <aside class="quality-coach-section gh-canvas">
+        <div class="quality-coach-header">
+            <div class="quality-coach-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="quality-coach-info">
+                <h3 class="quality-coach-title">Quality Coach AI Assistant</h3>
+                <p class="quality-coach-subtitle">Ask me about coaching, quality, and systems thinking</p>
+            </div>
+        </div>
+        
+        <div class="quality-coach-widget-container">
+            <iframe 
+                id="quality-coach-iframe"
+                src="https://YOUR-CHAT-DOMAIN.com"
+                width="100%" 
+                height="600px"
+                frameborder="0"
+                title="Quality Coach AI Assistant"
+                allow="clipboard-write"
+                loading="lazy"
+                data-post-context="{{slug}}"
+                data-post-title="{{title}}">
+            </iframe>
+        </div>
+        
+        <div class="quality-coach-footer">
+            <p class="quality-coach-note">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                Powered by "The Quality Coach's Handbook" • Your conversations are private
+            </p>
+        </div>
+    </aside>
+
+    <script>
+    // Pass post context to the chat widget
+    (function() {
+        const iframe = document.getElementById('quality-coach-iframe');
+        if (iframe) {
+            // Add post context to iframe URL when it loads
+            iframe.addEventListener('load', function() {
+                const postContext = {
+                    slug: '{{slug}}',
+                    title: '{{title}}',
+                    tags: [{{#foreach tags}}'{{name}}'{{#unless @last}},{{/unless}}{{/foreach}}],
+                    memberEmail: '{{@member.email}}',
+                    memberName: '{{@member.name}}'
+                };
+                
+                // Send context to iframe
+                iframe.contentWindow.postMessage({
+                    type: 'POST_CONTEXT',
+                    data: postContext
+                }, '*');
+            });
+        }
+        
+        // Track widget engagement
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'quality_coach_view', {
+                'post_slug': '{{slug}}',
+                'post_title': '{{title}}'
+            });
+        }
+    })();
+    </script>
+{{else}}
+    {{!-- NON-PAID MEMBERS & VISITORS: Show upgrade CTA --}}
+    <aside class="quality-coach-cta gh-canvas">
+        <div class="quality-coach-cta-content">
+            <div class="quality-coach-cta-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h3 class="quality-coach-cta-title">Quality Coach AI Assistant</h3>
+            <p class="quality-coach-cta-description">Get instant answers from "The Quality Coach's Handbook" with our AI assistant. Ask questions about coaching, quality, and systems thinking.</p>
+            <a href="#/portal/signup" class="quality-coach-cta-button gh-btn gh-primary-btn" data-portal="signup">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/>
+                </svg>
+                Upgrade to Access AI Assistant
+            </a>
+        </div>
+    </aside>
+{{/if}}

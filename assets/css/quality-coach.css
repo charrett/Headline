@@ -1,0 +1,166 @@
+/* Quality Coach AI Widget Styles */
+
+.quality-coach-section {
+    margin: 4rem auto 3rem;
+    padding: 0;
+    max-width: 100%;
+}
+
+.quality-coach-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 12px 12px 0 0;
+    border: 1px solid #0ea5e9;
+    border-bottom: none;
+}
+
+.quality-coach-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.quality-coach-icon svg {
+    color: white;
+}
+
+.quality-coach-info {
+    flex: 1;
+}
+
+.quality-coach-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0c4a6e;
+    margin: 0 0 0.25rem 0;
+}
+
+.quality-coach-subtitle {
+    font-size: 0.95rem;
+    color: #475569;
+    margin: 0;
+}
+
+.quality-coach-widget-container {
+    border-radius: 0;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-bottom: none;
+    background: #ffffff;
+}
+
+.quality-coach-widget-container iframe {
+    display: block;
+    width: 100%;
+    min-height: 600px;
+    border: none;
+}
+
+.quality-coach-footer {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+}
+
+.quality-coach-note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.quality-coach-note svg {
+    flex-shrink: 0;
+    color: #94a3b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .quality-coach-section {
+        margin: 2rem auto 2rem;
+    }
+    
+    .quality-coach-header {
+        padding: 1rem;
+    }
+    
+    .quality-coach-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .quality-coach-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .quality-coach-title {
+        font-size: 1.1rem;
+    }
+    
+    .quality-coach-subtitle {
+        font-size: 0.875rem;
+    }
+    
+    .quality-coach-widget-container iframe {
+        min-height: 500px;
+    }
+    
+    .quality-coach-footer {
+        padding: 0.75rem 1rem;
+    }
+    
+    .quality-coach-note {
+        font-size: 0.8rem;
+        flex-wrap: wrap;
+    }
+}
+
+/* Dark mode support (if theme has dark mode) */
+@media (prefers-color-scheme: dark) {
+    .quality-coach-header {
+        background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+    }
+    
+    .quality-coach-title {
+        color: #e0f2fe;
+    }
+    
+    .quality-coach-subtitle {
+        color: #cbd5e1;
+    }
+    
+    .quality-coach-widget-container {
+        border-color: #334155;
+    }
+    
+    .quality-coach-footer {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    .quality-coach-note {
+        color: #94a3b8;
+    }
+}
+
+/* Print styles - hide widget when printing */
+@media print {
+    .quality-coach-section {
+        display: none;
+    }
+}
