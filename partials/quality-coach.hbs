@@ -202,25 +202,4 @@
     </div>
 {{/if}}
 
-{{!-- CTA for non-members --}}
-{{#unless @member.email}}
-    <aside class="quality-coach-cta gh-canvas">
-        <div class="quality-coach-cta-content">
-            <div class="quality-coach-cta-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <h3 class="quality-coach-cta-title">Quality Coach AI Assistant</h3>
-            <p class="quality-coach-cta-description">Get instant answers from "The Quality Coach's Handbook" with our AI assistant. Ask questions about coaching, quality, and systems thinking.</p>
-            <a href="#/portal/signup" class="quality-coach-cta-button gh-btn gh-primary-btn" data-portal="signup">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/>
-                </svg>
-                Upgrade to Access AI Assistant
-            </a>
-        </div>
-    </aside>
-{{/unless}}
+{{!-- Beta: No CTA shown to non-members yet --}}
