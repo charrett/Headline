@@ -1,95 +1,174 @@
-/* Quality Coach AI Widget Styles */
+/* Quality Coach AI - Floating Chat Widget */
 
-.quality-coach-section {
-    margin: 4rem auto 3rem;
-    padding: 0;
-    max-width: 100%;
-}
-
-.quality-coach-header {
+/* Floating Chat Button */
+.qc-chat-button {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border-radius: 12px 12px 0 0;
-    border: 1px solid #0ea5e9;
-    border-bottom: none;
+    justify-content: center;
+    z-index: 9998;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: white;
 }
 
-.quality-coach-icon {
-    width: 48px;
-    height: 48px;
+.qc-chat-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
+}
+
+.qc-chat-button svg {
+    width: 28px;
+    height: 28px;
+}
+
+.qc-button-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 2px solid white;
+}
+
+/* Chat Window */
+.qc-chat-window {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 380px;
+    height: 600px;
+    max-height: calc(100vh - 48px);
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Window Header */
+.qc-window-header {
     background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    border-radius: 12px;
+    color: white;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.qc-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.qc-header-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.quality-coach-icon svg {
-    color: white;
-}
-
-.quality-coach-info {
-    flex: 1;
-}
-
-.quality-coach-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #0c4a6e;
-    margin: 0 0 0.25rem 0;
-}
-
-.quality-coach-subtitle {
-    font-size: 0.95rem;
-    color: #475569;
+.qc-header-text h3 {
     margin: 0;
+    font-size: 16px;
+    font-weight: 600;
 }
 
-.quality-coach-widget-container {
-    border-radius: 0;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
-    border-top: none;
-    border-bottom: none;
-    background: #ffffff;
+.qc-header-text p {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.qc-close-button {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
     display: flex;
-    flex-direction: column;
-    position: relative;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
 }
 
-/* Chat Messages Area */
+.qc-close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Messages Area */
 .qc-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5rem;
-    min-height: 400px;
-    max-height: 600px;
+    padding: 16px;
+    background: #f8fafc;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 12px;
 }
 
-.qc-welcome {
+.qc-welcome-message {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
     text-align: center;
-    color: #64748b;
-    padding: 2rem;
-    line-height: 1.6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.qc-welcome p {
-    margin: 0.5rem 0;
+.qc-welcome-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.qc-welcome-message p {
+    margin: 8px 0;
+    line-height: 1.5;
+    color: #475569;
+}
+
+.qc-welcome-message strong {
+    color: #1e293b;
+    font-size: 16px;
 }
 
 /* Message Bubbles */
 .qc-message {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 4px;
     animation: messageSlideIn 0.3s ease-out;
 }
 
@@ -114,37 +193,39 @@
 }
 
 .qc-message-bubble {
-    max-width: 80%;
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 12px;
     line-height: 1.5;
     word-wrap: break-word;
+    font-size: 14px;
 }
 
 .qc-message-user .qc-message-bubble {
     background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
     color: white;
-    border-bottom-right-radius: 0.25rem;
+    border-bottom-right-radius: 4px;
 }
 
 .qc-message-assistant .qc-message-bubble {
-    background: #f1f5f9;
+    background: white;
     color: #1e293b;
-    border-bottom-left-radius: 0.25rem;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .qc-message-error .qc-message-bubble {
     background: #fee2e2;
     color: #991b1b;
-    border-bottom-left-radius: 0.25rem;
+    border-bottom-left-radius: 4px;
 }
 
 /* Sources */
 .qc-sources {
-    font-size: 0.875rem;
+    font-size: 12px;
     color: #64748b;
-    padding: 0 1rem;
-    max-width: 80%;
+    padding: 0 14px;
+    max-width: 75%;
 }
 
 .qc-sources strong {
@@ -154,8 +235,8 @@
 /* Typing Indicator */
 .qc-typing {
     display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
+    gap: 6px;
+    padding: 12px 16px;
     align-items: center;
 }
 
@@ -180,31 +261,33 @@
         transform: translateY(0);
     }
     30% {
-        transform: translateY(-10px);
+        transform: translateY(-8px);
     }
 }
 
 /* Input Area */
-.qc-input-container {
+.qc-input-area {
     display: flex;
-    gap: 0.75rem;
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    background: #f8fafc;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #e2e8f0;
+    background: white;
     align-items: flex-end;
+    flex-shrink: 0;
 }
 
 .qc-input {
     flex: 1;
-    padding: 0.75rem 1rem;
+    padding: 10px 12px;
     border: 1px solid #cbd5e1;
-    border-radius: 0.75rem;
-    font-size: 1rem;
+    border-radius: 12px;
+    font-size: 14px;
     font-family: inherit;
     resize: none;
-    min-height: 44px;
-    max-height: 120px;
+    min-height: 40px;
+    max-height: 100px;
     transition: border-color 0.2s;
+    line-height: 1.4;
 }
 
 .qc-input:focus {
@@ -220,12 +303,12 @@
 
 .qc-send-button {
     flex-shrink: 0;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
     color: white;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -234,11 +317,11 @@
 }
 
 .qc-send-button:hover:not(:disabled) {
-    transform: translateY(-2px);
+    transform: scale(1.05);
 }
 
 .qc-send-button:active:not(:disabled) {
-    transform: translateY(0);
+    transform: scale(0.95);
 }
 
 .qc-send-button:disabled {
@@ -246,116 +329,56 @@
     cursor: not-allowed;
 }
 
-.quality-coach-footer {
-    padding: 1rem 1.5rem;
-    background: #f8fafc;
-    border-radius: 0 0 12px 12px;
-    border: 1px solid #e5e7eb;
-    border-top: none;
-}
-
-.quality-coach-note {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    font-size: 0.875rem;
-    color: #64748b;
-}
-
-.quality-coach-note svg {
-    flex-shrink: 0;
+/* Footer */
+.qc-window-footer {
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 11px;
     color: #94a3b8;
+    border-top: 1px solid #e2e8f0;
+    background: white;
+    flex-shrink: 0;
 }
 
-/* Responsive adjustments */
+/* Responsive - Mobile */
 @media (max-width: 768px) {
-    .quality-coach-section {
-        margin: 2rem auto 2rem;
+    .qc-chat-button {
+        bottom: 16px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
     }
     
-    .quality-coach-header {
-        padding: 1rem;
-    }
-    
-    .quality-coach-icon {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .quality-coach-icon svg {
-        width: 20px;
-        height: 20px;
-    }
-    
-    .quality-coach-title {
-        font-size: 1.1rem;
-    }
-    
-    .quality-coach-subtitle {
-        font-size: 0.875rem;
-    }
-    
-    .qc-messages {
-        min-height: 300px;
-        max-height: 400px;
-        padding: 1rem;
-    }
-    
-    .qc-welcome {
-        padding: 1rem;
+    .qc-chat-window {
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
     }
     
     .qc-message-bubble {
-        max-width: 90%;
-        font-size: 0.9375rem;
-    }
-    
-    .qc-input-container {
-        padding: 0.75rem;
-    }
-    
-    .quality-coach-footer {
-        padding: 0.75rem 1rem;
-    }
-    
-    .quality-coach-note {
-        font-size: 0.8rem;
-        flex-wrap: wrap;
+        max-width: 85%;
+        font-size: 15px;
     }
 }
 
-/* Dark mode support (if theme has dark mode) */
-@media (prefers-color-scheme: dark) {
-    .quality-coach-header {
-        background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
-    }
-    
-    .quality-coach-title {
-        color: #e0f2fe;
-    }
-    
-    .quality-coach-subtitle {
-        color: #cbd5e1;
-    }
-    
-    .quality-coach-widget-container {
-        border-color: #334155;
-    }
-    
-    .quality-coach-footer {
-        background: #1e293b;
-        border-color: #334155;
-    }
-    
-    .quality-coach-note {
-        color: #94a3b8;
-    }
+/* Scrollbar styling */
+.qc-messages::-webkit-scrollbar {
+    width: 6px;
 }
 
-/* Print styles - hide widget when printing */
-@media print {
-    .quality-coach-section {
-        display: none;
-    }
+.qc-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.qc-messages::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.qc-messages::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }

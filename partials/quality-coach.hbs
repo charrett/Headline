@@ -1,4 +1,4 @@
-{{!-- Quality Coach AI Assistant - Native Chat Interface --}}
+{{!-- Quality Coach AI - Floating Chat Widget --}}
 {{!-- Configure via Ghost Code Injection (Settings → Code Injection → Site Header):
      - allowedEmails: array of email addresses who can see the widget
      - allowPaidMembers: boolean for all paid members
@@ -25,93 +25,131 @@
         }
     </script>
     
-    {{!-- Show chat interface if member is allowed --}}
-    <div id="quality-coach-check" style="display: none;">
+    {{!-- Floating Chat Widget --}}
+    <div id="quality-coach-widget" style="display: none;">
         <script>
             if (window.QUALITY_COACH_SHOW) {
-                document.getElementById('quality-coach-check').style.display = 'block';
+                document.getElementById('quality-coach-widget').style.display = 'block';
             }
         </script>
 
-        <aside class="quality-coach-section gh-canvas">
-            <div class="quality-coach-header">
-                <div class="quality-coach-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="quality-coach-info">
-                    <h3 class="quality-coach-title">Quality Coach AI Assistant</h3>
-                    <p class="quality-coach-subtitle">Ask me about coaching, quality, and systems thinking</p>
-                </div>
-            </div>
-            
-            <div class="quality-coach-widget-container">
-                {{!-- Chat Messages --}}
-                <div id="qc-chat-messages" class="qc-messages">
-                    <div class="qc-welcome">
-                        <p>👋 Hi! I'm your Quality Coach AI assistant, trained on "The Quality Coach's Handbook".</p>
-                        <p>Ask me anything about quality coaching, systems thinking, or building quality culture.</p>
+        {{!-- Chat Button (initially visible) --}}
+        <button id="qc-chat-button" class="qc-chat-button" aria-label="Open Quality Coach AI">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="qc-button-badge">AI</span>
+        </button>
+
+        {{!-- Chat Window (hidden by default) --}}
+        <div id="qc-chat-window" class="qc-chat-window" style="display: none;">
+            {{!-- Header --}}
+            <div class="qc-window-header">
+                <div class="qc-header-content">
+                    <div class="qc-header-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="qc-header-text">
+                        <h3>Quality Coach AI</h3>
+                        <p>Ask me anything</p>
                     </div>
                 </div>
-                
-                {{!-- Typing Indicator --}}
-                <div id="qc-typing" class="qc-typing" style="display: none;">
-                    <div class="qc-typing-dot"></div>
-                    <div class="qc-typing-dot"></div>
-                    <div class="qc-typing-dot"></div>
-                </div>
-                
-                {{!-- Input Area --}}
-                <div class="qc-input-container">
-                    <textarea 
-                        id="qc-input" 
-                        class="qc-input" 
-                        placeholder="Ask a question about quality coaching..."
-                        rows="1"
-                        maxlength="500"></textarea>
-                    <button id="qc-send" class="qc-send-button" aria-label="Send message">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="quality-coach-footer">
-                <p class="quality-coach-note">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4M12 8h.01"/>
+                <button id="qc-close-button" class="qc-close-button" aria-label="Close chat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
-                    Powered by "The Quality Coach's Handbook" • Your conversations are private
-                </p>
+                </button>
             </div>
-        </aside>
+
+            {{!-- Messages Area --}}
+            <div id="qc-messages" class="qc-messages">
+                <div class="qc-welcome-message">
+                    <div class="qc-welcome-icon">👋</div>
+                    <p><strong>Hi! I'm your Quality Coach AI</strong></p>
+                    <p>I'm trained on "The Quality Coach's Handbook". Ask me about quality coaching, systems thinking, or building quality culture.</p>
+                </div>
+            </div>
+
+            {{!-- Typing Indicator --}}
+            <div id="qc-typing" class="qc-typing" style="display: none;">
+                <div class="qc-typing-dot"></div>
+                <div class="qc-typing-dot"></div>
+                <div class="qc-typing-dot"></div>
+            </div>
+
+            {{!-- Input Area --}}
+            <div class="qc-input-area">
+                <textarea 
+                    id="qc-input" 
+                    class="qc-input" 
+                    placeholder="Ask a question..."
+                    rows="1"
+                    maxlength="500"></textarea>
+                <button id="qc-send" class="qc-send-button" aria-label="Send message">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+
+            {{!-- Footer --}}
+            <div class="qc-window-footer">
+                <span>Powered by The Quality Coach's Handbook</span>
+            </div>
+        </div>
 
         <script>
         (function() {
             const API_URL = 'https://qchb-chat.fly.dev/api/v1/chat';
             const API_KEY = window.QUALITY_COACH_CONFIG.apiKey;
-            const messages = document.getElementById('qc-chat-messages');
+            
+            const chatButton = document.getElementById('qc-chat-button');
+            const chatWindow = document.getElementById('qc-chat-window');
+            const closeButton = document.getElementById('qc-close-button');
+            const messages = document.getElementById('qc-messages');
             const input = document.getElementById('qc-input');
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
             
+            let isOpen = false;
+            let conversationHistory = [];
+            let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
             // Check if API key is configured
             if (!API_KEY) {
                 console.error('Quality Coach: API key not configured in Code Injection');
-                addMessage('Configuration error: API key not set. Please contact the site administrator.', 'error');
-                input.disabled = true;
-                sendButton.disabled = true;
                 return;
             }
             
-            let conversationHistory = [];
-            let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            // Toggle chat window
+            chatButton.addEventListener('click', function() {
+                isOpen = !isOpen;
+                if (isOpen) {
+                    chatWindow.style.display = 'flex';
+                    chatButton.style.display = 'none';
+                    input.focus();
+                    
+                    // Track opening
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'quality_coach_opened', {
+                            'post_slug': '{{slug}}',
+                            'post_title': '{{title}}'
+                        });
+                    }
+                }
+            });
+            
+            closeButton.addEventListener('click', function() {
+                isOpen = false;
+                chatWindow.style.display = 'none';
+                chatButton.style.display = 'flex';
+            });
             
             // Auto-resize textarea
             input.addEventListener('input', function() {
@@ -206,17 +244,7 @@
                 messages.appendChild(messageDiv);
                 messages.scrollTop = messages.scrollHeight;
             }
-            
-            // Analytics tracking
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'quality_coach_loaded', {
-                    'post_slug': '{{slug}}',
-                    'post_title': '{{title}}'
-                });
-            }
         })();
         </script>
     </div>
 {{/if}}
-
-{{!-- Beta: No CTA shown to non-members yet --}}
