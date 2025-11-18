@@ -8,6 +8,11 @@
     window.QUALITY_COACH_CONFIG = window.QUALITY_COACH_CONFIG || {
         apiKey: '' // REQUIRED: Set this in Code Injection
     };
+    
+    // Debug info
+    console.log('Quality Coach Debug:');
+    console.log('- Member email:', '{{@member.email}}' || 'NOT LOGGED IN');
+    console.log('- Config:', window.QUALITY_COACH_CONFIG);
 </script>
 
 {{#if @member.email}}
@@ -15,14 +20,24 @@
         // Check if this member is allowed to see the widget
         window.QUALITY_COACH_SHOW = false;
         
+        console.log('Quality Coach Access Check:');
+        console.log('- Your email:', '{{@member.email}}');
+        console.log('- Allowed emails:', window.QUALITY_COACH_CONFIG.allowedEmails);
+        console.log('- Allow paid members:', window.QUALITY_COACH_CONFIG.allowPaidMembers);
+        console.log('- Member is paid:', {{#if @member.paid}}true{{else}}false{{/if}});
+        
         // Check allowed emails list (test mode)
         if (window.QUALITY_COACH_CONFIG.allowedEmails && window.QUALITY_COACH_CONFIG.allowedEmails.length > 0) {
             window.QUALITY_COACH_SHOW = window.QUALITY_COACH_CONFIG.allowedEmails.includes('{{@member.email}}');
+            console.log('- Email check result:', window.QUALITY_COACH_SHOW);
         }
         // Fallback to paid member check (production mode)
         else if (window.QUALITY_COACH_CONFIG.allowPaidMembers) {
             window.QUALITY_COACH_SHOW = {{#if @member.paid}}true{{else}}false{{/if}};
+            console.log('- Paid member check result:', window.QUALITY_COACH_SHOW);
         }
+        
+        console.log('- FINAL SHOW FLAG:', window.QUALITY_COACH_SHOW);
     </script>
     
     {{!-- Floating Chat Widget --}}
