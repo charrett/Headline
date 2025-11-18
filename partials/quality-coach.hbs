@@ -246,13 +246,32 @@
                 });
             }
             
+            function formatMessage(content) {
+                // Convert markdown-like formatting to HTML
+                return content
+                    // Bold text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    // Bullet points - handle both - and • 
+                    .replace(/^- (.*?)$/gm, '• $1')
+                    // Code blocks or sections in brackets
+                    .replace(/\[(.*?)\]/g, '<span style="color: #64748b; font-size: 0.9em;">[$1]</span>')
+                    // Line breaks for readability
+                    .replace(/\n/g, '<br>');
+            }
+            
             function addMessage(content, role, sources) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'qc-message qc-message-' + role;
                 
                 const bubble = document.createElement('div');
                 bubble.className = 'qc-message-bubble';
-                bubble.textContent = content;
+                
+                // Use innerHTML for formatted content, textContent for user messages
+                if (role === 'user') {
+                    bubble.textContent = content;
+                } else {
+                    bubble.innerHTML = formatMessage(content);
+                }
                 
                 messageDiv.appendChild(bubble);
                 

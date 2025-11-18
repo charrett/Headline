@@ -214,6 +214,17 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.qc-message-bubble strong {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.qc-message-bubble br + br {
+    display: block;
+    content: "";
+    margin-top: 0.5em;
+}
+
 .qc-message-error .qc-message-bubble {
     background: #fee2e2;
     color: #991b1b;
