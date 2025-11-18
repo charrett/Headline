@@ -225,10 +225,11 @@
                 .then(data => {
                     typingIndicator.style.display = 'none';
                     
-                    if (data.response) {
-                        addMessage(data.response, 'assistant', data.sources);
+                    // API returns 'answer' field, not 'response'
+                    if (data.answer) {
+                        addMessage(data.answer, 'assistant', data.sources);
                         conversationHistory.push({ role: 'user', content: message });
-                        conversationHistory.push({ role: 'assistant', content: data.response });
+                        conversationHistory.push({ role: 'assistant', content: data.answer });
                     } else {
                         addMessage('Sorry, I encountered an error. Please try again.', 'error');
                     }
