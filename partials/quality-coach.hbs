@@ -1,6 +1,30 @@
-{{!-- Quality Coach AI Assistant Widget - Only shown to paid members --}}
-{{#if @member.paid}}
-    {{!-- PAID MEMBERS: Show full widget --}}
+{{!-- Quality Coach AI Assistant Widget - Configure allowed email in Ghost Code Injection --}}
+<script>
+    window.QUALITY_COACH_CONFIG = window.QUALITY_COACH_CONFIG || {};
+</script>
+
+{{#if @member.email}}
+    <script>
+        // Check if this member is allowed to see the widget
+        window.QUALITY_COACH_SHOW = false;
+        
+        // Check allowed emails list (test mode)
+        if (window.QUALITY_COACH_CONFIG.allowedEmails && window.QUALITY_COACH_CONFIG.allowedEmails.length > 0) {
+            window.QUALITY_COACH_SHOW = window.QUALITY_COACH_CONFIG.allowedEmails.includes('{{@member.email}}');
+        }
+        // Fallback to paid member check (production mode)
+        else if (window.QUALITY_COACH_CONFIG.allowPaidMembers) {
+            window.QUALITY_COACH_SHOW = {{#if @member.paid}}true{{else}}false{{/if}};
+        }
+    </script>
+    
+    {{!-- Show widget if member is allowed --}}
+    <div id="quality-coach-check" style="display: none;">
+        <script>
+            if (window.QUALITY_COACH_SHOW) {
+                document.getElementById('quality-coach-check').style.display = 'block';
+            }
+        </script>
     <aside class="quality-coach-section gh-canvas">
         <div class="quality-coach-header">
             <div class="quality-coach-icon">
@@ -19,7 +43,7 @@
         <div class="quality-coach-widget-container">
             <iframe 
                 id="quality-coach-iframe"
-                src="https://YOUR-CHAT-DOMAIN.com"
+                src="https://qchb-chat.fly.dev"
                 width="100%" 
                 height="600px"
                 frameborder="0"
@@ -74,8 +98,11 @@
         }
     })();
     </script>
-{{else}}
-    {{!-- NON-PAID MEMBERS & VISITORS: Show upgrade CTA --}}
+    </div>
+{{/if}}
+{{!-- Intentionally hiding from everyone else - no CTA shown --}}
+{{#unless @member.email}}
+    {{!-- Could show something here for non-logged-in visitors --}}
     <aside class="quality-coach-cta gh-canvas">
         <div class="quality-coach-cta-content">
             <div class="quality-coach-cta-icon">
@@ -95,4 +122,4 @@
             </a>
         </div>
     </aside>
-{{/if}}
+{{/unless}}
