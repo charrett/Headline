@@ -4,7 +4,7 @@
 .qc-chat-button {
     position: fixed;
     bottom: 24px;
-    right: 24px;
+    left: 24px;
     width: 60px;
     height: 60px;
     background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
@@ -47,7 +47,7 @@
 .qc-chat-window {
     position: fixed;
     bottom: 24px;
-    right: 24px;
+    left: 24px;
     width: 380px;
     height: 600px;
     max-height: calc(100vh - 48px);
@@ -344,7 +344,7 @@
 @media (max-width: 768px) {
     .qc-chat-button {
         bottom: 16px;
-        right: 16px;
+        left: 16px;
         width: 56px;
         height: 56px;
     }
