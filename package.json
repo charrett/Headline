@@ -98,6 +98,7 @@
     },
     "scripts": {
         "dev": "gulp",
+        "build": "gulp build",
         "test": "gscan .",
         "test:e2e": "playwright test",
         "test:e2e:ui": "playwright test --ui",
