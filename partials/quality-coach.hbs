@@ -47,8 +47,12 @@
     {{!-- Floating Chat Widget --}}
     <div id="quality-coach-widget" style="display: none;">
         <script>
+            console.log('Widget visibility script running, SHOW flag is:', window.QUALITY_COACH_SHOW);
             if (window.QUALITY_COACH_SHOW) {
-                document.getElementById('quality-coach-widget').style.display = 'block';
+                const widget = document.getElementById('quality-coach-widget');
+                console.log('Widget element found:', widget);
+                widget.style.display = 'block';
+                console.log('Widget display set to block');
             }
         </script>
 
