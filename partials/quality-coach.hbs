@@ -1,7 +1,13 @@
 {{!-- Quality Coach AI Assistant - Native Chat Interface --}}
-{{!-- Configure access control via Ghost Code Injection (Settings → Code Injection → Site Header) --}}
+{{!-- Configure via Ghost Code Injection (Settings → Code Injection → Site Header):
+     - allowedEmails: array of email addresses who can see the widget
+     - allowPaidMembers: boolean for all paid members
+     - apiKey: your API secret key from backend .env
+--}}
 <script>
-    window.QUALITY_COACH_CONFIG = window.QUALITY_COACH_CONFIG || {};
+    window.QUALITY_COACH_CONFIG = window.QUALITY_COACH_CONFIG || {
+        apiKey: '' // REQUIRED: Set this in Code Injection
+    };
 </script>
 
 {{#if @member.email}}
@@ -89,10 +95,20 @@
         <script>
         (function() {
             const API_URL = 'https://qchb-chat.fly.dev/api/v1/chat';
+            const API_KEY = window.QUALITY_COACH_CONFIG.apiKey;
             const messages = document.getElementById('qc-chat-messages');
             const input = document.getElementById('qc-input');
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
+            
+            // Check if API key is configured
+            if (!API_KEY) {
+                console.error('Quality Coach: API key not configured in Code Injection');
+                addMessage('Configuration error: API key not set. Please contact the site administrator.', 'error');
+                input.disabled = true;
+                sendButton.disabled = true;
+                return;
+            }
             
             let conversationHistory = [];
             let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -132,6 +148,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
                     },
                     body: JSON.stringify({
                         message: message,
