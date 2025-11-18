@@ -5,6 +5,9 @@
      - apiKey: your API secret key from backend .env
 --}}
 <script>
+    console.log('=== QUALITY COACH PARTIAL LOADED ===');
+    console.log('Script is running!');
+    
     window.QUALITY_COACH_CONFIG = window.QUALITY_COACH_CONFIG || {
         apiKey: '' // REQUIRED: Set this in Code Injection
     };
@@ -13,6 +16,7 @@
     console.log('Quality Coach Debug:');
     console.log('- Member email:', '{{@member.email}}' || 'NOT LOGGED IN');
     console.log('- Config:', window.QUALITY_COACH_CONFIG);
+    console.log('- @member object exists:', {{#if @member}}true{{else}}false{{/if}});
 </script>
 
 {{#if @member.email}}
