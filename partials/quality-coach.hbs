@@ -1,4 +1,5 @@
-{{!-- Quality Coach AI Assistant Widget - Configure allowed email in Ghost Code Injection --}}
+{{!-- Quality Coach AI Assistant - Native Chat Interface --}}
+{{!-- Configure access control via Ghost Code Injection (Settings → Code Injection → Site Header) --}}
 <script>
     window.QUALITY_COACH_CONFIG = window.QUALITY_COACH_CONFIG || {};
 </script>
@@ -18,91 +19,191 @@
         }
     </script>
     
-    {{!-- Show widget if member is allowed --}}
+    {{!-- Show chat interface if member is allowed --}}
     <div id="quality-coach-check" style="display: none;">
         <script>
             if (window.QUALITY_COACH_SHOW) {
                 document.getElementById('quality-coach-check').style.display = 'block';
             }
         </script>
-    <aside class="quality-coach-section gh-canvas">
-        <div class="quality-coach-header">
-            <div class="quality-coach-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="quality-coach-info">
-                <h3 class="quality-coach-title">Quality Coach AI Assistant</h3>
-                <p class="quality-coach-subtitle">Ask me about coaching, quality, and systems thinking</p>
-            </div>
-        </div>
-        
-        <div class="quality-coach-widget-container">
-            <iframe 
-                id="quality-coach-iframe"
-                src="https://qchb-chat.fly.dev"
-                width="100%" 
-                height="600px"
-                frameborder="0"
-                title="Quality Coach AI Assistant"
-                allow="clipboard-write"
-                loading="lazy"
-                data-post-context="{{slug}}"
-                data-post-title="{{title}}">
-            </iframe>
-        </div>
-        
-        <div class="quality-coach-footer">
-            <p class="quality-coach-note">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 16v-4M12 8h.01"/>
-                </svg>
-                Powered by "The Quality Coach's Handbook" • Your conversations are private
-            </p>
-        </div>
-    </aside>
 
-    <script>
-    // Pass post context to the chat widget
-    (function() {
-        const iframe = document.getElementById('quality-coach-iframe');
-        if (iframe) {
-            // Add post context to iframe URL when it loads
-            iframe.addEventListener('load', function() {
-                const postContext = {
-                    slug: '{{slug}}',
-                    title: '{{title}}',
-                    tags: [{{#foreach tags}}'{{name}}'{{#unless @last}},{{/unless}}{{/foreach}}],
-                    memberEmail: '{{@member.email}}',
-                    memberName: '{{@member.name}}'
-                };
+        <aside class="quality-coach-section gh-canvas">
+            <div class="quality-coach-header">
+                <div class="quality-coach-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="quality-coach-info">
+                    <h3 class="quality-coach-title">Quality Coach AI Assistant</h3>
+                    <p class="quality-coach-subtitle">Ask me about coaching, quality, and systems thinking</p>
+                </div>
+            </div>
+            
+            <div class="quality-coach-widget-container">
+                {{!-- Chat Messages --}}
+                <div id="qc-chat-messages" class="qc-messages">
+                    <div class="qc-welcome">
+                        <p>👋 Hi! I'm your Quality Coach AI assistant, trained on "The Quality Coach's Handbook".</p>
+                        <p>Ask me anything about quality coaching, systems thinking, or building quality culture.</p>
+                    </div>
+                </div>
                 
-                // Send context to iframe
-                iframe.contentWindow.postMessage({
-                    type: 'POST_CONTEXT',
-                    data: postContext
-                }, '*');
+                {{!-- Typing Indicator --}}
+                <div id="qc-typing" class="qc-typing" style="display: none;">
+                    <div class="qc-typing-dot"></div>
+                    <div class="qc-typing-dot"></div>
+                    <div class="qc-typing-dot"></div>
+                </div>
+                
+                {{!-- Input Area --}}
+                <div class="qc-input-container">
+                    <textarea 
+                        id="qc-input" 
+                        class="qc-input" 
+                        placeholder="Ask a question about quality coaching..."
+                        rows="1"
+                        maxlength="500"></textarea>
+                    <button id="qc-send" class="qc-send-button" aria-label="Send message">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="quality-coach-footer">
+                <p class="quality-coach-note">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                    Powered by "The Quality Coach's Handbook" • Your conversations are private
+                </p>
+            </div>
+        </aside>
+
+        <script>
+        (function() {
+            const API_URL = 'https://qchb-chat.fly.dev/api/v1/chat';
+            const messages = document.getElementById('qc-chat-messages');
+            const input = document.getElementById('qc-input');
+            const sendButton = document.getElementById('qc-send');
+            const typingIndicator = document.getElementById('qc-typing');
+            
+            let conversationHistory = [];
+            let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Auto-resize textarea
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
             });
-        }
-        
-        // Track widget engagement
-        if (typeof gtag !== 'undefined') {
-            gtag('event', 'quality_coach_view', {
-                'post_slug': '{{slug}}',
-                'post_title': '{{title}}'
+            
+            // Send on Enter (Shift+Enter for newline)
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
             });
-        }
-    })();
-    </script>
+            
+            sendButton.addEventListener('click', sendMessage);
+            
+            function sendMessage() {
+                const message = input.value.trim();
+                if (!message) return;
+                
+                // Add user message to UI
+                addMessage(message, 'user');
+                input.value = '';
+                input.style.height = 'auto';
+                
+                // Disable input while processing
+                input.disabled = true;
+                sendButton.disabled = true;
+                typingIndicator.style.display = 'flex';
+                
+                // Send to API
+                fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId,
+                        context: {
+                            post_slug: '{{slug}}',
+                            post_title: '{{title}}',
+                            member_email: '{{@member.email}}'
+                        }
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    typingIndicator.style.display = 'none';
+                    
+                    if (data.response) {
+                        addMessage(data.response, 'assistant', data.sources);
+                        conversationHistory.push({ role: 'user', content: message });
+                        conversationHistory.push({ role: 'assistant', content: data.response });
+                    } else {
+                        addMessage('Sorry, I encountered an error. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Chat error:', error);
+                    typingIndicator.style.display = 'none';
+                    addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'error');
+                })
+                .finally(() => {
+                    input.disabled = false;
+                    sendButton.disabled = false;
+                    input.focus();
+                });
+            }
+            
+            function addMessage(content, role, sources) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'qc-message qc-message-' + role;
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'qc-message-bubble';
+                bubble.textContent = content;
+                
+                messageDiv.appendChild(bubble);
+                
+                // Add sources if available
+                if (sources && sources.length > 0) {
+                    const sourcesDiv = document.createElement('div');
+                    sourcesDiv.className = 'qc-sources';
+                    sourcesDiv.innerHTML = '<strong>Sources:</strong> ' + 
+                        sources.map(s => s.chapter || s.title).join(', ');
+                    messageDiv.appendChild(sourcesDiv);
+                }
+                
+                messages.appendChild(messageDiv);
+                messages.scrollTop = messages.scrollHeight;
+            }
+            
+            // Analytics tracking
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'quality_coach_loaded', {
+                    'post_slug': '{{slug}}',
+                    'post_title': '{{title}}'
+                });
+            }
+        })();
+        </script>
     </div>
 {{/if}}
-{{!-- Intentionally hiding from everyone else - no CTA shown --}}
+
+{{!-- CTA for non-members --}}
 {{#unless @member.email}}
-    {{!-- Could show something here for non-logged-in visitors --}}
     <aside class="quality-coach-cta gh-canvas">
         <div class="quality-coach-cta-content">
             <div class="quality-coach-cta-icon">
