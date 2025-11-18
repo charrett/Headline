@@ -227,11 +227,11 @@
                     
                     // API returns 'answer' field, not 'response'
                     if (data.answer) {
-                        addMessage(data.answer, 'assistant', data.sources);
+                        addMessage(data.answer, 'assistant', data.sources, data.small_bet);
                         conversationHistory.push({ role: 'user', content: message });
                         conversationHistory.push({ role: 'assistant', content: data.answer });
                     } else {
-                        addMessage('Sorry, I encountered an error. Please try again.', 'error');
+                        addMessage('Sorry, I encountered an error. Please try again.', 'error', null, null);
                     }
                 })
                 .catch(error => {
@@ -259,7 +259,7 @@
                     .replace(/\n/g, '<br>');
             }
             
-            function addMessage(content, role, sources) {
+            function addMessage(content, role, sources, smallBet) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'qc-message qc-message-' + role;
                 
@@ -274,6 +274,37 @@
                 }
                 
                 messageDiv.appendChild(bubble);
+                
+                // Add small bet if available
+                if (smallBet) {
+                    const betDiv = document.createElement('div');
+                    betDiv.className = 'qc-small-bet';
+                    betDiv.innerHTML = `
+                        <div class="qc-bet-header">💡 Small Bet Suggestion</div>
+                        <div class="qc-bet-content">
+                            ${smallBet.objective ? `<div class="qc-bet-section"><strong>Objective:</strong> ${smallBet.objective}</div>` : ''}
+                            ${smallBet.assumption_being_tested ? `<div class="qc-bet-section"><strong>Testing:</strong> ${smallBet.assumption_being_tested}</div>` : ''}
+                            ${smallBet.steps && smallBet.steps.length > 0 ? `
+                                <div class="qc-bet-section">
+                                    <strong>Steps:</strong>
+                                    <ol class="qc-bet-list">
+                                        ${smallBet.steps.map(step => `<li>${step}</li>`).join('')}
+                                    </ol>
+                                </div>
+                            ` : ''}
+                            ${smallBet.signals_to_look_for && smallBet.signals_to_look_for.length > 0 ? `
+                                <div class="qc-bet-section">
+                                    <strong>Look for:</strong>
+                                    <ul class="qc-bet-list">
+                                        ${smallBet.signals_to_look_for.map(signal => `<li>${signal}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                            ${smallBet.time_investment ? `<div class="qc-bet-section"><strong>Time:</strong> ${smallBet.time_investment}</div>` : ''}
+                        </div>
+                    `;
+                    messageDiv.appendChild(betDiv);
+                }
                 
                 // Add sources if available
                 if (sources && sources.length > 0) {
