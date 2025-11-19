@@ -66,14 +66,15 @@
                     <div class="qc-welcome-icon">👋</div>
                     <p><strong>Hi! I'm the Quality Coach Companion</strong></p>
                     <p>I'm grounded in "The Quality Coach's Handbook". Ask about systems thinking, coaching moves, or designing your next small bet.</p>
-                    <div class="qc-quick-actions">
-                        <button id="qc-feedback-chip" class="qc-feedback-chip" type="button">
-                            Share Companion feedback
-                        </button>
-                    </div>
-                    <p class="qc-feedback-hint">Tap to prefill "Feedback:" so you can send beta notes without leaving this chat.</p>
                 </div>
             </div>
+
+            <template id="qc-feedback-panel-template">
+                <div class="qc-feedback-panel" role="status" aria-live="polite">
+                    <div class="qc-feedback-panel-text">How useful was that response?</div>
+                    <p class="qc-feedback-hint">Share quick beta feedback so we can tune the Companion.</p>
+                </div>
+            </template>
 
             {{!-- Typing Indicator --}}
             <div id="qc-typing" class="qc-typing" style="display: none;">
@@ -119,10 +120,10 @@
             const chatWindow = document.getElementById('qc-chat-window');
             const closeButton = document.getElementById('qc-close-button');
             const messages = document.getElementById('qc-messages');
+            const feedbackTemplate = document.getElementById('qc-feedback-panel-template');
             const input = document.getElementById('qc-input');
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
-            const feedbackChip = document.getElementById('qc-feedback-chip');
             const PORTAL_SELECTORS = [
                 '.gh-portal-triggerbtn',
                 '.gh-portal-triggerbtn-root',
@@ -147,26 +148,11 @@
             let portalInterval = null;
             let portalFallbackTimer = null;
             let feedbackUnlocked = false;
+            let feedbackPanel = null;
+            let lastAssistantMessage = null;
+            const FEEDBACK_REMINDER_TEXT = 'Feedback: How useful was that response?';
 
             chatButton.classList.add('is-loading');
-
-            if (feedbackChip) {
-                feedbackChip.addEventListener('click', function() {
-                    const prefixText = 'Feedback: ';
-                    if (!input.value.toLowerCase().startsWith(FEEDBACK_PREFIX)) {
-                        input.value = prefixText;
-                    }
-                    input.focus();
-                    input.dispatchEvent(new Event('input'));
-                    showStatus('Thanks! Share what you need from the Companion and press send.', 'info');
-                    if (typeof gtag !== 'undefined') {
-                        gtag('event', 'quality_coach_feedback_chip_clicked', {
-                            'post_slug': '{{slug}}',
-                            'post_title': '{{title}}'
-                        });
-                    }
-                });
-            }
 
             initializeAccess();
             monitorPortalTrigger();
@@ -477,6 +463,44 @@
                 if (widgetContainer) {
                     widgetContainer.classList.add('qc-widget--feedback-ready');
                 }
+                ensureFeedbackPanelPosition();
+                promptForFeedback();
+            }
+
+            function getFeedbackPanel() {
+                if (feedbackPanel) return feedbackPanel;
+                if (!feedbackTemplate) return null;
+                const templateContent = feedbackTemplate.content || feedbackTemplate;
+                const sourceNode = templateContent.firstElementChild;
+                if (!sourceNode) return null;
+                feedbackPanel = sourceNode.cloneNode(true);
+                return feedbackPanel;
+            }
+
+            function ensureFeedbackPanelPosition() {
+                if (!feedbackUnlocked || !lastAssistantMessage) return;
+                const panel = getFeedbackPanel();
+                if (!panel) return;
+
+                if (panel.parentNode && panel.parentNode !== messages) {
+                    panel.parentNode.removeChild(panel);
+                }
+
+                if (lastAssistantMessage.nextElementSibling !== panel) {
+                    lastAssistantMessage.insertAdjacentElement('afterend', panel);
+                }
+
+                messages.scrollTop = messages.scrollHeight;
+            }
+
+            function promptForFeedback() {
+                if (!feedbackUnlocked || !input) return;
+                input.value = FEEDBACK_REMINDER_TEXT;
+                input.focus();
+                if (typeof input.select === 'function') {
+                    input.select();
+                }
+                input.dispatchEvent(new Event('input'));
             }
 
             function formatMessage(content) {
@@ -538,6 +562,14 @@
                     sourcesDiv.innerHTML = '<strong>Sources:</strong> ' + 
                         sources.map(s => s.chapter || s.title).join(', ');
                     messageDiv.appendChild(sourcesDiv);
+                }
+
+                if (role === 'assistant') {
+                    lastAssistantMessage = messageDiv;
+                    if (feedbackUnlocked) {
+                        ensureFeedbackPanelPosition();
+                        promptForFeedback();
+                    }
                 }
 
                 messages.appendChild(messageDiv);
