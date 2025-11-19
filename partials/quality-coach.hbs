@@ -402,8 +402,6 @@
                     return;
                 }
 
-                unlockFeedbackChip();
-
                 if (isFeedback) {
                     showStatus('Appreciate the Companion feedback — it will go straight to Anne-Marie.', 'info');
                 }
@@ -452,6 +450,7 @@
                         addMessage(data.answer, 'assistant', data.sources, data.small_bet);
                         conversationHistory.push({ role: 'user', content: message });
                         conversationHistory.push({ role: 'assistant', content: data.answer });
+                        unlockFeedbackChip();
                         if (isFeedback && typeof gtag !== 'undefined') {
                             gtag('event', 'quality_coach_feedback_submitted', {
                                 'post_slug': '{{slug}}',
