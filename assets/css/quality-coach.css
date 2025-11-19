@@ -569,14 +569,14 @@ body.qc-offset-for-portal {
 /* Responsive - Mobile */
 @media (max-width: 768px) {
     .qc-chat-button {
-        bottom: calc(12px + env(safe-area-inset-bottom));
+        bottom: calc(12px + env(safe-area-inset-bottom) + var(--qc-extra-offset));
         right: calc(16px + env(safe-area-inset-right));
         width: 56px;
         height: 56px;
     }
     
     .qc-chat-window {
-        bottom: 0;
+        bottom: var(--qc-extra-offset);
         right: 0;
         left: 0;
         width: 100%;

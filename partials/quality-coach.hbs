@@ -124,8 +124,15 @@
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
             const feedbackChip = document.getElementById('qc-feedback-chip');
-            const PORTAL_SELECTOR = '.gh-portal-triggerbtn';
+            const PORTAL_SELECTORS = [
+                '.gh-portal-triggerbtn',
+                '.gh-portal-triggerbtn-root',
+                '#ghost-portal-root',
+                'iframe[src*="ghost" i][title*="portal" i]'
+            ];
             const PORTAL_OFFSET_CLASS = 'qc-offset-for-portal';
+            const PORTAL_CHECK_INTERVAL_MS = 2000;
+            const PORTAL_FALLBACK_TIMEOUT_MS = 5000;
 
             if (!chatButton || !chatWindow || !input || !sendButton || !closeButton) {
                 return;
@@ -138,6 +145,8 @@
             let conversationHistory = [];
             let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             let portalObserver = null;
+            let portalInterval = null;
+            let portalFallbackTimer = null;
 
             chatButton.classList.add('is-loading');
 
@@ -176,30 +185,64 @@
             }
 
             function monitorPortalTrigger() {
-                if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') {
-                    return;
-                }
+                if (typeof document === 'undefined') return;
 
                 updatePortalOffset();
 
-                if (portalObserver) {
-                    portalObserver.disconnect();
+                if (typeof MutationObserver !== 'undefined') {
+                    if (portalObserver) {
+                        portalObserver.disconnect();
+                    }
+                    portalObserver = new MutationObserver(() => {
+                        updatePortalOffset();
+                    });
+                    portalObserver.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
                 }
 
-                portalObserver = new MutationObserver(() => {
-                    updatePortalOffset();
-                });
+                if (!portalInterval) {
+                    portalInterval = setInterval(() => {
+                        updatePortalOffset();
+                    }, PORTAL_CHECK_INTERVAL_MS);
+                }
 
-                portalObserver.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
+                if (!portalFallbackTimer) {
+                    portalFallbackTimer = setTimeout(() => {
+                        if (document.body && !document.body.classList.contains(PORTAL_OFFSET_CLASS)) {
+                            document.body.classList.add(PORTAL_OFFSET_CLASS);
+                        }
+                    }, PORTAL_FALLBACK_TIMEOUT_MS);
+                }
             }
 
             function updatePortalOffset() {
-                const portalButton = document.querySelector(PORTAL_SELECTOR);
                 if (!document.body) return;
-                document.body.classList.toggle(PORTAL_OFFSET_CLASS, Boolean(portalButton));
+                const portalElement = findPortalElement();
+                const hasPortal = Boolean(portalElement);
+                document.body.classList.toggle(PORTAL_OFFSET_CLASS, hasPortal);
+
+                if (hasPortal && portalFallbackTimer) {
+                    clearTimeout(portalFallbackTimer);
+                    portalFallbackTimer = null;
+                }
+
+                if (hasPortal && portalInterval) {
+                    clearInterval(portalInterval);
+                    portalInterval = null;
+                }
+            }
+
+            function findPortalElement() {
+                for (const selector of PORTAL_SELECTORS) {
+                    if (!selector) continue;
+                    const el = document.querySelector(selector);
+                    if (el) {
+                        return el;
+                    }
+                }
+                return null;
             }
 
             async function initializeAccess() {
