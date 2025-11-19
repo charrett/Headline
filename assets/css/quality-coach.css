@@ -42,6 +42,7 @@
     --qc-muted: var(--color-secondary-text, #475569);
     --qc-border: var(--color-light-gray, #e2e8f0);
     --qc-gap: clamp(16px, 2vw, 32px);
+    --qc-extra-offset: 0px;
 }
 
 @supports not (color: color-mix(in srgb, red, blue)) {
@@ -54,7 +55,7 @@
 /* Floating Chat Button */
 .qc-chat-button {
     position: fixed;
-    bottom: calc(var(--qc-gap) + env(safe-area-inset-bottom));
+    bottom: calc(var(--qc-gap) + env(safe-area-inset-bottom) + var(--qc-extra-offset));
     right: calc(var(--qc-gap) + env(safe-area-inset-right));
     left: auto;
     width: 60px;
@@ -150,7 +151,7 @@
 /* Chat Window */
 .qc-chat-window {
     position: fixed;
-    bottom: calc(var(--qc-gap) + env(safe-area-inset-bottom));
+    bottom: calc(var(--qc-gap) + env(safe-area-inset-bottom) + var(--qc-extra-offset));
     right: calc(var(--qc-gap) + env(safe-area-inset-right));
     left: auto;
     width: 380px;
@@ -164,6 +165,10 @@
     z-index: 9999;
     overflow: hidden;
     animation: slideUp 0.3s ease-out;
+}
+
+body.qc-offset-for-portal {
+    --qc-extra-offset: 80px;
 }
 
 .qc-chat-window.is-visible {

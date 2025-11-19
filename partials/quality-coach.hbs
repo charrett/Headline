@@ -124,6 +124,8 @@
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
             const feedbackChip = document.getElementById('qc-feedback-chip');
+            const PORTAL_SELECTOR = '.gh-portal-triggerbtn';
+            const PORTAL_OFFSET_CLASS = 'qc-offset-for-portal';
 
             if (!chatButton || !chatWindow || !input || !sendButton || !closeButton) {
                 return;
@@ -135,6 +137,7 @@
             let isLocked = false;
             let conversationHistory = [];
             let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            let portalObserver = null;
 
             chatButton.classList.add('is-loading');
 
@@ -157,6 +160,7 @@
             }
 
             initializeAccess();
+            monitorPortalTrigger();
 
             function showStatus(message, variant = 'info') {
                 if (!accessMessage) return;
@@ -169,6 +173,33 @@
                 accessMessage.textContent = message;
                 accessMessage.style.display = 'flex';
                 accessMessage.className = `qc-access-message qc-${variant}`;
+            }
+
+            function monitorPortalTrigger() {
+                if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') {
+                    return;
+                }
+
+                updatePortalOffset();
+
+                if (portalObserver) {
+                    portalObserver.disconnect();
+                }
+
+                portalObserver = new MutationObserver(() => {
+                    updatePortalOffset();
+                });
+
+                portalObserver.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+
+            function updatePortalOffset() {
+                const portalButton = document.querySelector(PORTAL_SELECTOR);
+                if (!document.body) return;
+                document.body.classList.toggle(PORTAL_OFFSET_CLASS, Boolean(portalButton));
             }
 
             async function initializeAccess() {
