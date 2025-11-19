@@ -203,29 +203,6 @@ body.qc-offset-for-portal {
     gap: 12px;
 }
 
-.qc-header-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.qc-header-text h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.qc-header-text p {
-    margin: 0;
-    font-size: 12px;
-    opacity: 0.9;
-}
-
 .qc-close-button {
     background: transparent;
     border: none;
@@ -262,27 +239,31 @@ body.qc-offset-for-portal {
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
-.qc-quick-actions {
-    display: none;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
+.qc-feedback-panel {
     margin-top: 16px;
-}
-
-.qc-feedback-hint {
-    margin-top: 12px;
-    font-size: 12px;
-    color: var(--qc-muted);
+    padding: 16px;
+    background: var(--qc-surface);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
     display: none;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.qc-widget.qc-widget--feedback-ready .qc-quick-actions {
+.qc-feedback-panel-text {
+    font-size: 13px;
+    color: var(--qc-text);
+    font-weight: 600;
+}
+
+.qc-widget.qc-widget--feedback-ready .qc-feedback-panel {
     display: flex;
 }
 
-.qc-widget.qc-widget--feedback-ready .qc-feedback-hint {
-    display: block;
+.qc-feedback-hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--qc-muted);
 }
 
 .qc-feedback-chip {
