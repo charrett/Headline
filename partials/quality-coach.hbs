@@ -1,57 +1,43 @@
-{{!-- Quality Coach AI - Floating Chat Widget --}}
+{{!-- Quality Coach Companion - Floating Chat Widget --}}
 {{!-- Server-side beta access is handled by /api/v1/access/check.
     No API keys or email lists should be injected into the browser. --}}
-<style>
-    .qc-access-message {
-        display: none;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1rem;
-        margin-bottom: 1rem;
-        border-radius: 12px;
-        background: #f1f5f9;
-        color: #0f172a;
-        font-size: 0.95rem;
-        font-weight: 500;
-    }
-
-    .qc-access-message.qc-warning {
-        background: #fff7ed;
-        color: #9a3412;
-    }
-
-    .qc-access-message.qc-error {
-        background: #fee2e2;
-        color: #b91c1c;
-    }
-
-    .qc-locked-message {
-        padding: 1rem;
-        margin-top: 1rem;
-        border-radius: 12px;
-        background: #f8fafc;
-        color: #0f172a;
-        text-align: center;
-        font-size: 0.95rem;
-    }
-</style>
 
 {{#if @member}}
     <div id="qc-access-message" class="qc-access-message" role="status"></div>
     
     {{!-- Floating Chat Widget --}}
-    <div id="quality-coach-widget" style="display: none;">
+    <div id="quality-coach-widget" class="qc-widget qc-widget--initializing">
 
         {{!-- Chat Button (initially visible) --}}
-        <button id="qc-chat-button" class="qc-chat-button" aria-label="Open Quality Coach AI">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span class="qc-button-badge">AI</span>
+        <button 
+            id="qc-chat-button" 
+            class="qc-chat-button is-loading" 
+            type="button"
+            aria-label="Open Quality Coach Companion"
+            aria-haspopup="dialog"
+            aria-controls="qc-chat-window"
+            aria-expanded="false"
+            aria-disabled="true"
+            title="Checking Companion access">
+            <span class="qc-chat-button-icon qc-chat-button-icon--chat" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </span>
+            <span class="qc-chat-button-icon qc-chat-button-icon--close" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </span>
+            <span class="qc-button-badge">Beta</span>
         </button>
 
         {{!-- Chat Window (hidden by default) --}}
-        <div id="qc-chat-window" class="qc-chat-window" style="display: none;">
+        <div id="qc-chat-window" class="qc-chat-window" role="dialog" aria-modal="true" aria-label="Quality Coach Companion">
+            <div class="qc-window-handle" aria-hidden="true">
+                <span></span>
+            </div>
             {{!-- Header --}}
             <div class="qc-window-header">
                 <div class="qc-header-content">
@@ -63,8 +49,8 @@
                         </svg>
                     </div>
                     <div class="qc-header-text">
-                        <h3>Quality Coach AI</h3>
-                        <p>Ask me anything</p>
+                        <h3>Quality Coach Companion</h3>
+                        <p>Get guidance in the flow of work</p>
                     </div>
                 </div>
                 <button id="qc-close-button" class="qc-close-button" aria-label="Close chat">
@@ -79,8 +65,14 @@
             <div id="qc-messages" class="qc-messages">
                 <div class="qc-welcome-message">
                     <div class="qc-welcome-icon">👋</div>
-                    <p><strong>Hi! I'm your Quality Coach AI</strong></p>
-                    <p>I'm trained on "The Quality Coach's Handbook". Ask me about quality coaching, systems thinking, or building quality culture.</p>
+                    <p><strong>Hi! I'm the Quality Coach Companion</strong></p>
+                    <p>I'm grounded in "The Quality Coach's Handbook". Ask about systems thinking, coaching moves, or designing your next small bet.</p>
+                    <div class="qc-quick-actions">
+                        <button id="qc-feedback-chip" class="qc-feedback-chip" type="button">
+                            Share Companion feedback
+                        </button>
+                    </div>
+                    <p class="qc-feedback-hint">Tap to prefill "Feedback:" so you can send beta notes without leaving this chat.</p>
                 </div>
             </div>
 
@@ -120,6 +112,7 @@
             const CHAT_URL = `${API_BASE}/api/v1/chat`;
             const memberEmail = '{{@member.email}}';
             const isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};
+            const FEEDBACK_PREFIX = 'feedback:';
 
             const accessMessage = document.getElementById('qc-access-message');
             const widgetContainer = document.getElementById('quality-coach-widget');
@@ -130,12 +123,38 @@
             const input = document.getElementById('qc-input');
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
+            const feedbackChip = document.getElementById('qc-feedback-chip');
+
+            if (!chatButton || !chatWindow || !input || !sendButton || !closeButton) {
+                return;
+            }
 
             let accessToken = null;
             let hasAccess = false;
             let isOpen = false;
+            let isLocked = false;
             let conversationHistory = [];
             let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+            chatButton.classList.add('is-loading');
+
+            if (feedbackChip) {
+                feedbackChip.addEventListener('click', function() {
+                    const prefixText = 'Feedback: ';
+                    if (!input.value.toLowerCase().startsWith(FEEDBACK_PREFIX)) {
+                        input.value = prefixText;
+                    }
+                    input.focus();
+                    input.dispatchEvent(new Event('input'));
+                    showStatus('Thanks! Share what you need from the Companion and press send.', 'info');
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'quality_coach_feedback_chip_clicked', {
+                            'post_slug': '{{slug}}',
+                            'post_title': '{{title}}'
+                        });
+                    }
+                });
+            }
 
             initializeAccess();
 
@@ -153,7 +172,7 @@
             }
 
             async function initializeAccess() {
-                showStatus('Checking beta access…');
+                showStatus('Checking Companion access…');
                 try {
                     const response = await fetch(ACCESS_URL, {
                         method: 'POST',
@@ -169,15 +188,21 @@
                     }
 
                     const data = await response.json();
+                    if (widgetContainer) {
+                        widgetContainer.classList.remove('qc-widget--initializing');
+                    }
+
                     if (!data.has_access || !data.access_token) {
                         hasAccess = false;
-                        widgetContainer.style.display = 'none';
-                        showStatus(data.reason || 'Quality Coach AI is available to beta testers only right now.', 'warning');
+                        isLocked = true;
+                        setButtonAccessibility({ disabled: true, loading: false, tooltip: data.reason || 'Quality Coach Companion is available to beta testers only right now.' });
+                        showStatus(data.reason || 'Quality Coach Companion is available to beta testers only right now.', 'warning');
                         return;
                     }
 
                     accessToken = data.access_token;
                     hasAccess = true;
+                    isLocked = false;
                     window.QUALITY_COACH_SESSION = {
                         token: accessToken,
                         expires_at: data.access_expires_at,
@@ -185,42 +210,91 @@
                         email: memberEmail
                     };
 
-                    widgetContainer.style.display = 'block';
+                    setButtonAccessibility({ disabled: false, loading: false, tooltip: 'Open Quality Coach Companion' });
                     showStatus('');
                 } catch (error) {
                     hasAccess = false;
-                    widgetContainer.style.display = 'none';
+                    isLocked = true;
+                    if (widgetContainer) {
+                        widgetContainer.classList.remove('qc-widget--initializing');
+                    }
+                    setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Unable to verify beta access. Please refresh and try again.' });
                     showStatus('Unable to verify beta access. Please refresh and try again.', 'error');
+                }
+            }
+
+            function setButtonAccessibility({ disabled, loading, tooltip }) {
+                if (!chatButton) return;
+                chatButton.classList.toggle('is-loading', Boolean(loading));
+                if (typeof disabled !== 'undefined') {
+                    if (disabled) {
+                        chatButton.setAttribute('aria-disabled', 'true');
+                        chatButton.disabled = true;
+                    } else {
+                        chatButton.removeAttribute('aria-disabled');
+                        chatButton.disabled = false;
+                    }
+                }
+                if (tooltip) {
+                    chatButton.setAttribute('title', tooltip);
+                } else {
+                    chatButton.removeAttribute('title');
                 }
             }
 
             // Toggle chat window
             chatButton.addEventListener('click', function() {
-                if (!hasAccess) {
-                    showStatus('Quality Coach AI is limited to approved members. Reach out to join the beta.', 'warning');
+                if (chatButton.getAttribute('aria-disabled') === 'true') {
+                    const lockedCopy = isLocked
+                        ? 'Quality Coach Companion is limited to approved members. Reach out to join the beta.'
+                        : 'Still checking your Companion access…';
+                    showStatus(lockedCopy, isLocked ? 'warning' : 'info');
                     return;
                 }
 
-                isOpen = !isOpen;
                 if (isOpen) {
-                    chatWindow.style.display = 'flex';
-                    chatButton.style.display = 'none';
-                    input.focus();
-
-                    if (typeof gtag !== 'undefined') {
-                        gtag('event', 'quality_coach_opened', {
-                            'post_slug': '{{slug}}',
-                            'post_title': '{{title}}'
-                        });
-                    }
+                    closeChatWindow();
+                } else {
+                    openChatWindow();
                 }
             });
 
-            closeButton.addEventListener('click', function() {
-                isOpen = false;
-                chatWindow.style.display = 'none';
-                chatButton.style.display = 'flex';
+            closeButton.addEventListener('click', closeChatWindow);
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && isOpen) {
+                    closeChatWindow();
+                }
             });
+
+            function openChatWindow() {
+                if (!hasAccess) {
+                    showStatus('Quality Coach Companion is limited to approved members. Reach out to join the beta.', 'warning');
+                    return;
+                }
+                isOpen = true;
+                chatWindow.classList.add('is-visible');
+                chatButton.classList.add('is-open');
+                chatButton.setAttribute('aria-expanded', 'true');
+                chatButton.setAttribute('aria-label', 'Close Quality Coach Companion');
+                input.focus();
+
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'quality_coach_opened', {
+                        'post_slug': '{{slug}}',
+                        'post_title': '{{title}}'
+                    });
+                }
+            }
+
+            function closeChatWindow() {
+                isOpen = false;
+                chatWindow.classList.remove('is-visible');
+                chatButton.classList.remove('is-open');
+                chatButton.setAttribute('aria-expanded', 'false');
+                chatButton.setAttribute('aria-label', 'Open Quality Coach Companion');
+                chatButton.focus();
+            }
 
             // Auto-resize textarea
             input.addEventListener('input', function() {
@@ -240,12 +314,22 @@
 
             function sendMessage() {
                 if (!hasAccess || !accessToken) {
-                    showStatus('Your beta access token expired. Refresh the page to request a new one.', 'warning');
+                    showStatus('Your Companion access token expired. Refresh the page to request a new one.', 'warning');
                     return;
                 }
 
                 const message = input.value.trim();
+                const isFeedback = message.toLowerCase().startsWith(FEEDBACK_PREFIX);
                 if (!message) return;
+
+                if (isFeedback && message.length <= FEEDBACK_PREFIX.length) {
+                    showStatus('Add a short note after “Feedback:” before sending.', 'warning');
+                    return;
+                }
+
+                if (isFeedback) {
+                    showStatus('Appreciate the Companion feedback — it will go straight to Anne-Marie.', 'info');
+                }
 
                 addMessage(message, 'user');
                 input.value = '';
@@ -268,7 +352,8 @@
                         context: {
                             post_slug: '{{slug}}',
                             post_title: '{{title}}',
-                            member_email: memberEmail
+                            member_email: memberEmail,
+                            is_feedback: isFeedback
                         }
                     })
                 })
@@ -278,7 +363,9 @@
                     if (!response.ok) {
                         if (response.status === 401 || response.status === 403) {
                             hasAccess = false;
-                            showStatus('Your beta access expired. Refresh the page to request a new token.', 'warning');
+                            isLocked = true;
+                            showStatus('Your Companion access expired. Refresh the page to request a new token.', 'warning');
+                            setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Access expired - refresh to continue.' });
                         }
                         throw new Error('Chat request failed');
                     }
@@ -288,6 +375,12 @@
                         addMessage(data.answer, 'assistant', data.sources, data.small_bet);
                         conversationHistory.push({ role: 'user', content: message });
                         conversationHistory.push({ role: 'assistant', content: data.answer });
+                        if (isFeedback && typeof gtag !== 'undefined') {
+                            gtag('event', 'quality_coach_feedback_submitted', {
+                                'post_slug': '{{slug}}',
+                                'post_title': '{{title}}'
+                            });
+                        }
                     } else {
                         addMessage('Sorry, I encountered an error. Please try again.', 'error', null, null);
                     }
@@ -372,6 +465,6 @@
     </div>
 {{else}}
     <div class="qc-locked-message">
-        The Quality Coach AI is available to members only. Sign in to request beta access.
+        The Quality Coach Companion is available to members only. Sign in to request beta access.
     </div>
 {{/if}}
