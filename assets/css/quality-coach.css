@@ -31,6 +31,10 @@
     font-size: 0.95rem;
 }
 
+.qc-widget--hidden {
+    display: none !important;
+}
+
 /* Quality Coach Companion - Floating Chat Widget */
 
 :root {

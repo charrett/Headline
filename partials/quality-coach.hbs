@@ -71,8 +71,8 @@
 
             <template id="qc-feedback-panel-template">
                 <div class="qc-feedback-panel" role="status" aria-live="polite">
-                    <div class="qc-feedback-panel-text">How useful was that response?</div>
-                    <p class="qc-feedback-hint">Share quick beta feedback so we can tune the Companion.</p>
+                    <div class="qc-feedback-panel-text">What can we make better?</div>
+                    <p class="qc-feedback-hint">Share suggestions so we can improve the Companion.</p>
                 </div>
             </template>
 
@@ -255,7 +255,7 @@
                     if (!data.has_access || !data.access_token) {
                         hasAccess = false;
                         isLocked = true;
-                        setButtonAccessibility({ disabled: true, loading: false, tooltip: data.reason || 'Quality Coach Companion is available to beta testers only right now.' });
+                        hideChatWidget();
                         showStatus(data.reason || 'Quality Coach Companion is available to beta testers only right now.', 'warning');
                         return;
                     }
@@ -263,6 +263,9 @@
                     accessToken = data.access_token;
                     hasAccess = true;
                     isLocked = false;
+                    if (widgetContainer) {
+                        widgetContainer.classList.remove('qc-widget--hidden');
+                    }
                     window.QUALITY_COACH_SESSION = {
                         token: accessToken,
                         expires_at: data.access_expires_at,
@@ -300,6 +303,13 @@
                 } else {
                     chatButton.removeAttribute('title');
                 }
+            }
+
+            function hideChatWidget() {
+                if (widgetContainer) {
+                    widgetContainer.classList.add('qc-widget--hidden');
+                }
+                setButtonAccessibility({ disabled: true, loading: false });
             }
 
             // Toggle chat window
