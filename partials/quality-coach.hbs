@@ -85,6 +85,20 @@
 
             {{!-- Input Area --}}
             <div class="qc-input-area">
+                <button 
+                    id="qc-feedback-chip"
+                    class="qc-feedback-chip"
+                    type="button"
+                    aria-label="Share feedback about the Quality Coach Companion">
+                    <span class="qc-feedback-chip-circle" aria-hidden="true">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <circle cx="12" cy="16" r="0.8"></circle>
+                        </svg>
+                    </span>
+                    <span class="qc-feedback-chip-text">How can we make it better?</span>
+                </button>
                 <textarea 
                     id="qc-input" 
                     class="qc-input" 
@@ -112,6 +126,8 @@
             const CHAT_URL = `${API_BASE}/api/v1/chat`;
             const memberEmail = '{{@member.email}}';
             const isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};
+            const DEFAULT_PLACEHOLDER = 'Ask a question...';
+            const FEEDBACK_PLACEHOLDER = 'Share suggestions on how to improve the Companion';
             const FEEDBACK_PREFIX = 'feedback:';
 
             const accessMessage = document.getElementById('qc-access-message');
@@ -121,6 +137,7 @@
             const closeButton = document.getElementById('qc-close-button');
             const messages = document.getElementById('qc-messages');
             const feedbackTemplate = document.getElementById('qc-feedback-panel-template');
+            const feedbackChip = document.getElementById('qc-feedback-chip');
             const input = document.getElementById('qc-input');
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
@@ -150,12 +167,29 @@
             let feedbackUnlocked = false;
             let feedbackPanel = null;
             let lastAssistantMessage = null;
-            const FEEDBACK_REMINDER_TEXT = 'Feedback: How useful was that response?';
+            let isFeedbackMode = false;
+            let feedbackChipPulseTimer = null;
 
             chatButton.classList.add('is-loading');
 
             initializeAccess();
             monitorPortalTrigger();
+
+            if (feedbackChip) {
+                feedbackChip.addEventListener('click', () => {
+                    if (!feedbackUnlocked) return;
+                    enableFeedbackMode();
+                });
+            }
+
+            if (input) {
+                input.placeholder = DEFAULT_PLACEHOLDER;
+                input.addEventListener('blur', () => {
+                    if (!input.value.trim()) {
+                        disableFeedbackMode();
+                    }
+                });
+            }
 
             function showStatus(message, variant = 'info') {
                 if (!accessMessage) return;
@@ -347,6 +381,9 @@
                 chatButton.classList.add('is-open');
                 chatButton.setAttribute('aria-expanded', 'true');
                 chatButton.setAttribute('aria-label', 'Close Quality Coach Companion');
+                if (!isFeedbackMode) {
+                    input.placeholder = DEFAULT_PLACEHOLDER;
+                }
                 input.focus();
 
                 if (typeof gtag !== 'undefined') {
@@ -388,12 +425,17 @@
                     return;
                 }
 
-                const message = input.value.trim();
-                const isFeedback = message.toLowerCase().startsWith(FEEDBACK_PREFIX);
-                if (!message) return;
+                const rawMessage = input.value.trim();
+                if (!rawMessage) return;
 
-                if (isFeedback && message.length <= FEEDBACK_PREFIX.length) {
-                    showStatus('Add a short note after “Feedback:” before sending.', 'warning');
+                const hasLegacyFeedbackPrefix = rawMessage.toLowerCase().startsWith(FEEDBACK_PREFIX);
+                const cleanedMessage = hasLegacyFeedbackPrefix
+                    ? rawMessage.slice(FEEDBACK_PREFIX.length).trimStart()
+                    : rawMessage;
+                const isFeedback = isFeedbackMode || hasLegacyFeedbackPrefix;
+
+                if (isFeedback && !cleanedMessage) {
+                    showStatus('Share a short note before sending feedback.', 'warning');
                     return;
                 }
 
@@ -401,9 +443,10 @@
                     showStatus('Appreciate the Companion feedback — it will go straight to Anne-Marie.', 'info');
                 }
 
-                addMessage(message, 'user');
+                addMessage(rawMessage, 'user');
                 input.value = '';
                 input.style.height = 'auto';
+                disableFeedbackMode();
 
                 input.disabled = true;
                 sendButton.disabled = true;
@@ -416,7 +459,7 @@
                         'Authorization': `Bearer ${accessToken}`
                     },
                     body: JSON.stringify({
-                        message: message,
+                        message: cleanedMessage,
                         session_id: sessionId,
                         history: conversationHistory,
                         context: {
@@ -443,7 +486,7 @@
                     const data = await response.json();
                     if (data.answer) {
                         addMessage(data.answer, 'assistant', data.sources, data.small_bet);
-                        conversationHistory.push({ role: 'user', content: message });
+                        conversationHistory.push({ role: 'user', content: cleanedMessage });
                         conversationHistory.push({ role: 'assistant', content: data.answer });
                         unlockFeedbackChip();
                         if (isFeedback && typeof gtag !== 'undefined') {
@@ -504,13 +547,41 @@
             }
 
             function promptForFeedback() {
-                if (!feedbackUnlocked || !input) return;
-                input.value = FEEDBACK_REMINDER_TEXT;
-                input.focus();
-                if (typeof input.select === 'function') {
-                    input.select();
+                if (!feedbackUnlocked) return;
+                pulseFeedbackChip();
+            }
+
+            function enableFeedbackMode() {
+                if (!input) return;
+                isFeedbackMode = true;
+                input.placeholder = FEEDBACK_PLACEHOLDER;
+                input.classList.add('qc-input--feedback-mode');
+                if (feedbackChip) {
+                    feedbackChip.classList.add('is-active');
                 }
+                input.focus();
                 input.dispatchEvent(new Event('input'));
+            }
+
+            function disableFeedbackMode() {
+                if (!input) return;
+                isFeedbackMode = false;
+                input.placeholder = DEFAULT_PLACEHOLDER;
+                input.classList.remove('qc-input--feedback-mode');
+                if (feedbackChip) {
+                    feedbackChip.classList.remove('is-active');
+                }
+            }
+
+            function pulseFeedbackChip() {
+                if (!feedbackChip) return;
+                feedbackChip.classList.add('is-pulsing');
+                if (feedbackChipPulseTimer) {
+                    clearTimeout(feedbackChipPulseTimer);
+                }
+                feedbackChipPulseTimer = setTimeout(() => {
+                    feedbackChip.classList.remove('is-pulsing');
+                }, 1800);
             }
 
             function formatMessage(content) {

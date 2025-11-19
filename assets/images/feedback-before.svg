@@ -1,0 +1,23 @@
+<svg width="360" height="220" viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="qcFeedbackBeforeTitle qcFeedbackBeforeDesc">
+  <title id="qcFeedbackBeforeTitle">Quality Coach Companion - Before Feedback Prompt</title>
+  <desc id="qcFeedbackBeforeDesc">Illustration of the chat widget showing the assistant response before the feedback chip is shown.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+    <filter id="card" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+  </defs>
+  <rect width="360" height="220" rx="24" fill="url(#bg)" />
+  <rect x="32" y="28" width="296" height="120" rx="16" fill="#fff" filter="url(#card)" />
+  <rect x="56" y="52" width="248" height="12" rx="6" fill="#0f172a" opacity="0.82" />
+  <rect x="56" y="74" width="212" height="10" rx="5" fill="#475569" opacity="0.7" />
+  <rect x="56" y="94" width="168" height="10" rx="5" fill="#94a3b8" opacity="0.6" />
+  <rect x="32" y="170" width="220" height="14" rx="7" fill="#cbd5f5" />
+  <rect x="260" y="166" width="68" height="22" rx="11" fill="#0ea5e9" />
+  <text x="42" y="181" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="10" fill="#0f172a" opacity="0.8">Ask a question...</text>
+  <text x="274" y="181" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="10" fill="#ffffff">Send</text>
+  <text x="36" y="18" font-family="'Inter', 'Segoe UI', system-ui, sans-serif" font-size="12" fill="#475569" opacity="0.9">State A · Assistant responds · No feedback prompt yet</text>
+</svg>
