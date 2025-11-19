@@ -1,60 +1,46 @@
 {{!-- Quality Coach AI - Floating Chat Widget --}}
-{{!-- Configure via Ghost Code Injection (Settings → Code Injection → Site Header):
-     - allowedEmails: array of email addresses who can see the widget
-     - allowPaidMembers: boolean for all paid members
-     - apiKey: your API secret key from backend .env
---}}
-<script>
-    console.log('=== QUALITY COACH PARTIAL LOADED ===');
-    console.log('Script is running!');
-    
-    window.QUALITY_COACH_CONFIG = window.QUALITY_COACH_CONFIG || {
-        apiKey: '' // REQUIRED: Set this in Code Injection
-    };
-    
-    // Debug info
-    console.log('Quality Coach Debug:');
-    console.log('- Member email:', '{{@member.email}}' || 'NOT LOGGED IN');
-    console.log('- Config:', window.QUALITY_COACH_CONFIG);
-    console.log('- @member object exists:', {{#if @member}}true{{else}}false{{/if}});
-</script>
+{{!-- Server-side beta access is handled by /api/v1/access/check.
+    No API keys or email lists should be injected into the browser. --}}
+<style>
+    .qc-access-message {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        background: #f1f5f9;
+        color: #0f172a;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
 
-{{#if @member.email}}
-    <script>
-        // Check if this member is allowed to see the widget
-        window.QUALITY_COACH_SHOW = false;
-        
-        console.log('Quality Coach Access Check:');
-        console.log('- Your email:', '{{@member.email}}');
-        console.log('- Allowed emails:', window.QUALITY_COACH_CONFIG.allowedEmails);
-        console.log('- Allow paid members:', window.QUALITY_COACH_CONFIG.allowPaidMembers);
-        console.log('- Member is paid:', {{#if @member.paid}}true{{else}}false{{/if}});
-        
-        // Check allowed emails list (test mode)
-        if (window.QUALITY_COACH_CONFIG.allowedEmails && window.QUALITY_COACH_CONFIG.allowedEmails.length > 0) {
-            window.QUALITY_COACH_SHOW = window.QUALITY_COACH_CONFIG.allowedEmails.includes('{{@member.email}}');
-            console.log('- Email check result:', window.QUALITY_COACH_SHOW);
-        }
-        // Fallback to paid member check (production mode)
-        else if (window.QUALITY_COACH_CONFIG.allowPaidMembers) {
-            window.QUALITY_COACH_SHOW = {{#if @member.paid}}true{{else}}false{{/if}};
-            console.log('- Paid member check result:', window.QUALITY_COACH_SHOW);
-        }
-        
-        console.log('- FINAL SHOW FLAG:', window.QUALITY_COACH_SHOW);
-    </script>
+    .qc-access-message.qc-warning {
+        background: #fff7ed;
+        color: #9a3412;
+    }
+
+    .qc-access-message.qc-error {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .qc-locked-message {
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 12px;
+        background: #f8fafc;
+        color: #0f172a;
+        text-align: center;
+        font-size: 0.95rem;
+    }
+</style>
+
+{{#if @member}}
+    <div id="qc-access-message" class="qc-access-message" role="status"></div>
     
     {{!-- Floating Chat Widget --}}
     <div id="quality-coach-widget" style="display: none;">
-        <script>
-            console.log('Widget visibility script running, SHOW flag is:', window.QUALITY_COACH_SHOW);
-            if (window.QUALITY_COACH_SHOW) {
-                const widget = document.getElementById('quality-coach-widget');
-                console.log('Widget element found:', widget);
-                widget.style.display = 'block';
-                console.log('Widget display set to block');
-            }
-        </script>
 
         {{!-- Chat Button (initially visible) --}}
         <button id="qc-chat-button" class="qc-chat-button" aria-label="Open Quality Coach AI">
@@ -129,9 +115,14 @@
 
         <script>
         (function() {
-            const API_URL = 'https://qchb-chat.fly.dev/api/v1/chat';
-            const API_KEY = window.QUALITY_COACH_CONFIG.apiKey;
-            
+            const API_BASE = 'https://qchb-chat.fly.dev';
+            const ACCESS_URL = `${API_BASE}/api/v1/access/check`;
+            const CHAT_URL = `${API_BASE}/api/v1/chat`;
+            const memberEmail = '{{@member.email}}';
+            const isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};
+
+            const accessMessage = document.getElementById('qc-access-message');
+            const widgetContainer = document.getElementById('quality-coach-widget');
             const chatButton = document.getElementById('qc-chat-button');
             const chatWindow = document.getElementById('qc-chat-window');
             const closeButton = document.getElementById('qc-close-button');
@@ -139,26 +130,83 @@
             const input = document.getElementById('qc-input');
             const sendButton = document.getElementById('qc-send');
             const typingIndicator = document.getElementById('qc-typing');
-            
+
+            let accessToken = null;
+            let hasAccess = false;
             let isOpen = false;
             let conversationHistory = [];
             let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            // Check if API key is configured
-            if (!API_KEY) {
-                console.error('Quality Coach: API key not configured in Code Injection');
-                return;
+
+            initializeAccess();
+
+            function showStatus(message, variant = 'info') {
+                if (!accessMessage) return;
+                if (!message) {
+                    accessMessage.textContent = '';
+                    accessMessage.style.display = 'none';
+                    accessMessage.className = 'qc-access-message';
+                    return;
+                }
+                accessMessage.textContent = message;
+                accessMessage.style.display = 'flex';
+                accessMessage.className = `qc-access-message qc-${variant}`;
             }
-            
+
+            async function initializeAccess() {
+                showStatus('Checking beta access…');
+                try {
+                    const response = await fetch(ACCESS_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: memberEmail,
+                            is_paid_member: isPaidMember
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Access check failed');
+                    }
+
+                    const data = await response.json();
+                    if (!data.has_access || !data.access_token) {
+                        hasAccess = false;
+                        widgetContainer.style.display = 'none';
+                        showStatus(data.reason || 'Quality Coach AI is available to beta testers only right now.', 'warning');
+                        return;
+                    }
+
+                    accessToken = data.access_token;
+                    hasAccess = true;
+                    window.QUALITY_COACH_SESSION = {
+                        token: accessToken,
+                        expires_at: data.access_expires_at,
+                        granted_via: data.access_granted_via,
+                        email: memberEmail
+                    };
+
+                    widgetContainer.style.display = 'block';
+                    showStatus('');
+                } catch (error) {
+                    hasAccess = false;
+                    widgetContainer.style.display = 'none';
+                    showStatus('Unable to verify beta access. Please refresh and try again.', 'error');
+                }
+            }
+
             // Toggle chat window
             chatButton.addEventListener('click', function() {
+                if (!hasAccess) {
+                    showStatus('Quality Coach AI is limited to approved members. Reach out to join the beta.', 'warning');
+                    return;
+                }
+
                 isOpen = !isOpen;
                 if (isOpen) {
                     chatWindow.style.display = 'flex';
                     chatButton.style.display = 'none';
                     input.focus();
-                    
-                    // Track opening
+
                     if (typeof gtag !== 'undefined') {
                         gtag('event', 'quality_coach_opened', {
                             'post_slug': '{{slug}}',
@@ -167,19 +215,19 @@
                     }
                 }
             });
-            
+
             closeButton.addEventListener('click', function() {
                 isOpen = false;
                 chatWindow.style.display = 'none';
                 chatButton.style.display = 'flex';
             });
-            
+
             // Auto-resize textarea
             input.addEventListener('input', function() {
                 this.style.height = 'auto';
                 this.style.height = Math.min(this.scrollHeight, 120) + 'px';
             });
-            
+
             // Send on Enter (Shift+Enter for newline)
             input.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -187,45 +235,55 @@
                     sendMessage();
                 }
             });
-            
+
             sendButton.addEventListener('click', sendMessage);
-            
+
             function sendMessage() {
+                if (!hasAccess || !accessToken) {
+                    showStatus('Your beta access token expired. Refresh the page to request a new one.', 'warning');
+                    return;
+                }
+
                 const message = input.value.trim();
                 if (!message) return;
-                
-                // Add user message to UI
+
                 addMessage(message, 'user');
                 input.value = '';
                 input.style.height = 'auto';
-                
-                // Disable input while processing
+
                 input.disabled = true;
                 sendButton.disabled = true;
                 typingIndicator.style.display = 'flex';
-                
-                // Send to API
-                fetch(API_URL, {
+
+                fetch(CHAT_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-API-Key': API_KEY
+                        'Authorization': `Bearer ${accessToken}`
                     },
                     body: JSON.stringify({
                         message: message,
                         session_id: sessionId,
+                        history: conversationHistory,
                         context: {
                             post_slug: '{{slug}}',
                             post_title: '{{title}}',
-                            member_email: '{{@member.email}}'
+                            member_email: memberEmail
                         }
                     })
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(async response => {
                     typingIndicator.style.display = 'none';
-                    
-                    // API returns 'answer' field, not 'response'
+
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            hasAccess = false;
+                            showStatus('Your beta access expired. Refresh the page to request a new token.', 'warning');
+                        }
+                        throw new Error('Chat request failed');
+                    }
+
+                    const data = await response.json();
                     if (data.answer) {
                         addMessage(data.answer, 'assistant', data.sources, data.small_bet);
                         conversationHistory.push({ role: 'user', content: message });
@@ -234,8 +292,7 @@
                         addMessage('Sorry, I encountered an error. Please try again.', 'error', null, null);
                     }
                 })
-                .catch(error => {
-                    console.error('Chat error:', error);
+                .catch(() => {
                     typingIndicator.style.display = 'none';
                     addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'error');
                 })
@@ -245,37 +302,30 @@
                     input.focus();
                 });
             }
-            
+
             function formatMessage(content) {
-                // Convert markdown-like formatting to HTML
                 return content
-                    // Bold text
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    // Bullet points - handle both - and • 
                     .replace(/^- (.*?)$/gm, '• $1')
-                    // Code blocks or sections in brackets
                     .replace(/\[(.*?)\]/g, '<span style="color: #64748b; font-size: 0.9em;">[$1]</span>')
-                    // Line breaks for readability
                     .replace(/\n/g, '<br>');
             }
-            
+
             function addMessage(content, role, sources, smallBet) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'qc-message qc-message-' + role;
-                
+
                 const bubble = document.createElement('div');
                 bubble.className = 'qc-message-bubble';
-                
-                // Use innerHTML for formatted content, textContent for user messages
+
                 if (role === 'user') {
                     bubble.textContent = content;
                 } else {
                     bubble.innerHTML = formatMessage(content);
                 }
-                
+
                 messageDiv.appendChild(bubble);
-                
-                // Add small bet if available
+
                 if (smallBet) {
                     const betDiv = document.createElement('div');
                     betDiv.className = 'qc-small-bet';
@@ -305,8 +355,7 @@
                     `;
                     messageDiv.appendChild(betDiv);
                 }
-                
-                // Add sources if available
+
                 if (sources && sources.length > 0) {
                     const sourcesDiv = document.createElement('div');
                     sourcesDiv.className = 'qc-sources';
@@ -314,11 +363,15 @@
                         sources.map(s => s.chapter || s.title).join(', ');
                     messageDiv.appendChild(sourcesDiv);
                 }
-                
+
                 messages.appendChild(messageDiv);
                 messages.scrollTop = messages.scrollHeight;
             }
         })();
         </script>
+    </div>
+{{else}}
+    <div class="qc-locked-message">
+        The Quality Coach AI is available to members only. Sign in to request beta access.
     </div>
 {{/if}}
