@@ -147,6 +147,7 @@
             let portalObserver = null;
             let portalInterval = null;
             let portalFallbackTimer = null;
+            let feedbackUnlocked = false;
 
             chatButton.classList.add('is-loading');
 
@@ -401,6 +402,8 @@
                     return;
                 }
 
+                unlockFeedbackChip();
+
                 if (isFeedback) {
                     showStatus('Appreciate the Companion feedback — it will go straight to Anne-Marie.', 'info');
                 }
@@ -468,6 +471,14 @@
                     sendButton.disabled = false;
                     input.focus();
                 });
+            }
+
+            function unlockFeedbackChip() {
+                if (feedbackUnlocked) return;
+                feedbackUnlocked = true;
+                if (widgetContainer) {
+                    widgetContainer.classList.add('qc-widget--feedback-ready');
+                }
             }
 
             function formatMessage(content) {
