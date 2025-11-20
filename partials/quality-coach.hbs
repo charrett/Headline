@@ -118,6 +118,10 @@
             const isPaidMember = {{#if @member.paid}}true{{else}}false{{/if}};
             const DEFAULT_PLACEHOLDER = 'Ask a question...';
             const FEEDBACK_PREFIX = 'feedback:';
+            const ACCESS_CACHE_PREFIX = 'qc_access_cache:';
+            const ACCESS_CACHE_MIN_VALID_MS = 30 * 1000;
+            const ACCESS_REFRESH_BUFFER_MS = 5 * 60 * 1000;
+            const ACCESS_LAG_MESSAGE_MS = 4000;
 
             const accessMessage = document.getElementById('qc-access-message');
             const widgetContainer = document.getElementById('quality-coach-widget');
@@ -143,6 +147,13 @@
                 return;
             }
 
+            if (typeof window !== 'undefined') {
+                window.QUALITY_COACH_SESSION = {
+                    status: 'pending',
+                    email: memberEmail
+                };
+            }
+
             let accessToken = null;
             let hasAccess = false;
             let isOpen = false;
@@ -157,6 +168,8 @@
             let feedbackTextarea = null;
             let feedbackSubmitButton = null;
             let lastAssistantMessage = null;
+            let accessRefreshTimer = null;
+            let accessLagTimer = null;
 
             chatButton.classList.add('is-loading');
 
@@ -177,6 +190,163 @@
                 accessMessage.textContent = message;
                 accessMessage.style.display = 'flex';
                 accessMessage.className = `qc-access-message qc-${variant}`;
+            }
+
+            function startAccessLagTimer() {
+                if (accessLagTimer) {
+                    clearTimeout(accessLagTimer);
+                }
+                accessLagTimer = setTimeout(() => {
+                    showStatus('Still checking your Companion access…', 'info');
+                }, ACCESS_LAG_MESSAGE_MS);
+            }
+
+            function stopAccessLagTimer() {
+                if (accessLagTimer) {
+                    clearTimeout(accessLagTimer);
+                    accessLagTimer = null;
+                }
+            }
+
+            function attemptRestoreCachedAccess() {
+                const cached = loadAccessCache();
+                if (!cached) {
+                    return false;
+                }
+                if (!canUseCachedAccess(cached)) {
+                    clearAccessCache();
+                    return false;
+                }
+                applyAccessSuccess({
+                    access_token: cached.access_token,
+                    access_expires_at: cached.access_expires_at,
+                    access_granted_via: cached.access_granted_via,
+                    is_beta_tester: cached.is_beta_tester,
+                    is_paid_member: cached.is_paid_member
+                }, {
+                    source: 'cache',
+                    skipCache: true
+                });
+                return true;
+            }
+
+            function applyAccessSuccess(data, { source = 'network', skipCache = false } = {}) {
+                if (!data || !data.access_token) {
+                    return;
+                }
+                accessToken = data.access_token;
+                hasAccess = true;
+                isLocked = false;
+                if (widgetContainer) {
+                    widgetContainer.classList.remove('qc-widget--hidden');
+                    widgetContainer.classList.remove('qc-widget--initializing');
+                }
+                window.QUALITY_COACH_SESSION = {
+                    token: accessToken,
+                    expires_at: data.access_expires_at,
+                    granted_via: data.access_granted_via,
+                    email: memberEmail,
+                    status: 'ready',
+                    source,
+                    is_beta_tester: data.is_beta_tester,
+                    is_paid_member: data.is_paid_member
+                };
+
+                setButtonAccessibility({ disabled: false, loading: false, tooltip: 'Open Quality Coach Companion' });
+                if (!skipCache) {
+                    saveAccessCache({
+                        access_token: data.access_token,
+                        access_expires_at: data.access_expires_at,
+                        access_granted_via: data.access_granted_via,
+                        is_beta_tester: data.is_beta_tester,
+                        is_paid_member: data.is_paid_member
+                    });
+                }
+                scheduleAccessRefresh(data.access_expires_at);
+                showStatus('');
+            }
+
+            function scheduleAccessRefresh(expiresAt) {
+                if (accessRefreshTimer) {
+                    clearTimeout(accessRefreshTimer);
+                    accessRefreshTimer = null;
+                }
+                if (!expiresAt) return;
+                const expiryTime = Date.parse(expiresAt);
+                if (!expiryTime) return;
+                const delay = expiryTime - Date.now() - ACCESS_REFRESH_BUFFER_MS;
+                if (delay <= 0) {
+                    accessRefreshTimer = setTimeout(() => {
+                        refreshAccessToken('expired');
+                    }, 1000);
+                    return;
+                }
+                accessRefreshTimer = setTimeout(() => {
+                    refreshAccessToken('scheduled');
+                }, delay);
+            }
+
+            async function refreshAccessToken(reason = 'scheduled') {
+                try {
+                    await performAccessCheck({ silent: true });
+                } catch (error) {
+                    if (typeof console !== 'undefined' && console.debug) {
+                        console.debug('Companion access refresh failed', reason, error);
+                    }
+                }
+            }
+
+            function getCacheKey() {
+                return `${ACCESS_CACHE_PREFIX}${memberEmail || 'anonymous'}`;
+            }
+
+            function loadAccessCache() {
+                if (typeof sessionStorage === 'undefined') return null;
+                try {
+                    const raw = sessionStorage.getItem(getCacheKey());
+                    if (!raw) return null;
+                    return JSON.parse(raw);
+                } catch (error) {
+                    clearAccessCache();
+                    return null;
+                }
+            }
+
+            function saveAccessCache(payload) {
+                if (typeof sessionStorage === 'undefined' || !payload) return;
+                const cacheEntry = {
+                    ...payload,
+                    cached_at: new Date().toISOString(),
+                    member_email: memberEmail
+                };
+                try {
+                    sessionStorage.setItem(getCacheKey(), JSON.stringify(cacheEntry));
+                } catch (error) {
+                    // Ignore quota errors silently
+                }
+            }
+
+            function clearAccessCache() {
+                if (typeof sessionStorage === 'undefined') return;
+                sessionStorage.removeItem(getCacheKey());
+                if (accessRefreshTimer) {
+                    clearTimeout(accessRefreshTimer);
+                    accessRefreshTimer = null;
+                }
+            }
+
+            function canUseCachedAccess(entry) {
+                if (!entry || !entry.access_token || !entry.access_expires_at) {
+                    return false;
+                }
+                const expiryTime = Date.parse(entry.access_expires_at);
+                if (!expiryTime) {
+                    return false;
+                }
+                if (expiryTime - Date.now() <= ACCESS_CACHE_MIN_VALID_MS) {
+                    return false;
+                }
+                return true;
             }
 
             function monitorPortalTrigger() {
@@ -241,7 +411,19 @@
             }
 
             async function initializeAccess() {
-                showStatus('Checking Companion access…');
+                const restored = attemptRestoreCachedAccess();
+                if (restored) {
+                    return;
+                }
+                await performAccessCheck();
+            }
+
+            async function performAccessCheck({ silent = false } = {}) {
+                if (!silent) {
+                    showStatus('Checking Companion access…');
+                    startAccessLagTimer();
+                }
+
                 try {
                     const response = await fetch(ACCESS_URL, {
                         method: 'POST',
@@ -266,24 +448,14 @@
                         isLocked = true;
                         hideChatWidget();
                         showStatus(data.reason || 'Quality Coach Companion is available to beta testers only right now.', 'warning');
-                        return;
+                        clearAccessCache();
+                        return false;
                     }
 
-                    accessToken = data.access_token;
-                    hasAccess = true;
-                    isLocked = false;
-                    if (widgetContainer) {
-                        widgetContainer.classList.remove('qc-widget--hidden');
-                    }
-                    window.QUALITY_COACH_SESSION = {
-                        token: accessToken,
-                        expires_at: data.access_expires_at,
-                        granted_via: data.access_granted_via,
-                        email: memberEmail
-                    };
-
-                    setButtonAccessibility({ disabled: false, loading: false, tooltip: 'Open Quality Coach Companion' });
-                    showStatus('');
+                    applyAccessSuccess(data, {
+                        source: silent ? 'refresh' : 'network'
+                    });
+                    return true;
                 } catch (error) {
                     hasAccess = false;
                     isLocked = true;
@@ -291,7 +463,15 @@
                         widgetContainer.classList.remove('qc-widget--initializing');
                     }
                     setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Unable to verify beta access. Please refresh and try again.' });
-                    showStatus('Unable to verify beta access. Please refresh and try again.', 'error');
+                    if (!silent) {
+                        showStatus('Unable to verify beta access. Please refresh and try again.', 'error');
+                    }
+                    clearAccessCache();
+                    return false;
+                } finally {
+                    if (!silent) {
+                        stopAccessLagTimer();
+                    }
                 }
             }
 
