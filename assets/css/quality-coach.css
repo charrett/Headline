@@ -243,24 +243,6 @@ body.qc-offset-for-portal {
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
-.qc-feedback-panel {
-    margin: 16px 0;
-    padding: 16px;
-    background: var(--qc-surface);
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.qc-feedback-panel-text {
-    font-size: 13px;
-    color: var(--qc-text);
-    font-weight: 600;
-}
-
-
 .qc-welcome-icon {
     font-size: 40px;
     margin-bottom: 12px;
@@ -442,74 +424,12 @@ body.qc-offset-for-portal {
 /* Input Area */
 .qc-input-area {
     display: flex;
-    flex-wrap: wrap;
     gap: 8px;
     padding: 12px;
     border-top: 1px solid var(--qc-border);
     background: var(--qc-surface);
     align-items: center;
     flex-shrink: 0;
-}
-
-.qc-feedback-chip {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    background: #e2e8f0;
-    border-radius: 999px;
-    padding: 6px 16px 6px 10px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #0f172a;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.qc-feedback-chip:focus-visible {
-    outline: 3px solid rgba(14, 165, 233, 0.35);
-    outline-offset: 2px;
-}
-
-.qc-feedback-chip:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
-    background: #e0f2fe;
-}
-
-.qc-feedback-chip.is-active {
-    background: #dbeafe;
-    box-shadow: 0 8px 18px rgba(14, 165, 233, 0.25);
-}
-
-.qc-feedback-chip.is-pulsing {
-    animation: qc-chip-pulse 0.8s ease-in-out 2;
-}
-
-@keyframes qc-chip-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.5); }
-    100% { box-shadow: 0 0 0 16px rgba(14, 165, 233, 0); }
-}
-
-.qc-feedback-chip-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--qc-accent);
-    color: var(--color-white, #ffffff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.qc-feedback-chip-circle svg {
-    width: 18px;
-    height: 18px;
-}
-
-.qc-widget--feedback-ready .qc-feedback-chip {
-    display: inline-flex;
 }
 
 .qc-input {
@@ -530,13 +450,94 @@ body.qc-offset-for-portal {
     color: #94a3b8;
 }
 
-.qc-input.qc-input--feedback-mode::placeholder {
-    color: #475569;
+/* Feedback Panel */
+.qc-feedback-panel {
+    margin: 16px 0;
+    padding: 18px;
+    background: var(--qc-surface);
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.05);
 }
 
-.qc-input.qc-input--feedback-mode {
+.qc-feedback-panel-text {
+    font-size: 14px;
+    color: var(--qc-text);
+    font-weight: 600;
+}
+
+.qc-feedback-textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 72px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.qc-feedback-textarea:focus {
+    outline: none;
     border-color: var(--qc-accent);
-    background: #f0f9ff;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+}
+
+.qc-feedback-textarea:disabled {
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.qc-feedback-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.qc-feedback-submit {
+    border: none;
+    background: var(--qc-accent);
+    color: var(--color-white, #ffffff);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.qc-feedback-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(14, 165, 233, 0.25);
+}
+
+.qc-feedback-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.qc-feedback-hint {
+    font-size: 12px;
+    color: var(--qc-muted);
+}
+
+.qc-feedback-panel.is-loading {
+    opacity: 0.7;
+}
+
+.qc-message-feedback {
+    align-items: flex-start;
+}
+
+.qc-feedback-message-label {
+    font-size: 12px;
+    color: var(--qc-muted);
+    margin-bottom: 4px;
 }
 
 .qc-input:focus {
