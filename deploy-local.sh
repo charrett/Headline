@@ -3,6 +3,16 @@
 # Deploy theme to local Ghost installation
 # This script builds the theme and copies it to the local Ghost themes directory
 
+# Try to load nvm and use the correct node version
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+    if [ -f ".nvmrc" ]; then
+        echo "🔧 Using Node version from .nvmrc..."
+        nvm use
+    fi
+fi
+
 set -e  # Exit on any error
 
 THEME_NAME="headline"

@@ -110,7 +110,7 @@
         </div>
 
         <script>
-        (function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Automatically switch between local and production backend
             const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
                 ? 'http://localhost:8000'
@@ -158,12 +158,27 @@
                 };
             }
 
+            // Initialize Quality Coach Client
+            // Ensure QualityCoachClient is available
+            if (typeof QualityCoachClient === 'undefined') {
+                console.error('QualityCoachClient not loaded');
+                return;
+            }
+
+            const client = new QualityCoachClient({
+                apiBase: API_BASE,
+                storageKey: 'qc_thread_id'
+            });
+            
+            // Initialize thread ID immediately
+            const clientThreadId = client.init();
+
             let accessToken = null;
             let hasAccess = false;
             let isOpen = false;
             let isLocked = false;
             let conversationHistory = [];
-            let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
             let portalObserver = null;
             let portalInterval = null;
             let portalFallbackTimer = null;
@@ -239,6 +254,9 @@
                     return;
                 }
                 accessToken = data.access_token;
+                // Ensure client has the token
+                client.setAccessToken(accessToken);
+                
                 hasAccess = true;
                 isLocked = false;
                 if (widgetContainer) {
@@ -268,6 +286,9 @@
                 }
                 scheduleAccessRefresh(data.access_expires_at);
                 showStatus('');
+                
+                // Load history if available
+                loadConversationHistory();
             }
 
             function scheduleAccessRefresh(expiresAt) {
@@ -414,6 +435,30 @@
                 return null;
             }
 
+            async function loadConversationHistory() {
+                if (!clientThreadId || !accessToken) return;
+                
+                // Avoid loading if we already have history in memory (e.g. from previous session in same window)
+                if (conversationHistory.length > 0) return;
+
+                try {
+                    const messages = await client.getHistory();
+                    
+                    if (Array.isArray(messages) && messages.length > 0) {
+                        // Clear welcome message if we have history
+                        const welcomeMsg = document.querySelector('.qc-welcome-message');
+                        if (welcomeMsg) welcomeMsg.style.display = 'none';
+
+                        messages.forEach(msg => {
+                            addMessage(msg.content, msg.role);
+                            conversationHistory.push({ role: msg.role, content: msg.content });
+                        });
+                    }
+                } catch (error) {
+                    console.debug('Failed to load conversation history', error);
+                }
+            }
+
             async function initializeAccess() {
                 const restored = attemptRestoreCachedAccess();
                 if (restored) {
@@ -429,20 +474,8 @@
                 }
 
                 try {
-                    const response = await fetch(ACCESS_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: memberEmail,
-                            is_paid_member: isPaidMember
-                        })
-                    });
+                    const data = await client.checkAccess(memberEmail);
 
-                    if (!response.ok) {
-                        throw new Error('Access check failed');
-                    }
-
-                    const data = await response.json();
                     if (widgetContainer) {
                         widgetContainer.classList.remove('qc-widget--initializing');
                     }
@@ -455,6 +488,9 @@
                         clearAccessCache();
                         return false;
                     }
+
+                    // Update client with token
+                    client.setAccessToken(data.access_token);
 
                     applyAccessSuccess(data, {
                         source: silent ? 'refresh' : 'network'
@@ -622,38 +658,15 @@
                 }
                 typingIndicator.style.display = 'flex';
 
-                fetch(CHAT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({
-                        message: cleanedMessage,
-                        session_id: sessionId,
-                        history: conversationHistory,
-                        context: {
-                            post_slug: '{{slug}}',
-                            post_title: '{{title}}',
-                            member_email: memberEmail,
-                            is_feedback: isFeedback
-                        }
-                    })
+                client.sendMessage(cleanedMessage, conversationHistory, {
+                    post_slug: '{{slug}}',
+                    post_title: '{{title}}',
+                    member_email: memberEmail,
+                    is_feedback: isFeedback
                 })
-                .then(async response => {
+                .then(data => {
                     typingIndicator.style.display = 'none';
 
-                    if (!response.ok) {
-                        if (response.status === 401 || response.status === 403) {
-                            hasAccess = false;
-                            isLocked = true;
-                            showStatus('Your Companion access expired. Refresh the page to request a new token.', 'warning');
-                            setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Access expired - refresh to continue.' });
-                        }
-                        throw new Error('Chat request failed');
-                    }
-
-                    const data = await response.json();
                     if (data.answer) {
                         addMessage(data.answer, 'assistant', data.sources, data.small_bet);
                         conversationHistory.push({ role: 'user', content: cleanedMessage });
@@ -669,9 +682,17 @@
                         addMessage('Sorry, I encountered an error. Please try again.', 'error', null, null);
                     }
                 })
-                .catch(() => {
+                .catch(error => {
                     typingIndicator.style.display = 'none';
-                    addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'error');
+                    
+                    if (error.message.includes('401') || error.message.includes('403')) {
+                        hasAccess = false;
+                        isLocked = true;
+                        showStatus('Your Companion access expired. Refresh the page to request a new token.', 'warning');
+                        setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Access expired - refresh to continue.' });
+                    } else {
+                        addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'error');
+                    }
                 })
                 .finally(() => {
                     if (usingPrimaryInput) {
@@ -841,7 +862,7 @@
                 messages.appendChild(messageDiv);
                 messages.scrollTop = messages.scrollHeight;
             }
-        })();
+        });
         </script>
     </div>
 {{else}}
