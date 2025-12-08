@@ -58,3 +58,7 @@ headline2.zip
 headline3..zip
 headline4..zip
 headline5.zip
+
+# Playwright test artifacts
+playwright-report/
+test-results/
