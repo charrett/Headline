@@ -771,7 +771,8 @@
                                 showPersonaConfirmation(data.persona, data.persona_confidence, {
                                     answer: data.answer,
                                     sources: data.sources,
-                                    originalMessage: cleanedMessage
+                                    originalMessage: cleanedMessage,
+                                    lowRelevance: data.low_relevance
                                 });
                                 return; // STOP HERE
                             }
@@ -786,7 +787,7 @@
                                 updatePersonaDropdown(data.persona);
                             }
                             
-                            addMessage(data.answer, 'assistant', data.sources);
+                            addMessage(data.answer, 'assistant', data.sources, false, data.low_relevance);
                             conversationHistory.push({ role: 'user', content: cleanedMessage });
                             conversationHistory.push({ role: 'assistant', content: data.answer });
                         }
@@ -864,7 +865,7 @@
                     // If we have deferred data but confirmation was already shown/confirmed elsewhere,
                     // we should probably just show the answer?
                     if (deferredData && deferredData.answer) {
-                         addMessage(deferredData.answer, 'assistant', deferredData.sources);
+                         addMessage(deferredData.answer, 'assistant', deferredData.sources, false, deferredData.lowRelevance);
                          conversationHistory.push({ role: 'user', content: deferredData.originalMessage });
                          conversationHistory.push({ role: 'assistant', content: deferredData.answer });
                     }
@@ -908,7 +909,7 @@
 
                     // Show the deferred answer
                     if (deferredData && deferredData.answer) {
-                         addMessage(deferredData.answer, 'assistant', deferredData.sources);
+                         addMessage(deferredData.answer, 'assistant', deferredData.sources, false, deferredData.lowRelevance);
                          conversationHistory.push({ role: 'user', content: deferredData.originalMessage });
                          conversationHistory.push({ role: 'assistant', content: deferredData.answer });
                     }
@@ -1047,7 +1048,7 @@
                 });
             }
 
-            function addMessage(content, role, sources, isFeedbackMessage = false) {
+            function addMessage(content, role, sources, isFeedbackMessage = false, lowRelevance = false) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'qc-message qc-message-' + role;
 
@@ -1075,9 +1076,10 @@
                     const sourcesDiv = document.createElement('div');
                     sourcesDiv.className = 'qc-sources-container';
                     
-                    // Check if we have high-quality handbook sources (similarity > 0.5)
+                    // Use backend's low_relevance flag as primary gate
+                    // Only show "From the Handbook" if backend says content is relevant
                     const handbookSources = sources && sources.filter(s => s.similarity >= 0.5);
-                    const hasHandbookSources = handbookSources && handbookSources.length > 0;
+                    const hasHandbookSources = !lowRelevance && handbookSources && handbookSources.length > 0;
                     
                     if (hasHandbookSources) {
                         // Get unique chapter/section names
