@@ -123,6 +123,14 @@
     line-height: 1;
 }
 
+/* Book cover icon in chat button */
+.qc-book-icon {
+    width: 40px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 .qc-chat-button-icon {
     display: flex;
     align-items: center;
@@ -225,6 +233,23 @@ body.qc-offset-for-portal {
 .qc-header-icon {
     font-size: 1.5rem;
     line-height: 1;
+}
+
+/* Book cover icon in header */
+.qc-header-book-icon {
+    width: 28px;
+    height: auto;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Book cover icon in welcome message */
+.qc-welcome-book-icon {
+    width: 20px;
+    height: auto;
+    vertical-align: middle;
+    margin-right: 4px;
+    border-radius: 2px;
 }
 
 .qc-header-title {
