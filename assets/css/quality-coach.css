@@ -56,14 +56,73 @@
     }
 }
 
-/* Floating Chat Button */
-.qc-chat-button {
+/* Chat Button Wrapper with Circular Text */
+.qc-chat-button-wrapper {
     position: fixed;
     bottom: calc(var(--qc-gap) + env(safe-area-inset-bottom) + var(--qc-extra-offset));
     right: calc(16px + env(safe-area-inset-right));
-    left: auto;
-    width: 56px;
-    height: 56px;
+    width: 80px;
+    height: 80px;
+    z-index: 9998;
+}
+
+/* Circular Text SVG - Rotating */
+.qc-circular-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    animation: qc-rotate 15s linear infinite;
+}
+
+@keyframes qc-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Pause rotation on hover for readability */
+.qc-chat-button-wrapper:hover .qc-circular-text {
+    animation-play-state: paused;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .qc-circular-text {
+        animation: none;
+    }
+}
+
+.qc-circular-text-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    fill: #475569; /* Light mode: dark gray text */
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .qc-circular-text-label {
+        fill: #e2e8f0; /* Dark mode: light text */
+    }
+}
+
+/* Ghost theme dark mode class support */
+.dark-mode .qc-circular-text-label,
+[data-color-scheme="dark"] .qc-circular-text-label {
+    fill: #e2e8f0;
+}
+
+/* Floating Chat Button */
+.qc-chat-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
     background: #ffffff;
     border: none;
     border-radius: 50%;
@@ -79,8 +138,13 @@
 }
 
 .qc-chat-button:hover:not([aria-disabled="true"]) {
-    transform: scale(1.08);
+    transform: translate(-50%, -50%) scale(1.08);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover effect on wrapper affects text ring too */
+.qc-chat-button-wrapper:hover .qc-circular-text {
+    opacity: 0.8;
 }
 
 .qc-chat-button[aria-disabled="true"] {
@@ -707,11 +771,21 @@ body.qc-offset-for-portal {
 
 /* Responsive - Mobile */
 @media (max-width: 768px) {
-    .qc-chat-button {
+    .qc-chat-button-wrapper {
         bottom: calc(12px + env(safe-area-inset-bottom) + var(--qc-extra-offset));
-        right: calc(16px + env(safe-area-inset-right));
-        width: 56px;
-        height: 56px;
+        right: calc(12px + env(safe-area-inset-right));
+        width: 70px;
+        height: 70px;
+    }
+    
+    .qc-chat-button {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .qc-circular-text-label {
+        font-size: 8px;
+        letter-spacing: 1.5px;
     }
     
     .qc-chat-window {

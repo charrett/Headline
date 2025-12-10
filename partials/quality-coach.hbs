@@ -9,26 +9,38 @@
     <div id="quality-coach-widget" class="qc-widget qc-widget--initializing">
 
         {{!-- Chat Button (initially visible) --}}
-        <button 
-            id="qc-chat-button" 
-            class="qc-chat-button is-loading" 
-            type="button"
-            aria-label="Open Quality Coach Researcher"
-            aria-haspopup="dialog"
-            aria-controls="qc-chat-window"
-            aria-expanded="false"
-            aria-disabled="true"
-            title="Checking access">
-            <span class="qc-chat-button-icon qc-chat-button-icon--chat" aria-hidden="true">
-                <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook" class="qc-book-icon">
-            </span>
-            <span class="qc-chat-button-icon qc-chat-button-icon--close" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </span>
-        </button>
+        <div class="qc-chat-button-wrapper">
+            {{!-- Rotating circular text ring --}}
+            <svg class="qc-circular-text" viewBox="0 0 100 100" aria-hidden="true">
+                <defs>
+                    <path id="qc-circle-path" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" fill="none"/>
+                </defs>
+                <text class="qc-circular-text-label">
+                    <textPath href="#qc-circle-path" startOffset="0%">ASK THE BOOK • ASK THE BOOK • </textPath>
+                </text>
+            </svg>
+            
+            <button 
+                id="qc-chat-button" 
+                class="qc-chat-button is-loading" 
+                type="button"
+                aria-label="Open Quality Coach Researcher"
+                aria-haspopup="dialog"
+                aria-controls="qc-chat-window"
+                aria-expanded="false"
+                aria-disabled="true"
+                title="Checking access">
+                <span class="qc-chat-button-icon qc-chat-button-icon--chat" aria-hidden="true">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook" class="qc-book-icon">
+                </span>
+                <span class="qc-chat-button-icon qc-chat-button-icon--close" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </span>
+            </button>
+        </div>
 
         {{!-- Chat Window (hidden by default) --}}
         <div id="qc-chat-window" class="qc-chat-window" role="dialog" aria-modal="true" aria-label="Quality Coach Researcher">
