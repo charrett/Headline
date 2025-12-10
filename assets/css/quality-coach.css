@@ -60,12 +60,12 @@
 .qc-chat-button {
     position: fixed;
     bottom: calc(var(--qc-gap) + env(safe-area-inset-bottom) + var(--qc-extra-offset));
-    right: calc(var(--qc-gap) + env(safe-area-inset-right));
+    right: calc(20px + env(safe-area-inset-right));
     left: auto;
     width: 60px;
     height: 60px;
-    background: var(--qc-accent);
-    border: none;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
     border-radius: 50%;
     box-shadow: 0 16px 30px rgba(15, 23, 42, 0.18);
     cursor: pointer;
@@ -80,7 +80,7 @@
 .qc-chat-button:hover:not([aria-disabled="true"]) {
     transform: scale(1.1);
     box-shadow: 0 20px 35px rgba(15, 23, 42, 0.25);
-    background: var(--qc-accent-soft);
+    background: #f8fafc;
 }
 
 .qc-chat-button[aria-disabled="true"] {
@@ -109,7 +109,11 @@
 }
 
 .qc-chat-button.is-open {
-    background: var(--qc-accent-strong);
+    background: #ffffff;
+}
+
+.qc-chat-button.is-open svg {
+    stroke: #64748b;
 }
 
 .qc-chat-button svg {
@@ -118,7 +122,8 @@
 }
 
 .qc-chat-button-icon--chat {
-    font-size: 28px;
+    font-size: 36px;
+    line-height: 1;
 }
 
 .qc-chat-button-icon {
