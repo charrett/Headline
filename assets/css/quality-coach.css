@@ -117,6 +117,10 @@
     height: 28px;
 }
 
+.qc-chat-button-icon--chat {
+    font-size: 28px;
+}
+
 .qc-chat-button-icon {
     display: flex;
     align-items: center;
