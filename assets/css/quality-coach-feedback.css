@@ -1,0 +1,110 @@
+/* Message Actions (Feedback & Copy) */
+.qc-message-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    opacity: 0; /* Hidden by default, shown on hover */
+    transition: opacity 0.2s ease;
+    padding-left: 4px;
+}
+
+.qc-message-assistant:hover .qc-message-actions,
+.qc-message-actions.is-active {
+    opacity: 1;
+}
+
+.qc-action-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.qc-action-btn:hover {
+    background: #f1f5f9;
+    color: var(--qc-text);
+}
+
+.qc-action-btn.is-active {
+    color: var(--qc-accent);
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.qc-action-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Inline Feedback Form */
+.qc-inline-feedback {
+    margin-top: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px;
+    animation: slideDown 0.2s ease-out;
+}
+
+.qc-inline-feedback textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+    min-height: 60px;
+    resize: vertical;
+    margin-bottom: 8px;
+    font-family: inherit;
+}
+
+.qc-inline-feedback textarea:focus {
+    outline: none;
+    border-color: var(--qc-accent);
+}
+
+.qc-inline-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.qc-btn-xs {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.qc-btn-ghost {
+    background: transparent;
+    border: none;
+    color: #64748b;
+}
+
+.qc-btn-ghost:hover {
+    color: #0f172a;
+    background: #e2e8f0;
+}
+
+.qc-btn-primary {
+    background: var(--qc-accent);
+    color: white;
+    border: none;
+}
+
+.qc-btn-primary:hover {
+    opacity: 0.9;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,4 +1,4 @@
-{{!-- Quality Coach Companion - Floating Chat Widget --}}
+{{!-- Quality Coach Researcher - Floating Chat Widget --}}
 {{!-- Server-side beta access is handled by /api/v1/access/check.
     No API keys or email lists should be injected into the browser. --}}
 
@@ -13,12 +13,12 @@
             id="qc-chat-button" 
             class="qc-chat-button is-loading" 
             type="button"
-            aria-label="Open Quality Coach Companion"
+            aria-label="Open Quality Coach Researcher"
             aria-haspopup="dialog"
             aria-controls="qc-chat-window"
             aria-expanded="false"
             aria-disabled="true"
-            title="Checking Companion access">
+            title="Checking access">
             <span class="qc-chat-button-icon qc-chat-button-icon--chat" aria-hidden="true">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -33,23 +33,43 @@
         </button>
 
         {{!-- Chat Window (hidden by default) --}}
-        <div id="qc-chat-window" class="qc-chat-window" role="dialog" aria-modal="true" aria-label="Quality Coach Companion">
+        <div id="qc-chat-window" class="qc-chat-window" role="dialog" aria-modal="true" aria-label="Quality Coach Researcher">
             <div class="qc-window-handle" aria-hidden="true">
                 <span></span>
             </div>
             {{!-- Header --}}
             <div class="qc-window-header">
                 <div class="qc-header-content">
-                    <div class="qc-header-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M2 17L12 22L22 17" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M2 12L12 17L22 12" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                    <div class="qc-header-brand">
+                        <span class="qc-header-icon">📚</span>
+                        <h3 class="qc-header-title">Quality Coach <span class="qc-header-title">Researcher</span></h3>
                     </div>
-                    <div class="qc-header-text">
-                        <h3>Quality Coach Companion</h3>
-                        <p>Get guidance on quality coaching</p>
+                    {{!-- Persona Badge --}}
+                    <div class="qc-persona-badge" id="qc-persona-badge" style="display: none;">
+                        <button class="qc-persona-button" id="qc-persona-button" type="button" aria-haspopup="true" aria-expanded="false">
+                            <span id="qc-persona-label">Quality Coach</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="qc-persona-dropdown" id="qc-persona-dropdown" style="display: none;">
+                            <div class="qc-persona-dropdown-header">
+                                <span>I am a:</span>
+                                <button class="qc-persona-close" id="qc-persona-close" type="button" aria-label="Close">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            <button class="qc-persona-option" data-persona="QUALITY_COACH">Quality Coach</button>
+                            <button class="qc-persona-option" data-persona="ENGINEERING_MANAGER">Engineering Manager</button>
+                            <button class="qc-persona-option" data-persona="DELIVERY_LEAD">Delivery Lead</button>
+                            <button class="qc-persona-option" data-persona="CEO_EXECUTIVE">CEO/Executive</button>
+                            <button class="qc-persona-option" data-persona="SOFTWARE_ENGINEER">Software Engineer</button>
+                            <button class="qc-persona-option" data-persona="TEST_LEAD">Test Lead</button>
+                            <button class="qc-persona-option" data-persona="OTHER">Other</button>
+                        </div>
                     </div>
                 </div>
                 <button id="qc-close-button" class="qc-close-button" aria-label="Close chat">
@@ -63,22 +83,10 @@
             {{!-- Messages Area --}}
             <div id="qc-messages" class="qc-messages">
                 <div class="qc-welcome-message">
-                    <div class="qc-welcome-icon">👋</div>
-                    <p><strong>Hi! I'm the Quality Coach Companion</strong></p>
-                    <p>I'm grounded in "The Quality Coach's Handbook". Ask about systems thinking, coaching moves, or designing your next small bet.</p>
+                    <p><span class="qc-welcome-icon">📚</span> <strong>Welcome!</strong> I'll help you explore Anne-Marie's Quality Coach's Handbook.</p>
+                    <p class="qc-welcome-hint">Ask me about coaching techniques, quality practices, or what workshop to run.</p>
                 </div>
             </div>
-
-            <template id="qc-feedback-panel-template">
-                <div class="qc-feedback-panel" role="status" aria-live="polite">
-                    <div class="qc-feedback-panel-text">How can we make this better?</div>
-                    <textarea class="qc-feedback-textarea" rows="3" maxlength="400" placeholder="Share suggestions on how to improve the Companion"></textarea>
-                    <div class="qc-feedback-controls">
-                        <button type="button" class="qc-feedback-submit">Send feedback</button>
-                        <span class="qc-feedback-hint">Goes straight to Anne-Marie.</span>
-                    </div>
-                </div>
-            </template>
 
             {{!-- Typing Indicator --}}
             <div id="qc-typing" class="qc-typing" style="display: none;">
@@ -105,7 +113,7 @@
 
             {{!-- Footer --}}
             <div class="qc-window-footer">
-                <span>Powered by The Quality Coach's Handbook</span>
+                <span class="qc-footer-disclaimer">Grounded in the Handbook, supplemented by coaching expertise</span>
             </div>
         </div>
 
@@ -182,20 +190,50 @@
             let portalObserver = null;
             let portalInterval = null;
             let portalFallbackTimer = null;
-            let feedbackUnlocked = false;
-            let feedbackPanel = null;
-            let feedbackTextarea = null;
-            let feedbackSubmitButton = null;
             let lastAssistantMessage = null;
             let accessRefreshTimer = null;
             let accessLagTimer = null;
+            
+            // Persona state
+            let currentPersona = null;
+            let currentPersonaConfidence = 0;
+            let detectedPersonaMessage = ''; // Track message that triggered detection
+            let hasShownPersonaConfirmation = false; // Only show once per session
+            const personaNames = {
+                'QUALITY_COACH': 'Quality Coach',
+                'ENGINEERING_MANAGER': 'Engineering Manager',
+                'DELIVERY_LEAD': 'Delivery Lead',
+                'CEO_EXECUTIVE': 'CEO/Executive',
+                'SOFTWARE_ENGINEER': 'Software Engineer',
+                'TEST_LEAD': 'Test Lead',
+                'OTHER': 'Other'
+            };
+            
+            // Persona UI elements
+            const personaBadge = document.getElementById('qc-persona-badge');
+            const personaButton = document.getElementById('qc-persona-button');
+            const personaLabel = document.getElementById('qc-persona-label');
+            const personaDropdown = document.getElementById('qc-persona-dropdown');
 
             chatButton.classList.add('is-loading');
 
             initializeAccess();
             monitorPortalTrigger();
+            restorePersonaBadge();
             if (input) {
                 input.placeholder = DEFAULT_PLACEHOLDER;
+            }
+            
+            // Restore persona badge for returning users
+            function restorePersonaBadge() {
+                const savedPersona = localStorage.getItem('qc_persona_choice');
+                const hasConfirmed = localStorage.getItem('qc_persona_confirmed');
+                
+                if (hasConfirmed && savedPersona && personaBadge && personaLabel) {
+                    currentPersona = savedPersona;
+                    personaLabel.textContent = personaNames[savedPersona] || savedPersona;
+                    personaBadge.style.display = 'flex';
+                }
             }
 
             function showStatus(message, variant = 'info') {
@@ -216,7 +254,7 @@
                     clearTimeout(accessLagTimer);
                 }
                 accessLagTimer = setTimeout(() => {
-                    showStatus('Still checking your Companion access…', 'info');
+                    showStatus('Still checking access…', 'info');
                 }, ACCESS_LAG_MESSAGE_MS);
             }
 
@@ -274,7 +312,7 @@
                     is_paid_member: data.is_paid_member
                 };
 
-                setButtonAccessibility({ disabled: false, loading: false, tooltip: 'Open Quality Coach Companion' });
+                setButtonAccessibility({ disabled: false, loading: false, tooltip: 'Open Quality Coach Researcher' });
                 if (!skipCache) {
                     saveAccessCache({
                         access_token: data.access_token,
@@ -316,7 +354,7 @@
                     await performAccessCheck({ silent: true });
                 } catch (error) {
                     if (typeof console !== 'undefined' && console.debug) {
-                        console.debug('Companion access refresh failed', reason, error);
+                        console.debug('Access refresh failed', reason, error);
                     }
                 }
             }
@@ -469,7 +507,7 @@
 
             async function performAccessCheck({ silent = false } = {}) {
                 if (!silent) {
-                    showStatus('Checking Companion access…');
+                    showStatus('Checking access…');
                     startAccessLagTimer();
                 }
 
@@ -484,7 +522,7 @@
                         hasAccess = false;
                         isLocked = true;
                         hideChatWidget();
-                        showStatus(data.reason || 'Quality Coach Companion is available to beta testers only right now.', 'warning');
+                        showStatus(data.reason || 'The Researcher is available to beta testers only right now.', 'warning');
                         clearAccessCache();
                         return false;
                     }
@@ -545,8 +583,8 @@
             chatButton.addEventListener('click', function() {
                 if (chatButton.getAttribute('aria-disabled') === 'true') {
                     const lockedCopy = isLocked
-                        ? 'Quality Coach Companion is limited to approved members. Reach out to join the beta.'
-                        : 'Still checking your Companion access…';
+                        ? 'The Researcher is available to approved members. Reach out to join the beta.'
+                        : 'Still checking access…';
                     showStatus(lockedCopy, isLocked ? 'warning' : 'info');
                     return;
                 }
@@ -568,14 +606,14 @@
 
             function openChatWindow() {
                 if (!hasAccess) {
-                    showStatus('Quality Coach Companion is limited to approved members. Reach out to join the beta.', 'warning');
+                    showStatus('The Researcher is available to approved members. Reach out to join the beta.', 'warning');
                     return;
                 }
                 isOpen = true;
                 chatWindow.classList.add('is-visible');
                 chatButton.classList.add('is-open');
                 chatButton.setAttribute('aria-expanded', 'true');
-                chatButton.setAttribute('aria-label', 'Close Quality Coach Companion');
+                chatButton.setAttribute('aria-label', 'Close Quality Coach Researcher');
                 input.focus();
 
                 if (typeof gtag !== 'undefined') {
@@ -591,7 +629,7 @@
                 chatWindow.classList.remove('is-visible');
                 chatButton.classList.remove('is-open');
                 chatButton.setAttribute('aria-expanded', 'false');
-                chatButton.setAttribute('aria-label', 'Open Quality Coach Companion');
+                chatButton.setAttribute('aria-label', 'Open Quality Coach Researcher');
                 chatButton.focus();
             }
 
@@ -610,14 +648,53 @@
             });
 
             sendButton.addEventListener('click', sendMessage);
+            
+            // Persona dropdown toggle (header badge)
+            if (personaButton && personaDropdown) {
+                personaButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isVisible = personaDropdown.style.display === 'block';
+                    personaDropdown.style.display = isVisible ? 'none' : 'block';
+                    personaButton.setAttribute('aria-expanded', !isVisible);
+                });
+                
+                // Close button in dropdown
+                const personaCloseBtn = document.getElementById('qc-persona-close');
+                if (personaCloseBtn) {
+                    personaCloseBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        personaDropdown.style.display = 'none';
+                        personaButton.setAttribute('aria-expanded', 'false');
+                    });
+                }
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!personaButton.contains(e.target) && !personaDropdown.contains(e.target)) {
+                        personaDropdown.style.display = 'none';
+                        personaButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Handle persona option clicks
+                const personaOptions = document.querySelectorAll('.qc-persona-option');
+                personaOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const selectedPersona = this.dataset.persona;
+                        correctPersona(selectedPersona, 'user_selected');
+                        personaDropdown.style.display = 'none';
+                        personaButton.setAttribute('aria-expanded', 'false');
+                    });
+                });
+            }
 
             function sendMessage(options = {}) {
                 if (!hasAccess || !accessToken) {
-                    showStatus('Your Companion access token expired. Refresh the page to request a new one.', 'warning');
+                    showStatus('Your access token expired. Refresh the page to continue.', 'warning');
                     return;
                 }
 
-                const { messageOverride = null, isFeedbackOverride = null } = options;
+                const { messageOverride = null, isFeedbackOverride = null, skipUserMessage = false } = options;
                 const usingPrimaryInput = messageOverride === null;
                 const sourceValue = usingPrimaryInput ? input.value : messageOverride;
                 const rawMessage = (sourceValue || '').trim();
@@ -637,28 +714,26 @@
                 }
 
                 if (isFeedback) {
-                    showStatus('Appreciate the Companion feedback — it will go straight to Anne-Marie.', 'info');
+                    showStatus('Thanks for the feedback — it goes straight to Anne-Marie.', 'info');
                 }
 
                 const displayMessage = isFeedback ? cleanedMessage : rawMessage;
-                addMessage(displayMessage, 'user', null, null, isFeedback);
+                if (!isFeedback && !skipUserMessage) {
+                    addMessage(displayMessage, 'user', null, null, isFeedback);
+                }
 
                 if (usingPrimaryInput) {
                     input.value = '';
                     input.style.height = 'auto';
-                } else if (feedbackTextarea) {
-                    feedbackTextarea.value = '';
                 }
 
                 if (usingPrimaryInput) {
                     input.disabled = true;
                     sendButton.disabled = true;
-                } else {
-                    setFeedbackPanelLoading(true);
                 }
                 typingIndicator.style.display = 'flex';
 
-                client.sendMessage(cleanedMessage, conversationHistory, {
+                return client.sendMessage(cleanedMessage, conversationHistory, {
                     post_slug: '{{slug}}',
                     post_title: '{{title}}',
                     member_email: memberEmail,
@@ -668,10 +743,44 @@
                     typingIndicator.style.display = 'none';
 
                     if (data.answer) {
-                        addMessage(data.answer, 'assistant', data.sources, data.small_bet);
-                        conversationHistory.push({ role: 'user', content: cleanedMessage });
-                        conversationHistory.push({ role: 'assistant', content: data.answer });
-                        unlockFeedbackPanel();
+                        if (!isFeedback) {
+                            // Check for confirmation need
+                            const needsConfirmation = data.persona && 
+                                                    !hasShownPersonaConfirmation && 
+                                                    !localStorage.getItem('qc_persona_confirmed');
+
+                            if (needsConfirmation) {
+                                currentPersona = data.persona;
+                                currentPersonaConfidence = data.persona_confidence;
+                                detectedPersonaMessage = cleanedMessage;
+                                
+                                // Update footer badge immediately so user sees what we detected
+                                updatePersonaDropdown(data.persona);
+                                
+                                // Show confirmation instead of answer
+                                showPersonaConfirmation(data.persona, data.persona_confidence, {
+                                    answer: data.answer,
+                                    sources: data.sources,
+                                    originalMessage: cleanedMessage
+                                });
+                                return; // STOP HERE
+                            }
+
+                            // Update persona if returned by backend
+                            if (data.persona) {
+                                currentPersona = data.persona;
+                                currentPersonaConfidence = data.persona_confidence;
+                                detectedPersonaMessage = cleanedMessage;
+                                
+                                // Update footer badge (always visible)
+                                updatePersonaDropdown(data.persona);
+                            }
+                            
+                            addMessage(data.answer, 'assistant', data.sources);
+                            conversationHistory.push({ role: 'user', content: cleanedMessage });
+                            conversationHistory.push({ role: 'assistant', content: data.answer });
+                        }
+                        
                         if (isFeedback && typeof gtag !== 'undefined') {
                             gtag('event', 'quality_coach_feedback_submitted', {
                                 'post_slug': '{{slug}}',
@@ -688,7 +797,7 @@
                     if (error.message.includes('401') || error.message.includes('403')) {
                         hasAccess = false;
                         isLocked = true;
-                        showStatus('Your Companion access expired. Refresh the page to request a new token.', 'warning');
+                        showStatus('Your access expired. Refresh the page to continue.', 'warning');
                         setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Access expired - refresh to continue.' });
                     } else {
                         addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'error');
@@ -699,99 +808,236 @@
                         input.disabled = false;
                         sendButton.disabled = false;
                         input.focus();
-                    } else {
-                        setFeedbackPanelLoading(false);
-                        if (feedbackTextarea) {
-                            feedbackTextarea.focus();
-                        }
                     }
                 });
             }
-
-            function unlockFeedbackPanel() {
-                if (feedbackUnlocked) return;
-                feedbackUnlocked = true;
-                if (widgetContainer) {
-                    widgetContainer.classList.add('qc-widget--feedback-ready');
-                }
-                ensureFeedbackPanelPosition();
-            }
-
-            function getFeedbackPanel() {
-                if (feedbackPanel) return feedbackPanel;
-                if (!feedbackTemplate) return null;
-                const templateContent = feedbackTemplate.content || feedbackTemplate;
-                const sourceNode = templateContent.firstElementChild;
-                if (!sourceNode) return null;
-                feedbackPanel = sourceNode.cloneNode(true);
-                feedbackTextarea = feedbackPanel.querySelector('.qc-feedback-textarea');
-                feedbackSubmitButton = feedbackPanel.querySelector('.qc-feedback-submit');
-
-                if (feedbackTextarea) {
-                    feedbackTextarea.addEventListener('keydown', event => {
-                        if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
-                            event.preventDefault();
-                            submitFeedbackFromPanel();
-                        }
-                    });
-                }
-
-                if (feedbackSubmitButton) {
-                    feedbackSubmitButton.addEventListener('click', submitFeedbackFromPanel);
-                }
-
-                return feedbackPanel;
-            }
-
-            function ensureFeedbackPanelPosition() {
-                if (!feedbackUnlocked || !messages || !lastAssistantMessage) return;
-                const panel = getFeedbackPanel();
-                if (!panel) return;
-
-                if (panel.parentNode && panel.parentNode !== messages) {
-                    panel.parentNode.removeChild(panel);
-                }
-
-                lastAssistantMessage.insertAdjacentElement('afterend', panel);
-                messages.scrollTop = messages.scrollHeight;
-            }
-
-            function submitFeedbackFromPanel() {
-                if (!feedbackTextarea) return;
-                const note = feedbackTextarea.value.trim();
-                if (!note) {
-                    showStatus('Add a short note before sending feedback.', 'warning');
-                    feedbackTextarea.focus();
-                    return;
-                }
-                sendMessage({
-                    messageOverride: note,
-                    isFeedbackOverride: true
-                });
-            }
-
-            function setFeedbackPanelLoading(isLoading) {
-                if (feedbackPanel) {
-                    feedbackPanel.classList.toggle('is-loading', Boolean(isLoading));
-                }
-                if (feedbackTextarea) {
-                    feedbackTextarea.disabled = Boolean(isLoading);
-                }
-                if (feedbackSubmitButton) {
-                    feedbackSubmitButton.disabled = Boolean(isLoading);
-                }
-            }
-
 
             function formatMessage(content) {
                 return content
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/^- (.*?)$/gm, '• $1')
-                    .replace(/\[(.*?)\]/g, '<span style="color: #64748b; font-size: 0.9em;">[$1]</span>')
                     .replace(/\n/g, '<br>');
             }
+            
+            function updatePersonaDropdown(persona) {
+                if (!persona) return;
+                
+                // Mark active option in dropdown
+                const options = document.querySelectorAll('.qc-persona-option');
+                options.forEach(opt => {
+                    if (opt.dataset.persona === persona) {
+                        opt.classList.add('is-active');
+                    } else {
+                        opt.classList.remove('is-active');
+                    }
+                });
+                
+                // Update header persona label if visible
+                if (personaLabel) {
+                    const personaNames = {
+                        'QUALITY_COACH': 'Quality Coach',
+                        'ENGINEERING_MANAGER': 'Engineering Manager',
+                        'DELIVERY_LEAD': 'Delivery Lead',
+                        'CEO_EXECUTIVE': 'CEO/Executive',
+                        'SOFTWARE_ENGINEER': 'Software Engineer',
+                        'TEST_LEAD': 'Test Lead'
+                    };
+                    personaLabel.textContent = personaNames[persona] || persona;
+                }
+            }
+            
+            function showPersonaConfirmation(persona, confidence, deferredData = null) {
+                // Only show once per session AND only if not previously confirmed
+                const hasConfirmed = localStorage.getItem('qc_persona_confirmed');
+                
+                if (hasShownPersonaConfirmation || hasConfirmed) {
+                    // If we have deferred data but confirmation was already shown/confirmed elsewhere,
+                    // we should probably just show the answer?
+                    if (deferredData && deferredData.answer) {
+                         addMessage(deferredData.answer, 'assistant', deferredData.sources);
+                         conversationHistory.push({ role: 'user', content: deferredData.originalMessage });
+                         conversationHistory.push({ role: 'assistant', content: deferredData.answer });
+                    }
+                    return;
+                }
+                
+                hasShownPersonaConfirmation = true;
+                
+                const displayName = personaNames[persona] || persona;
+                const confirmDiv = document.createElement('div');
+                confirmDiv.className = 'qc-persona-confirmation';
+                confirmDiv.setAttribute('tabindex', '-1');
+                confirmDiv.innerHTML = `
+                    <div class="qc-persona-confirmation-content">
+                        <div class="qc-persona-confirmation-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="qc-persona-confirmation-text">
+                            <strong>I'm responding as if you're a ${displayName}.</strong>
+                            <span>Is that right?</span>
+                        </div>
+                        <div class="qc-persona-confirmation-actions">
+                            <button class="qc-persona-confirm-yes" data-action="confirm">Yes, that's right</button>
+                            <button class="qc-persona-confirm-change" data-action="change">Actually, I'm a...</button>
+                        </div>
+                    </div>
+                `;
+                
+                messages.appendChild(confirmDiv);
+                messages.scrollTop = messages.scrollHeight;
+                confirmDiv.focus();
+                
+                // Handle confirmation actions
+                confirmDiv.querySelector('[data-action="confirm"]').addEventListener('click', function() {
+                    confirmPersona(persona);
+                    confirmDiv.classList.add('qc-fade-out');
+                    setTimeout(() => confirmDiv.remove(), 300);
 
-            function addMessage(content, role, sources, smallBet, isFeedbackMessage = false) {
+                    // Show the deferred answer
+                    if (deferredData && deferredData.answer) {
+                         addMessage(deferredData.answer, 'assistant', deferredData.sources);
+                         conversationHistory.push({ role: 'user', content: deferredData.originalMessage });
+                         conversationHistory.push({ role: 'assistant', content: deferredData.answer });
+                    }
+                });
+                
+                confirmDiv.querySelector('[data-action="change"]').addEventListener('click', function() {
+                    showPersonaSelector(confirmDiv, persona, deferredData);
+                });
+            }
+            
+            function showPersonaSelector(confirmDiv, originalPersona, deferredData = null) {
+                confirmDiv.innerHTML = `
+                    <div class="qc-persona-confirmation-content">
+                        <div class="qc-persona-confirmation-text">
+                            <strong>What's your role?</strong>
+                        </div>
+                        <div class="qc-persona-selector">
+                            <button class="qc-persona-select-option" data-persona="QUALITY_COACH">
+                                <span class="qc-persona-icon">🎯</span>
+                                <span>Quality Coach</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="ENGINEERING_MANAGER">
+                                <span class="qc-persona-icon">👔</span>
+                                <span>Engineering Manager</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="DELIVERY_LEAD">
+                                <span class="qc-persona-icon">📊</span>
+                                <span>Delivery Lead</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="CEO_EXECUTIVE">
+                                <span class="qc-persona-icon">💼</span>
+                                <span>CEO/Executive</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="SOFTWARE_ENGINEER">
+                                <span class="qc-persona-icon">💻</span>
+                                <span>Software Engineer</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="TEST_LEAD">
+                                <span class="qc-persona-icon">🧪</span>
+                                <span>Test Lead</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Handle persona selection
+                confirmDiv.querySelectorAll('.qc-persona-select-option').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const newPersona = this.dataset.persona;
+                        correctPersona(newPersona, 'user_selected');
+                        confirmDiv.classList.add('qc-fade-out');
+                        setTimeout(() => confirmDiv.remove(), 300);
+
+                        // If we have deferred data, re-fetch answer with new persona
+                        if (deferredData && deferredData.originalMessage) {
+                            sendMessage({
+                                messageOverride: deferredData.originalMessage,
+                                skipUserMessage: true
+                            });
+                        }
+                    });
+                });
+            }
+            
+            function confirmPersona(persona) {
+                // Save to localStorage - never show again
+                localStorage.setItem('qc_persona_confirmed', 'true');
+                localStorage.setItem('qc_persona_choice', persona);
+                
+                // Show persona badge in header
+                if (personaBadge) {
+                    personaBadge.style.display = 'flex';
+                    if (personaLabel) {
+                        personaLabel.textContent = personaNames[persona] || persona;
+                    }
+                }
+                
+                // Optionally save to backend for cross-device persistence
+                // (Can add API call here if needed)
+            }
+            
+            function correctPersona(newPersona, reason = 'user_selected') {
+                if (!newPersona || newPersona === currentPersona) return;
+                
+                const originalPersona = currentPersona;
+                const lastUserMessage = conversationHistory.length > 0 
+                    ? conversationHistory[conversationHistory.length - 2]?.content 
+                    : null;
+                
+                // Update UI immediately
+                updatePersonaDropdown(newPersona);
+                
+                // Show persona badge in header
+                if (personaBadge) {
+                    personaBadge.style.display = 'flex';
+                    if (personaLabel) {
+                        personaLabel.textContent = personaNames[newPersona] || newPersona;
+                    }
+                }
+                
+                // Send correction to backend
+                fetch(`${API_BASE}/api/v1/persona/correct`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        thread_id: clientThreadId,
+                        user_id: memberEmail,
+                        corrected_persona: newPersona,
+                        original_persona: originalPersona,
+                        original_confidence: currentPersonaConfidence,
+                        message_context: lastUserMessage,
+                        correction_reason: reason
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        currentPersona = newPersona;
+                        showStatus(`Persona updated to ${personaNames[newPersona]}. Your next responses will be tailored accordingly.`, 'info');
+                        setTimeout(() => showStatus('', ''), 3000);
+                        
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'persona_corrected', {
+                                'from': originalPersona,
+                                'to': newPersona,
+                                'reason': reason
+                            });
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to update persona:', error);
+                });
+            }
+
+            function addMessage(content, role, sources, isFeedbackMessage = false) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'qc-message qc-message-' + role;
 
@@ -814,59 +1060,150 @@
 
                 messageDiv.appendChild(bubble);
 
-                if (smallBet) {
-                    const betDiv = document.createElement('div');
-                    betDiv.className = 'qc-small-bet';
-                    betDiv.innerHTML = `
-                        <div class="qc-bet-header">💡 Small Bet Suggestion</div>
-                        <div class="qc-bet-content">
-                            ${smallBet.objective ? `<div class="qc-bet-section"><strong>Objective:</strong> ${smallBet.objective}</div>` : ''}
-                            ${smallBet.assumption_being_tested ? `<div class="qc-bet-section"><strong>Testing:</strong> ${smallBet.assumption_being_tested}</div>` : ''}
-                            ${smallBet.steps && smallBet.steps.length > 0 ? `
-                                <div class="qc-bet-section">
-                                    <strong>Steps:</strong>
-                                    <ol class="qc-bet-list">
-                                        ${smallBet.steps.map(step => `<li>${step}</li>`).join('')}
-                                    </ol>
-                                </div>
-                            ` : ''}
-                            ${smallBet.signals_to_look_for && smallBet.signals_to_look_for.length > 0 ? `
-                                <div class="qc-bet-section">
-                                    <strong>Look for:</strong>
-                                    <ul class="qc-bet-list">
-                                        ${smallBet.signals_to_look_for.map(signal => `<li>${signal}</li>`).join('')}
-                                    </ul>
-                                </div>
-                            ` : ''}
-                            ${smallBet.time_investment ? `<div class="qc-bet-section"><strong>Time:</strong> ${smallBet.time_investment}</div>` : ''}
-                        </div>
-                    `;
-                    messageDiv.appendChild(betDiv);
-                }
-
-                if (sources && sources.length > 0) {
+                // Sources attribution (only for assistant messages)
+                if (role === 'assistant') {
                     const sourcesDiv = document.createElement('div');
-                    sourcesDiv.className = 'qc-sources';
-                    sourcesDiv.innerHTML = '<strong>Sources:</strong> ' + 
-                        sources.map(s => s.chapter || s.title).join(', ');
+                    sourcesDiv.className = 'qc-sources-container';
+                    
+                    // Check if we have high-quality handbook sources (similarity > 0.5)
+                    const handbookSources = sources && sources.filter(s => s.similarity >= 0.5);
+                    const hasHandbookSources = handbookSources && handbookSources.length > 0;
+                    
+                    if (hasHandbookSources) {
+                        // Get unique chapter/section names
+                        const chapterNames = [...new Set(
+                            handbookSources.map(s => s.section || s.label || s.chapter || 'Handbook')
+                        )].slice(0, 3); // Max 3 chapters
+                        
+                        sourcesDiv.innerHTML = `
+                            <div class="qc-sources-badge qc-sources-handbook">
+                                <span class="qc-sources-icon">📚</span>
+                                <span class="qc-sources-label">From the Handbook:</span>
+                                <span class="qc-sources-chapters">${chapterNames.join(', ')}</span>
+                            </div>
+                        `;
+                    } else {
+                        // No high-quality handbook sources - indicate general knowledge
+                        sourcesDiv.innerHTML = `
+                            <div class="qc-sources-badge qc-sources-general">
+                                <span class="qc-sources-icon">💡</span>
+                                <span class="qc-sources-label">General coaching guidance</span>
+                            </div>
+                        `;
+                    }
+                    
                     messageDiv.appendChild(sourcesDiv);
                 }
 
                 if (role === 'assistant') {
                     lastAssistantMessage = messageDiv;
-                    if (feedbackUnlocked) {
-                        ensureFeedbackPanelPosition();
-                    }
+                    
+                    // Add Action Bar (Copy, Thumbs Up, Thumbs Down)
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'qc-message-actions';
+                    
+                    // Copy Button
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'qc-action-btn';
+                    copyBtn.title = 'Copy to clipboard';
+                    copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                    copyBtn.onclick = () => {
+                        navigator.clipboard.writeText(content);
+                        copyBtn.classList.add('is-active');
+                        setTimeout(() => copyBtn.classList.remove('is-active'), 1000);
+                    };
+                    
+                    // Thumbs Up
+                    const upBtn = document.createElement('button');
+                    upBtn.className = 'qc-action-btn';
+                    upBtn.title = 'Helpful';
+                    upBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>';
+                    upBtn.onclick = () => handleFeedback(messageDiv, 'positive', upBtn);
+
+                    // Thumbs Down
+                    const downBtn = document.createElement('button');
+                    downBtn.className = 'qc-action-btn';
+                    downBtn.title = 'Not helpful';
+                    downBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>';
+                    downBtn.onclick = () => handleFeedback(messageDiv, 'negative', downBtn);
+
+                    actionsDiv.appendChild(copyBtn);
+                    actionsDiv.appendChild(upBtn);
+                    actionsDiv.appendChild(downBtn);
+                    messageDiv.appendChild(actionsDiv);
                 }
 
                 messages.appendChild(messageDiv);
                 messages.scrollTop = messages.scrollHeight;
+            }
+
+            function handleFeedback(messageDiv, rating, btn) {
+                // Remove existing feedback forms in this message if any
+                const existingForm = messageDiv.querySelector('.qc-inline-feedback');
+                if (existingForm) existingForm.remove();
+
+                // Highlight button
+                const buttons = messageDiv.querySelectorAll('.qc-action-btn');
+                buttons.forEach(b => b.classList.remove('is-active'));
+                btn.classList.add('is-active');
+
+                // Create inline form
+                const form = document.createElement('div');
+                form.className = 'qc-inline-feedback';
+                
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = rating === 'positive' ? 'What was helpful? (Optional)' : 'How can we improve this? (Optional)';
+                
+                const actions = document.createElement('div');
+                actions.className = 'qc-inline-actions';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'qc-btn-xs qc-btn-ghost';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.onclick = () => {
+                    form.remove();
+                    btn.classList.remove('is-active');
+                };
+
+                const submitBtn = document.createElement('button');
+                submitBtn.className = 'qc-btn-xs qc-btn-primary';
+                submitBtn.textContent = 'Send Feedback';
+                submitBtn.onclick = () => {
+                    const comment = textarea.value.trim();
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Sending...';
+                    
+                    submitFeedback(rating, comment).then(() => {
+                        form.innerHTML = '<div style="color: var(--qc-accent); font-size: 13px; font-weight: 500;">Thanks for your feedback!</div>';
+                        setTimeout(() => {
+                            form.remove();
+                        }, 2000);
+                    }).catch(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Send Feedback';
+                    });
+                };
+
+                actions.appendChild(cancelBtn);
+                actions.appendChild(submitBtn);
+                form.appendChild(textarea);
+                form.appendChild(actions);
+                
+                messageDiv.appendChild(form);
+                textarea.focus();
+            }
+
+            function submitFeedback(rating, comment) {
+                return sendMessage({
+                    messageOverride: comment || rating, // Send rating if comment is empty
+                    isFeedbackOverride: true
+                });
             }
         });
         </script>
     </div>
 {{else}}
     <div class="qc-locked-message">
-        The Quality Coach Companion is available to members only. Sign in to request beta access.
+        The Quality Coach Researcher is available to members only. Sign in to request beta access.
     </div>
 {{/if}}

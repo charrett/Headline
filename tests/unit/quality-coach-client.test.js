@@ -56,12 +56,13 @@ describe('QualityCoachClient', () => {
     it('should throw error if access check fails', async () => {
         global.fetch.mock.mockImplementationOnce(() => Promise.resolve({
             ok: false,
-            status: 403
+            status: 403,
+            json: () => Promise.resolve({})
         }));
 
         await assert.rejects(
             async () => await client.checkAccess('test@example.com'),
-            { message: 'Access check failed: 403' }
+            { message: 'Request failed: 403' }
         );
     });
 

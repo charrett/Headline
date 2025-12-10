@@ -46,22 +46,68 @@ class QualityCoachClient {
     }
 
     /**
+     * Execute fetch with retry logic and error handling.
+     */
+    async fetchWithRetry(url, options, retries = 3, backoff = 1000) {
+        try {
+            const response = await fetch(url, options);
+            
+            // Handle 429 Too Many Requests specifically
+            if (response.status === 429) {
+                const retryAfter = response.headers.get('Retry-After');
+                const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : backoff;
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                    return this.fetchWithRetry(url, options, retries - 1, backoff * 2);
+                }
+            }
+
+            // Handle 5xx Server Errors
+            if (response.status >= 500 && retries > 0) {
+                await new Promise(resolve => setTimeout(resolve, backoff));
+                return this.fetchWithRetry(url, options, retries - 1, backoff * 2);
+            }
+
+            if (!response.ok) {
+                // Try to parse error message from JSON
+                let errorMessage = `Request failed: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.detail) errorMessage = errorData.detail;
+                    else if (errorData.message) errorMessage = errorData.message;
+                } catch (e) {
+                    // Ignore JSON parse error
+                }
+                
+                const error = new Error(errorMessage);
+                error.status = response.status;
+                throw error;
+            }
+
+            return response;
+        } catch (error) {
+            if (retries > 0 && (error.name === 'TypeError' || error.name === 'AbortError')) {
+                // Network errors (TypeError)
+                await new Promise(resolve => setTimeout(resolve, backoff));
+                return this.fetchWithRetry(url, options, retries - 1, backoff * 2);
+            }
+            throw error;
+        }
+    }
+
+    /**
      * Check access permission for the user.
      */
     async checkAccess(email) {
         if (!email) throw new Error('Email is required');
         
-        const response = await fetch(`${this.apiBase}/api/v1/access/check`, {
+        const response = await this.fetchWithRetry(`${this.apiBase}/api/v1/access/check`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email })
         });
-
-        if (!response.ok) {
-            throw new Error(`Access check failed: ${response.status}`);
-        }
 
         return await response.json();
     }
@@ -73,7 +119,12 @@ class QualityCoachClient {
         if (!this.accessToken) throw new Error('Access token required');
         if (!this.threadId) this.init();
 
-        const response = await fetch(`${this.apiBase}/api/v1/chat`, {
+        // Handle feedback submission separately
+        if (context.is_feedback) {
+            return this.sendFeedback(message, context);
+        }
+
+        const response = await this.fetchWithRetry(`${this.apiBase}/api/v1/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -86,10 +137,6 @@ class QualityCoachClient {
                 context
             })
         });
-
-        if (!response.ok) {
-            throw new Error(`Chat request failed: ${response.status}`);
-        }
 
         const data = await response.json();
         
@@ -105,25 +152,50 @@ class QualityCoachClient {
     }
 
     /**
+     * Send feedback to the API.
+     */
+    async sendFeedback(comment, context = {}) {
+        const response = await this.fetchWithRetry(`${this.apiBase}/api/v1/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.accessToken}`
+            },
+            body: JSON.stringify({
+                thread_id: this.threadId,
+                rating: 'comment',
+                comment: comment,
+                message_id: context.message_id
+            })
+        });
+
+        // Return a mock chat response to satisfy the UI
+        return {
+            answer: "Thanks for your feedback! I've shared it with Anne-Marie.",
+            sources: [],
+            thread_id: this.threadId
+        };
+    }
+
+    /**
      * Load conversation history from the server.
      */
     async getHistory() {
         if (!this.accessToken) throw new Error('Access token required');
         if (!this.threadId) return [];
 
-        const response = await fetch(`${this.apiBase}/api/v1/conversations/${this.threadId}/messages`, {
-            headers: {
-                'Authorization': `Bearer ${this.accessToken}`
-            }
-        });
-
-        if (!response.ok) {
+        try {
+            const response = await this.fetchWithRetry(`${this.apiBase}/api/v1/conversations/${this.threadId}/messages`, {
+                headers: {
+                    'Authorization': `Bearer ${this.accessToken}`
+                }
+            });
+            return await response.json();
+        } catch (error) {
             // 404 means no history yet, which is fine
-            if (response.status === 404) return [];
-            throw new Error(`Failed to load history: ${response.status}`);
+            if (error.status === 404) return [];
+            throw error;
         }
-
-        return await response.json();
     }
 }
 
