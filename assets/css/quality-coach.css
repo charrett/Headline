@@ -60,33 +60,30 @@
 .qc-chat-button {
     position: fixed;
     bottom: calc(var(--qc-gap) + env(safe-area-inset-bottom) + var(--qc-extra-offset));
-    right: calc(20px + env(safe-area-inset-right));
+    right: calc(16px + env(safe-area-inset-right));
     left: auto;
     width: 60px;
     height: 60px;
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
+    background: transparent;
+    border: none;
     border-radius: 50%;
-    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.18);
+    box-shadow: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9998;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.2s ease;
-    color: var(--color-white, #ffffff);
+    transition: transform 0.3s ease;
+    color: inherit;
 }
 
 .qc-chat-button:hover:not([aria-disabled="true"]) {
-    transform: scale(1.1);
-    box-shadow: 0 20px 35px rgba(15, 23, 42, 0.25);
-    background: #f8fafc;
+    transform: scale(1.15);
 }
 
 .qc-chat-button[aria-disabled="true"] {
     cursor: not-allowed;
-    opacity: 0.7;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+    opacity: 0.5;
 }
 
 .qc-chat-button.is-loading::after {
@@ -95,8 +92,8 @@
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.4);
-    border-top-color: var(--color-white, #ffffff);
+    border: 3px solid rgba(100, 116, 139, 0.3);
+    border-top-color: #64748b;
     animation: qc-spin 0.9s linear infinite;
 }
 
@@ -109,7 +106,7 @@
 }
 
 .qc-chat-button.is-open {
-    background: #ffffff;
+    background: transparent;
 }
 
 .qc-chat-button.is-open svg {
