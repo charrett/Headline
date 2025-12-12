@@ -1262,6 +1262,14 @@ body.qc-offset-for-portal {
     border: 1px solid rgba(148, 163, 184, 0.15);
 }
 
+.qc-sources-related {
+    background: rgba(139, 92, 246, 0.08);
+    color: #7c3aed;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    margin-top: 6px;
+    font-size: 13px;
+}
+
 .qc-sources-icon {
     flex-shrink: 0;
     font-size: 0.9rem;

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Button Mockup - Option 4: ASK THE BOOK</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .mockup-container {
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .mockup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .mockup-label {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        /* The circular button with text ring */
+        .chat-button-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .circular-text-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .circular-text {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            fill: #475569;
+        }
+        
+        .chat-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 56px;
+            height: 56px;
+            background: #ffffff;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .chat-button:hover {
+            transform: translate(-50%, -50%) scale(1.08);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        /* Variation styles */
+        .variation-accent .circular-text {
+            fill: #0ea5e9;
+        }
+        
+        .variation-dark .circular-text {
+            fill: #1e293b;
+        }
+        
+        .variation-gradient .circular-text {
+            fill: url(#gradient);
+        }
+        
+        /* Background variations */
+        .bg-white {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .bg-dark {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 16px;
+        }
+        
+        .bg-dark .circular-text {
+            fill: #e2e8f0;
+        }
+        
+        /* Animated rotation option */
+        .animated .circular-text-svg {
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .note {
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Option 4: "ASK THE BOOK"</h1>
+    
+    <div class="mockup-container">
+        <!-- Standard Version -->
+        <div class="mockup bg-white">
+            <div class="chat-button-wrapper">
+                <svg class="circular-text-svg" viewBox="0 0 100 100">
+                    <defs>
+                        <!-- Top arc path -->
+                        <path id="topArc" d="M 10,50 A 40,40 0 0,1 90,50" fill="none"/>
+                        <!-- Bottom arc path -->
+                        <path id="bottomArc" d="M 90,50 A 40,40 0 0,1 10,50" fill="none"/>
+                    </defs>
+                    
+                    <!-- Top text: "ASK THE" -->
+                    <text class="circular-text">
+                        <textPath href="#topArc" startOffset="50%" text-anchor="middle">
+                            ASK THE
+                        </textPath>
+                    </text>
+                    
+                    <!-- Bottom text: "BOOK" -->
+                    <text class="circular-text">
+                        <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
+                            BOOK
+                        </textPath>
+                    </text>
+                </svg>
+                
+                <button class="chat-button">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook">
+                </button>
+            </div>
+            <span class="mockup-label">Standard (Gray text)</span>
+        </div>
+        
+        <!-- Accent Color Version -->
+        <div class="mockup bg-white variation-accent">
+            <div class="chat-button-wrapper">
+                <svg class="circular-text-svg" viewBox="0 0 100 100">
+                    <defs>
+                        <path id="topArc2" d="M 10,50 A 40,40 0 0,1 90,50" fill="none"/>
+                        <path id="bottomArc2" d="M 90,50 A 40,40 0 0,1 10,50" fill="none"/>
+                    </defs>
+                    <text class="circular-text">
+                        <textPath href="#topArc2" startOffset="50%" text-anchor="middle">
+                            ASK THE
+                        </textPath>
+                    </text>
+                    <text class="circular-text">
+                        <textPath href="#bottomArc2" startOffset="50%" text-anchor="middle">
+                            BOOK
+                        </textPath>
+                    </text>
+                </svg>
+                <button class="chat-button">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook">
+                </button>
+            </div>
+            <span class="mockup-label">Accent Color (Teal)</span>
+        </div>
+        
+        <!-- Dark Text Version -->
+        <div class="mockup bg-white variation-dark">
+            <div class="chat-button-wrapper">
+                <svg class="circular-text-svg" viewBox="0 0 100 100">
+                    <defs>
+                        <path id="topArc3" d="M 10,50 A 40,40 0 0,1 90,50" fill="none"/>
+                        <path id="bottomArc3" d="M 90,50 A 40,40 0 0,1 10,50" fill="none"/>
+                    </defs>
+                    <text class="circular-text">
+                        <textPath href="#topArc3" startOffset="50%" text-anchor="middle">
+                            ASK THE
+                        </textPath>
+                    </text>
+                    <text class="circular-text">
+                        <textPath href="#bottomArc3" startOffset="50%" text-anchor="middle">
+                            BOOK
+                        </textPath>
+                    </text>
+                </svg>
+                <button class="chat-button">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook">
+                </button>
+            </div>
+            <span class="mockup-label">Dark Text</span>
+        </div>
+        
+        <!-- Dark Background -->
+        <div class="mockup bg-dark">
+            <div class="chat-button-wrapper">
+                <svg class="circular-text-svg" viewBox="0 0 100 100">
+                    <defs>
+                        <path id="topArc4" d="M 10,50 A 40,40 0 0,1 90,50" fill="none"/>
+                        <path id="bottomArc4" d="M 90,50 A 40,40 0 0,1 10,50" fill="none"/>
+                    </defs>
+                    <text class="circular-text">
+                        <textPath href="#topArc4" startOffset="50%" text-anchor="middle">
+                            ASK THE
+                        </textPath>
+                    </text>
+                    <text class="circular-text">
+                        <textPath href="#bottomArc4" startOffset="50%" text-anchor="middle">
+                            BOOK
+                        </textPath>
+                    </text>
+                </svg>
+                <button class="chat-button">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook">
+                </button>
+            </div>
+            <span class="mockup-label" style="color: #94a3b8;">On Dark Background</span>
+        </div>
+        
+        <!-- Animated Version -->
+        <div class="mockup bg-white animated">
+            <div class="chat-button-wrapper">
+                <svg class="circular-text-svg" viewBox="0 0 100 100">
+                    <defs>
+                        <path id="fullCircle" d="M 50,10 A 40,40 0 1,1 49.99,10" fill="none"/>
+                    </defs>
+                    <text class="circular-text">
+                        <textPath href="#fullCircle" startOffset="0%">
+                            ASK THE BOOK • ASK THE BOOK • 
+                        </textPath>
+                    </text>
+                </svg>
+                <button class="chat-button">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook">
+                </button>
+            </div>
+            <span class="mockup-label">Animated Rotation</span>
+        </div>
+    </div>
+    
+    <p class="note">
+        Hover over the buttons to see the interaction. The "Animated Rotation" version has continuously spinning text.
+        <br><br>
+        The circular text uses SVG textPath for crisp rendering at any size.
+    </p>
+    
+    <h2 style="margin-top: 40px; color: #1e293b;">Size Comparison (Actual Size)</h2>
+    
+    <div class="mockup-container">
+        <!-- Actual size preview -->
+        <div class="mockup bg-white">
+            <div class="chat-button-wrapper" style="width: 80px; height: 80px;">
+                <svg class="circular-text-svg" viewBox="0 0 100 100">
+                    <defs>
+                        <path id="topArcSmall" d="M 12,50 A 38,38 0 0,1 88,50" fill="none"/>
+                        <path id="bottomArcSmall" d="M 88,50 A 38,38 0 0,1 12,50" fill="none"/>
+                    </defs>
+                    <text class="circular-text" style="font-size: 10px;">
+                        <textPath href="#topArcSmall" startOffset="50%" text-anchor="middle">
+                            ASK THE
+                        </textPath>
+                    </text>
+                    <text class="circular-text" style="font-size: 10px;">
+                        <textPath href="#bottomArcSmall" startOffset="50%" text-anchor="middle">
+                            BOOK
+                        </textPath>
+                    </text>
+                </svg>
+                <button class="chat-button" style="width: 48px; height: 48px;">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook">
+                </button>
+            </div>
+            <span class="mockup-label">~Actual button size (80px)</span>
+        </div>
+        
+        <!-- Without text for comparison -->
+        <div class="mockup bg-white">
+            <div class="chat-button-wrapper" style="width: 56px; height: 56px;">
+                <button class="chat-button" style="width: 56px; height: 56px; position: relative; transform: none; top: 0; left: 0;">
+                    <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook">
+                </button>
+            </div>
+            <span class="mockup-label">Current (no text, 56px)</span>
+        </div>
+    </div>
+</body>
+</html>

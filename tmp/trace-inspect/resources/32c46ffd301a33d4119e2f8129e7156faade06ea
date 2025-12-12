@@ -1,0 +1,440 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - paragraph [ref=e5]:
+      - text: Paperback and hardback options of the Quality Coach's Handbook are now on sale at Amazon
+      - link "https://www.amazon.com/dp/B0FGY1G62R#" [ref=e6] [cursor=pointer]:
+        - /url: https://www.amazon.com/dp/B0FGY1G62R#
+    - button "close" [ref=e7] [cursor=pointer]:
+      - img [ref=e8]
+  - generic [ref=e10]:
+    - banner [ref=e11]:
+      - generic [ref=e12]:
+        - heading "Anne-Marie Charrett" [level=1] [ref=e15]:
+          - link "Anne-Marie Charrett" [ref=e16] [cursor=pointer]:
+            - /url: http://localhost:2368
+            - img "Anne-Marie Charrett" [ref=e17]
+        - navigation [ref=e18]:
+          - list [ref=e19]:
+            - listitem [ref=e20]:
+              - link "Home" [ref=e21] [cursor=pointer]:
+                - /url: http://localhost:2368/
+            - listitem [ref=e22]:
+              - link "Quality Coach Book" [ref=e23] [cursor=pointer]:
+                - /url: http://localhost:2368/tag/book/
+            - listitem [ref=e24]:
+              - link "Leadership in Tech" [ref=e25] [cursor=pointer]:
+                - /url: http://localhost:2368/tag/leadership/
+            - listitem [ref=e26]:
+              - link "Quality Engineering" [ref=e27] [cursor=pointer]:
+                - /url: http://localhost:2368/tag/quality-engineering/
+            - listitem [ref=e28]:
+              - link "Software Testing" [ref=e29] [cursor=pointer]:
+                - /url: http://localhost:2368/tag/software-testing/
+            - listitem [ref=e30]:
+              - link "Gender & Inclusion" [ref=e31] [cursor=pointer]:
+                - /url: http://localhost:2368/tag/women-in-tech/
+            - listitem [ref=e32]:
+              - link "Newsletters" [ref=e33] [cursor=pointer]:
+                - /url: http://localhost:2368/tag/newsletter/
+            - button "More" [ref=e34] [cursor=pointer]:
+              - img [ref=e35]
+        - generic [ref=e37]:
+          - button "Search this site" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+          - link "Account" [ref=e42] [cursor=pointer]:
+            - /url: "#/portal/account"
+    - main [ref=e43]:
+      - generic [ref=e45]:
+        - generic [ref=e47]:
+          - heading "Engineering, Leadership and Quality" [level=2] [ref=e48]
+          - paragraph [ref=e49]: Enjoy an eclectic mix of writing on Leadership, Quality and Women in Tech. Plus the occasional rant!
+          - paragraph [ref=e50]:
+            - text: It's where the original content for the
+            - link "Quality Coach's Handbook" [ref=e51] [cursor=pointer]:
+              - /url: /tag/book/
+            - text: is written. The book explains the quality coach role, with workshops and templates along with advice for managing quality coaching within an organisation.
+          - heading "Purchase the Quality Coach's Handbook" [level=5] [ref=e52]
+          - paragraph [ref=e53]: The Quality Coach's Handbook is available for purchase on Leanpub and Amazon.
+          - generic [ref=e54]:
+            - link "Buy Ebook" [ref=e55] [cursor=pointer]:
+              - /url: https://leanpub.com/qc
+            - link "Buy Paperback or Hardback" [ref=e56] [cursor=pointer]:
+              - /url: https://www.amazon.com/dp/B0FGYF6DG6
+          - paragraph [ref=e57]: Want access to latest content? You can sign up for a premium subscription, which provides access to the book's original materials.
+          - paragraph [ref=e58]:
+            - text: If you haven't already,
+            - link "sign up to my newsletter" [ref=e59] [cursor=pointer]:
+              - /url: "#/portal/signup"
+        - link "Quality Coach Book by Anne-Marie Charrett" [ref=e61] [cursor=pointer]:
+          - /url: https://leanpub.com/qc
+          - img "Quality Coach Book by Anne-Marie Charrett" [ref=e62]
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - heading "Latest" [level=2] [ref=e65]:
+            - link "Latest" [ref=e66] [cursor=pointer]:
+              - /url: http://localhost:2368/page/2
+          - generic [ref=e67]:
+            - article [ref=e68]:
+              - 'link "Quality Coach newsletter #38 The Quality Coach''s Handbook Course is now available. New post on change in enterprise plus some great discounts for Agile Testing Days 🙌 AMC 18 Sep 2025" [ref=e69] [cursor=pointer]':
+                - /url: /quality-coach-newsletter-38/
+                - generic [ref=e70]:
+                  - 'heading "Quality Coach newsletter #38" [level=3] [ref=e72]'
+                  - generic [ref=e73]: The Quality Coach's Handbook Course is now available. New post on change in enterprise plus some great discounts for Agile Testing Days 🙌
+                  - generic [ref=e74]:
+                    - generic [ref=e75]: AMC
+                    - time [ref=e76]: 18 Sep 2025
+            - article [ref=e77]:
+              - link "Building Momentum for change in Enterprise AMC 17 Sep 2025" [ref=e78] [cursor=pointer]:
+                - /url: /building-momentum-for-change-in-enterprise/
+                - figure [ref=e79]:
+                  - img "Building Momentum for change in Enterprise" [ref=e80]
+                - generic [ref=e81]:
+                  - heading "Building Momentum for change in Enterprise" [level=3] [ref=e83]
+                  - generic [ref=e84]:
+                    - generic [ref=e85]: AMC
+                    - time [ref=e86]: 17 Sep 2025
+            - article [ref=e87]:
+              - link "Coming soon AMC 09 Sep 2025" [ref=e88] [cursor=pointer]:
+                - /url: /coming-soon/
+                - figure [ref=e89]:
+                  - img "Coming soon" [ref=e90]
+                - generic [ref=e91]:
+                  - heading "Coming soon" [level=3] [ref=e93]
+                  - generic [ref=e94]:
+                    - generic [ref=e95]: AMC
+                    - time [ref=e96]: 09 Sep 2025
+            - article [ref=e97]:
+              - 'link "Quality Coach newsletter #37 AMC, Irja Straus 09 Jul 2025" [ref=e98] [cursor=pointer]':
+                - /url: /quality-coach-newsletter-37/
+                - generic [ref=e99]:
+                  - 'heading "Quality Coach newsletter #37" [level=3] [ref=e101]'
+                  - generic [ref=e102]:
+                    - generic [ref=e103]: AMC, Irja Straus
+                    - time [ref=e104]: 09 Jul 2025
+            - article [ref=e105]:
+              - link "Quality, Critical Thinking and Risk in Modern Engineering AMC 02 Jul 2025" [ref=e106] [cursor=pointer]:
+                - /url: /quality-critical-thinking-and-risk-in-modern-engineering/
+                - figure [ref=e107]:
+                  - img "Quality, Critical Thinking and Risk in Modern Engineering" [ref=e108]
+                - generic [ref=e109]:
+                  - heading "Quality, Critical Thinking and Risk in Modern Engineering" [level=3] [ref=e111]
+                  - generic [ref=e112]:
+                    - generic [ref=e113]: AMC
+                    - time [ref=e114]: 02 Jul 2025
+            - article [ref=e115]:
+              - link "How to write a book AMC 20 Jun 2025" [ref=e116] [cursor=pointer]:
+                - /url: /how-to-write-a-book/
+                - figure [ref=e117]:
+                  - img "How to write a book" [ref=e118]
+                - generic [ref=e119]:
+                  - heading "How to write a book" [level=3] [ref=e121]
+                  - generic [ref=e122]:
+                    - generic [ref=e123]: AMC
+                    - time [ref=e124]: 20 Jun 2025
+            - article [ref=e125]:
+              - link "Be the spark AMC 23 Apr 2025" [ref=e126] [cursor=pointer]:
+                - /url: /be-the-spark/
+                - figure [ref=e127]:
+                  - img "Be the spark" [ref=e128]
+                - generic [ref=e129]:
+                  - heading "Be the spark" [level=3] [ref=e131]
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: AMC
+                    - time [ref=e134]: 23 Apr 2025
+          - link "Show more" [ref=e136] [cursor=pointer]:
+            - /url: http://localhost:2368/page/2
+            - text: Show more
+            - img [ref=e137]
+        - generic [ref=e139]:
+          - heading "Tech Leadership" [level=2] [ref=e140]:
+            - link "Tech Leadership" [ref=e141] [cursor=pointer]:
+              - /url: /tag/leadership/
+          - generic [ref=e142]:
+            - article [ref=e143]:
+              - link "Be the spark I am wood wanting to be fire. AMC 23 Apr 2025" [ref=e144] [cursor=pointer]:
+                - /url: /be-the-spark/
+                - figure [ref=e145]:
+                  - img "Be the spark" [ref=e146]
+                - generic [ref=e147]:
+                  - heading "Be the spark" [level=3] [ref=e149]
+                  - generic [ref=e150]: I am wood wanting to be fire.
+                  - generic [ref=e151]:
+                    - generic [ref=e152]: AMC
+                    - time [ref=e153]: 23 Apr 2025
+            - article [ref=e154]:
+              - link "Togetherness AMC 14 Nov 2024" [ref=e155] [cursor=pointer]:
+                - /url: /togetherness/
+                - figure [ref=e156]:
+                  - img "Dawn" [ref=e157]
+                - generic [ref=e158]:
+                  - heading "Togetherness" [level=3] [ref=e160]
+                  - generic [ref=e161]:
+                    - generic [ref=e162]: AMC
+                    - time [ref=e163]: 14 Nov 2024
+            - article [ref=e164]:
+              - link "Value AMC 24 Aug 2024" [ref=e165] [cursor=pointer]:
+                - /url: /value/
+                - figure [ref=e166]:
+                  - img "Value" [ref=e167]
+                - generic [ref=e168]:
+                  - heading "Value" [level=3] [ref=e170]
+                  - generic [ref=e171]:
+                    - generic [ref=e172]: AMC
+                    - time [ref=e173]: 24 Aug 2024
+            - article [ref=e174]:
+              - link "Recognition AMC 23 Aug 2024" [ref=e175] [cursor=pointer]:
+                - /url: /recognition/
+                - figure [ref=e176]:
+                  - img "Recognition" [ref=e177]
+                - generic [ref=e178]:
+                  - heading "Recognition" [level=3] [ref=e180]
+                  - generic [ref=e181]:
+                    - generic [ref=e182]: AMC
+                    - time [ref=e183]: 23 Aug 2024
+            - article [ref=e184]:
+              - link "The secret ingredient is joy AMC 17 Aug 2024" [ref=e185] [cursor=pointer]:
+                - /url: /the-secret-ingredient-is-joy/
+                - figure [ref=e186]:
+                  - img "The secret ingredient is joy" [ref=e187]
+                - generic [ref=e188]:
+                  - heading "The secret ingredient is joy" [level=3] [ref=e190]
+                  - generic [ref=e191]:
+                    - generic [ref=e192]: AMC
+                    - time [ref=e193]: 17 Aug 2024
+            - article [ref=e194]:
+              - link "Be like mist AMC 14 Aug 2024" [ref=e195] [cursor=pointer]:
+                - /url: /be-like-mist/
+                - figure [ref=e196]:
+                  - img "Be like mist" [ref=e197]
+                - generic [ref=e198]:
+                  - heading "Be like mist" [level=3] [ref=e200]
+                  - generic [ref=e201]:
+                    - generic [ref=e202]: AMC
+                    - time [ref=e203]: 14 Aug 2024
+            - article [ref=e204]:
+              - link "Glints in Leadership AMC 17 Feb 2024" [ref=e205] [cursor=pointer]:
+                - /url: /glints-in-leadership/
+                - figure [ref=e206]:
+                  - img "Glints in Leadership" [ref=e207]
+                - generic [ref=e208]:
+                  - heading "Glints in Leadership" [level=3] [ref=e210]
+                  - generic [ref=e211]:
+                    - generic [ref=e212]: AMC
+                    - time [ref=e213]: 17 Feb 2024
+          - link "Show more" [ref=e215] [cursor=pointer]:
+            - /url: /tag/leadership/
+            - text: Show more
+            - img [ref=e216]
+        - generic [ref=e218]:
+          - heading "Quality Coach Book" [level=2] [ref=e219]:
+            - link "Quality Coach Book" [ref=e220] [cursor=pointer]:
+              - /url: /tag/book/
+          - generic [ref=e221]:
+            - article [ref=e222]:
+              - link "Building Momentum for change in Enterprise Driving change in Enterprise requires relationship building and thoughtful communication. AMC 17 Sep 2025" [ref=e223] [cursor=pointer]:
+                - /url: /building-momentum-for-change-in-enterprise/
+                - figure [ref=e224]:
+                  - img "Building Momentum for change in Enterprise" [ref=e225]
+                - generic [ref=e226]:
+                  - heading "Building Momentum for change in Enterprise" [level=3] [ref=e228]
+                  - generic [ref=e229]: Driving change in Enterprise requires relationship building and thoughtful communication.
+                  - generic [ref=e230]:
+                    - generic [ref=e231]: AMC
+                    - time [ref=e232]: 17 Sep 2025
+            - article [ref=e233]:
+              - link "Quality, Critical Thinking and Risk in Modern Engineering AMC 02 Jul 2025" [ref=e234] [cursor=pointer]:
+                - /url: /quality-critical-thinking-and-risk-in-modern-engineering/
+                - figure [ref=e235]:
+                  - img "Quality, Critical Thinking and Risk in Modern Engineering" [ref=e236]
+                - generic [ref=e237]:
+                  - heading "Quality, Critical Thinking and Risk in Modern Engineering" [level=3] [ref=e239]
+                  - generic [ref=e240]:
+                    - generic [ref=e241]: AMC
+                    - time [ref=e242]: 02 Jul 2025
+            - article [ref=e243]:
+              - link "Laying the Foundation for Quality Software Alessandra Moreira 09 Apr 2025" [ref=e244] [cursor=pointer]:
+                - /url: /laying-the-foundation-for-quality-software/
+                - figure [ref=e245]:
+                  - img "Laying the Foundation for Quality Software" [ref=e246]
+                - generic [ref=e247]:
+                  - heading "Laying the Foundation for Quality Software" [level=3] [ref=e249]
+                  - generic [ref=e250]:
+                    - generic [ref=e251]: Alessandra Moreira
+                    - time [ref=e252]: 09 Apr 2025
+            - article [ref=e253]:
+              - link "Exploratory Testing with a Team AMC 16 Jan 2025" [ref=e254] [cursor=pointer]:
+                - /url: /exploratory-testing-with-a-team/
+                - figure [ref=e255]:
+                  - img "Exploratory Testing with a Team" [ref=e256]
+                - generic [ref=e257]:
+                  - heading "Exploratory Testing with a Team" [level=3] [ref=e259]
+                  - generic [ref=e260]:
+                    - generic [ref=e261]: AMC
+                    - time [ref=e262]: 16 Jan 2025
+            - article [ref=e263]:
+              - link "Using AI in Quality Coaching AMC 24 Nov 2024" [ref=e264] [cursor=pointer]:
+                - /url: /using-ai-in-quality-coaching/
+                - figure [ref=e265]:
+                  - img "Google DeepMind used in an article on AI in quality coaching by Anne-Marie Charrett" [ref=e266]
+                - generic [ref=e267]:
+                  - heading "Using AI in Quality Coaching" [level=3] [ref=e269]
+                  - generic [ref=e270]:
+                    - generic [ref=e271]: AMC
+                    - time [ref=e272]: 24 Nov 2024
+            - article [ref=e273]:
+              - link "Create a Team Test Automation Strategy AMC 19 Nov 2024" [ref=e274] [cursor=pointer]:
+                - /url: /create-a-team-test-automation-strategy/
+                - figure [ref=e275]:
+                  - img "Photo by anthony mcgee louvre pyramid used in test automation strategy by annemarie charrett" [ref=e276]
+                - generic [ref=e277]:
+                  - heading "Create a Team Test Automation Strategy" [level=3] [ref=e279]
+                  - generic [ref=e280]:
+                    - generic [ref=e281]: AMC
+                    - time [ref=e282]: 19 Nov 2024
+            - article [ref=e283]:
+              - link "Building Cross-Functional expertise in a team Parveen Khan 04 Nov 2024" [ref=e284] [cursor=pointer]:
+                - /url: /building-cross-functional-expertise-in-a-team/
+                - figure [ref=e285]:
+                  - img "Building Cross-Functional expertise in a team" [ref=e286]
+                - generic [ref=e287]:
+                  - heading "Building Cross-Functional expertise in a team" [level=3] [ref=e289]
+                  - generic [ref=e290]:
+                    - generic [ref=e291]: Parveen Khan
+                    - time [ref=e292]: 04 Nov 2024
+          - link "Show more" [ref=e294] [cursor=pointer]:
+            - /url: /tag/book/
+            - text: Show more
+            - img [ref=e295]
+        - generic [ref=e297]:
+          - heading "Women in Tech" [level=2] [ref=e298]:
+            - link "Women in Tech" [ref=e299] [cursor=pointer]:
+              - /url: /tag/women-in-tech/
+          - generic [ref=e300]:
+            - article [ref=e301]:
+              - link "Be the spark I am wood wanting to be fire. AMC 23 Apr 2025" [ref=e302] [cursor=pointer]:
+                - /url: /be-the-spark/
+                - figure [ref=e303]:
+                  - img "Be the spark" [ref=e304]
+                - generic [ref=e305]:
+                  - heading "Be the spark" [level=3] [ref=e307]
+                  - generic [ref=e308]: I am wood wanting to be fire.
+                  - generic [ref=e309]:
+                    - generic [ref=e310]: AMC
+                    - time [ref=e311]: 23 Apr 2025
+            - article [ref=e312]:
+              - link "The Gratitude Jar AMC 03 Jan 2020" [ref=e313] [cursor=pointer]:
+                - /url: /the-gratitude-jar/
+                - figure [ref=e314]:
+                  - img "The Gratitude Jar" [ref=e315]
+                - generic [ref=e316]:
+                  - heading "The Gratitude Jar" [level=3] [ref=e318]
+                  - generic [ref=e319]:
+                    - generic [ref=e320]: AMC
+                    - time [ref=e321]: 03 Jan 2020
+            - article [ref=e322]:
+              - link "No REST for women AMC 05 Nov 2018" [ref=e323] [cursor=pointer]:
+                - /url: /rest-apis-written-by-women/
+                - figure [ref=e324]:
+                  - img "No REST for women" [ref=e325]
+                - generic [ref=e326]:
+                  - heading "No REST for women" [level=3] [ref=e328]
+                  - generic [ref=e329]:
+                    - generic [ref=e330]: AMC
+                    - time [ref=e331]: 05 Nov 2018
+            - article [ref=e332]:
+              - link "Raising Female Technology Leaders AMC 24 May 2018" [ref=e333] [cursor=pointer]:
+                - /url: /women-in-technology-facts/
+                - figure [ref=e334]:
+                  - img "Raising Female Technology Leaders" [ref=e335]
+                - generic [ref=e336]:
+                  - heading "Raising Female Technology Leaders" [level=3] [ref=e338]
+                  - generic [ref=e339]:
+                    - generic [ref=e340]: AMC
+                    - time [ref=e341]: 24 May 2018
+            - article [ref=e342]:
+              - link "No women speakers? No Bother! AMC 01 Aug 2015" [ref=e343] [cursor=pointer]:
+                - /url: /why-im-not-worried-about-women-in-software-testing-conferences/
+                - figure [ref=e344]:
+                  - img "No women speakers? No Bother!" [ref=e345]
+                - generic [ref=e346]:
+                  - heading "No women speakers? No Bother!" [level=3] [ref=e348]
+                  - generic [ref=e349]:
+                    - generic [ref=e350]: AMC
+                    - time [ref=e351]: 01 Aug 2015
+            - article [ref=e352]:
+              - link "Nice girls don't get the Keynote AMC 11 Apr 2015" [ref=e353] [cursor=pointer]:
+                - /url: /nice-girls-dont-get-the-keynote/
+                - figure [ref=e354]:
+                  - img "Nice girls don't get the Keynote" [ref=e355]
+                - generic [ref=e356]:
+                  - heading "Nice girls don't get the Keynote" [level=3] [ref=e358]
+                  - generic [ref=e359]:
+                    - generic [ref=e360]: AMC
+                    - time [ref=e361]: 11 Apr 2015
+          - link "Show more" [ref=e363] [cursor=pointer]:
+            - /url: /tag/women-in-tech/
+            - text: Show more
+            - img [ref=e364]
+    - contentinfo [ref=e366]:
+      - generic [ref=e367]:
+        - navigation [ref=e368]:
+          - list [ref=e369]:
+            - listitem [ref=e370]:
+              - link "FAQ" [ref=e371] [cursor=pointer]:
+                - /url: http://localhost:2368/faq/
+            - listitem [ref=e372]:
+              - link "Data & privacy" [ref=e373] [cursor=pointer]:
+                - /url: http://localhost:2368/privacy-policy/
+            - listitem [ref=e374]:
+              - link "Terms of Service" [ref=e375] [cursor=pointer]:
+                - /url: http://localhost:2368/terms-of-service/
+            - listitem [ref=e376]:
+              - link "About AMC" [ref=e377] [cursor=pointer]:
+                - /url: http://localhost:2368/aboutme/
+            - listitem [ref=e378]:
+              - link "Testing Times Consultancy" [ref=e379] [cursor=pointer]:
+                - /url: https://www.testingtimes.com.au
+            - listitem [ref=e380]:
+              - link "Polywork" [ref=e381] [cursor=pointer]:
+                - /url: https://update.annemariecharrett.com/
+            - listitem [ref=e382]:
+              - link "Newsletter" [ref=e383] [cursor=pointer]:
+                - /url: http://localhost:2368/tag/newsletter/
+        - generic [ref=e384]: Home of the Quality Coach Book plus insights on engineering leadership
+  - generic:
+    - generic [ref=e385]:
+      - img:
+        - generic: ASK THE BOOK • ASK THE BOOK •
+      - button "Close Quality Coach Researcher" [expanded] [ref=e386] [cursor=pointer]:
+        - generic:
+          - img
+        - generic:
+          - img
+    - dialog "Quality Coach Researcher" [ref=e387]:
+      - generic [ref=e388]:
+        - generic [ref=e389]:
+          - generic [ref=e390]:
+            - img "Quality Coach Handbook" [ref=e391]
+            - heading "Quality Coach Researcher" [level=3] [ref=e392]
+          - button "Test Lead" [ref=e394] [cursor=pointer]:
+            - generic [ref=e395]: Test Lead
+            - img [ref=e396]
+        - button "Close chat" [ref=e398] [cursor=pointer]:
+          - img [ref=e399]
+      - generic [ref=e403]:
+        - paragraph [ref=e404]:
+          - strong [ref=e405]: Welcome!
+          - text: I'll help you explore Anne-Marie's Quality Coach's Handbook.
+        - paragraph [ref=e406]: Ask me about coaching techniques, quality practices, or what workshop to run.
+      - generic [ref=e407]:
+        - textbox "Ask a question..." [ref=e408]
+        - button "Send message" [ref=e409] [cursor=pointer]:
+          - img [ref=e410]
+      - generic [ref=e413]: Grounded in the Handbook, supplemented by coaching expertise
+  - iframe [ref=e414]:
+    - figure [ref=f1e4] [cursor=pointer]:
+      - img [ref=f1e5]
+```

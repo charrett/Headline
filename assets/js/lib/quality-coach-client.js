@@ -206,5 +206,6 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // Export for Browser environments
 if (typeof window !== 'undefined') {
-    window.QualityCoachClient = QualityCoachClient;
+    window.QualityCoach = window.QualityCoach || {};
+    window.QualityCoach.Client = QualityCoachClient;
 }

@@ -1,0 +1,1 @@
+{"load_session_id":"62260a1a-0845-46d5-a593-13468533d26d","widget_id":"c5d943cc-0e7d-43d3-b25e-1b7184c3fc11","version":"1","action":"view","visitor_id":"b9616ddb-5a7f-4f15-a9bb-8503becdd940","timestamp":"2025-12-11T03:59:15.676Z","payload":"{\"country\":\"AU\",\"page\":\"http://localhost:2368/\",\"host\":\"localhost:2368\",\"design\":\"toast\",\"powered_by_enabled\":false}"}
