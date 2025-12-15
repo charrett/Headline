@@ -545,7 +545,7 @@ class QualityCoachUI {
                 if (welcomeMsg) welcomeMsg.style.display = 'none';
 
                 messages.forEach(msg => {
-                    this.addMessage(msg.content, msg.role);
+                    this.addMessage(msg.content, msg.role, null, false, false, msg.id);
                     this.conversationHistory.push({ role: msg.role, content: msg.content });
                 });
             }
