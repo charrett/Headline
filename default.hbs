@@ -103,10 +103,11 @@
     {{> "pswp"}}
 {{/is}}
 
-{{!-- Quality Coach AI - Floating Widget (appears on all pages) --}}
-{{> "quality-coach"}}
-
 <script src="{{asset "built/main.min.js"}}"></script>
+
+{{!-- Quality Coach AI - Floating Widget (appears on all pages) --}}
+{{!-- MUST load after main.min.js so QualityCoach.UI class is available --}}
+{{> "quality-coach"}}
 
 {{ghost_foot}}
 
