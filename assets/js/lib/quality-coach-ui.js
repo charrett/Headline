@@ -689,7 +689,7 @@ class QualityCoachUI {
             return;
         }
 
-        const { messageOverride = null, isFeedbackOverride = null, skipUserMessage = false, feedbackRating = null } = options;
+        const { messageOverride = null, isFeedbackOverride = null, skipUserMessage = false, feedbackRating = null, messageId = null } = options;
         const usingPrimaryInput = messageOverride === null;
         const sourceValue = usingPrimaryInput ? this.elements.input.value : messageOverride;
         const rawMessage = (sourceValue || '').trim();
@@ -734,7 +734,8 @@ class QualityCoachUI {
             member_email: this.config.memberEmail,
             is_feedback: isFeedback,
             rating: feedbackRating,
-            persona: this.currentPersona
+            persona: this.currentPersona,
+            message_id: messageId
         })
         .then(data => {
             this.elements.typingIndicator.style.display = 'none';
@@ -756,7 +757,8 @@ class QualityCoachUI {
                             answer: data.answer,
                             sources: data.sources,
                             originalMessage: cleanedMessage,
-                            lowRelevance: data.low_relevance
+                            lowRelevance: data.low_relevance,
+                            messageId: data.message_id
                         });
                         return;
                     }
@@ -769,7 +771,7 @@ class QualityCoachUI {
                         this.updatePersonaDropdown(data.persona);
                     }
                     
-                    this.addMessage(data.answer, 'assistant', data.sources, false, data.low_relevance);
+                    this.addMessage(data.answer, 'assistant', data.sources, false, data.low_relevance, data.message_id);
                     this.conversationHistory.push({ role: 'user', content: cleanedMessage });
                     this.conversationHistory.push({ role: 'assistant', content: data.answer });
                 }
@@ -845,7 +847,7 @@ class QualityCoachUI {
         
         if (this.hasShownPersonaConfirmation || hasConfirmed) {
             if (deferredData && deferredData.answer) {
-                 this.addMessage(deferredData.answer, 'assistant', deferredData.sources, false, deferredData.lowRelevance);
+                 this.addMessage(deferredData.answer, 'assistant', deferredData.sources, false, deferredData.lowRelevance, deferredData.messageId);
                  this.conversationHistory.push({ role: 'user', content: deferredData.originalMessage });
                  this.conversationHistory.push({ role: 'assistant', content: deferredData.answer });
             }
@@ -1058,9 +1060,12 @@ class QualityCoachUI {
         }
     }
 
-    addMessage(content, role, sources, isFeedbackMessage = false, lowRelevance = false) {
+    addMessage(content, role, sources, isFeedbackMessage = false, lowRelevance = false, messageId = null) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'qc-message qc-message-' + role;
+        if (messageId) {
+            messageDiv.dataset.messageId = messageId;
+        }
 
         const bubble = document.createElement('div');
         bubble.className = 'qc-message-bubble';
@@ -1216,7 +1221,8 @@ class QualityCoachUI {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
             
-            this.submitFeedback(rating, comment).then(() => {
+            const messageId = messageDiv.dataset.messageId;
+            this.submitFeedback(rating, comment, messageId).then(() => {
                 form.innerHTML = '<div style="color: var(--qc-accent); font-size: 13px; font-weight: 500;">Thanks for your feedback!</div>';
                 setTimeout(() => {
                     form.remove();
@@ -1236,11 +1242,12 @@ class QualityCoachUI {
         textarea.focus();
     }
 
-    submitFeedback(rating, comment) {
+    submitFeedback(rating, comment, messageId) {
         return this.sendMessage({
             messageOverride: comment || rating,
             isFeedbackOverride: true,
-            feedbackRating: rating
+            feedbackRating: rating,
+            messageId: messageId
         });
     }
 }
