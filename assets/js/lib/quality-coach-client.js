@@ -121,7 +121,7 @@ class QualityCoachClient {
 
         // Handle feedback submission separately
         if (context.is_feedback) {
-            return this.sendFeedback(message, context);
+            return this.sendFeedback(message, context.rating, context);
         }
 
         const response = await this.fetchWithRetry(`${this.apiBase}/api/v1/chat`, {
@@ -154,7 +154,7 @@ class QualityCoachClient {
     /**
      * Send feedback to the API.
      */
-    async sendFeedback(comment, context = {}) {
+    async sendFeedback(comment, rating, context = {}) {
         const response = await this.fetchWithRetry(`${this.apiBase}/api/v1/feedback`, {
             method: 'POST',
             headers: {
@@ -163,7 +163,7 @@ class QualityCoachClient {
             },
             body: JSON.stringify({
                 thread_id: this.threadId,
-                rating: 'comment',
+                rating: rating || 'comment',
                 comment: comment,
                 message_id: context.message_id
             })

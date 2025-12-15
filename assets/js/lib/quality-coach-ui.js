@@ -689,7 +689,7 @@ class QualityCoachUI {
             return;
         }
 
-        const { messageOverride = null, isFeedbackOverride = null, skipUserMessage = false } = options;
+        const { messageOverride = null, isFeedbackOverride = null, skipUserMessage = false, feedbackRating = null } = options;
         const usingPrimaryInput = messageOverride === null;
         const sourceValue = usingPrimaryInput ? this.elements.input.value : messageOverride;
         const rawMessage = (sourceValue || '').trim();
@@ -733,6 +733,7 @@ class QualityCoachUI {
             post_title: this.config.postTitle,
             member_email: this.config.memberEmail,
             is_feedback: isFeedback,
+            rating: feedbackRating,
             persona: this.currentPersona
         })
         .then(data => {
@@ -1238,7 +1239,8 @@ class QualityCoachUI {
     submitFeedback(rating, comment) {
         return this.sendMessage({
             messageOverride: comment || rating,
-            isFeedbackOverride: true
+            isFeedbackOverride: true,
+            feedbackRating: rating
         });
     }
 }
