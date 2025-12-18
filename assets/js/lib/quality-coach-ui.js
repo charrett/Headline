@@ -707,7 +707,7 @@ class QualityCoachUI {
         this.elements.input.focus();
 
         if (typeof gtag !== 'undefined') {
-            gtag('event', 'quality_coach_opened', {
+            gtag('event', 'qc_chat_opened', {
                 'post_slug': this.config.postSlug,
                 'post_title': this.config.postTitle
             });
