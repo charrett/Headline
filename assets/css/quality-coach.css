@@ -1284,3 +1284,22 @@ body.qc-offset-for-portal {
     opacity: 0.9;
 }
 
+/* Guest Signin Container */
+.qc-signin-container {
+    display: flex;
+    gap: 8px;
+    padding: 4px;
+    width: 100%;
+}
+
+.qc-signin-container .gh-btn {
+    flex: 1;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+/* Ensure Sign In button text is readable (white) on the black background */
+.qc-signin-container .gh-btn:not(.gh-primary-btn) {
+    color: #ffffff;
+}
+

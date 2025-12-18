@@ -101,7 +101,7 @@ class QualityCoachUI {
             personaDropdown: document.getElementById('qc-persona-dropdown')
         };
 
-        if (!this.elements.chatButton || !this.elements.chatWindow || !this.elements.input || !this.elements.sendButton || !this.elements.closeButton) {
+        if (!this.elements.chatButton || !this.elements.chatWindow || !this.elements.closeButton) {
             return;
         }
 
@@ -133,10 +133,36 @@ class QualityCoachUI {
             this.elements.input.placeholder = this.DEFAULT_PLACEHOLDER;
         }
 
-        this.initializeAccess();
+        if (this.config.memberEmail) {
+            this.initializeAccess();
+        } else {
+            // Guest mode: Widget visible, but input replaced by signin button (handled in HBS)
+            this.setButtonAccessibility({ loading: false });
+            this.setState(this.QC_STATE.READY);
+            if (this.elements.widgetContainer) {
+                this.elements.widgetContainer.classList.remove('qc-widget--initializing');
+            }
+        }
         this.monitorPortalTrigger();
         this.restorePersonaBadge();
         this.setupEventListeners();
+        this.checkReturnToChat();
+    }
+
+    checkReturnToChat() {
+        try {
+            const shouldReturn = localStorage.getItem('qc_return_to_chat');
+            if (shouldReturn === 'true' && this.config.memberEmail) {
+                // User just signed in/up and came back
+                // Small delay to ensure UI is ready
+                setTimeout(() => {
+                    this.openChatWindow();
+                    localStorage.removeItem('qc_return_to_chat');
+                }, 500);
+            }
+        } catch (e) {
+            // Ignore storage errors
+        }
     }
 
     setupEventListeners() {
@@ -166,20 +192,24 @@ class QualityCoachUI {
         });
 
         // Auto-resize textarea
-        this.elements.input.addEventListener('input', () => {
-            this.elements.input.style.height = 'auto';
-            this.elements.input.style.height = Math.min(this.elements.input.scrollHeight, 120) + 'px';
-        });
+        if (this.elements.input) {
+            this.elements.input.addEventListener('input', () => {
+                this.elements.input.style.height = 'auto';
+                this.elements.input.style.height = Math.min(this.elements.input.scrollHeight, 120) + 'px';
+            });
 
-        // Send on Enter (Shift+Enter for newline)
-        this.elements.input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendMessage();
-            }
-        });
+            // Send on Enter (Shift+Enter for newline)
+            this.elements.input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+        }
 
-        this.elements.sendButton.addEventListener('click', () => this.sendMessage());
+        if (this.elements.sendButton) {
+            this.elements.sendButton.addEventListener('click', () => this.sendMessage());
+        }
         
         // Persona dropdown toggle
         if (this.elements.personaButton && this.elements.personaDropdown) {
@@ -237,6 +267,16 @@ class QualityCoachUI {
                 }, 150);
             });
         }
+
+        // Guest Signin/Signup Tracking
+        const guestLinks = document.querySelectorAll('.qc-signin-container a');
+        guestLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                try {
+                    localStorage.setItem('qc_return_to_chat', 'true');
+                } catch (e) {}
+            });
+        });
     }
 
     setState(newState) {
@@ -691,7 +731,9 @@ class QualityCoachUI {
 
         const { messageOverride = null, isFeedbackOverride = null, skipUserMessage = false, feedbackRating = null, messageId = null } = options;
         const usingPrimaryInput = messageOverride === null;
-        const sourceValue = usingPrimaryInput ? this.elements.input.value : messageOverride;
+        const sourceValue = usingPrimaryInput 
+            ? (this.elements.input ? this.elements.input.value : '') 
+            : messageOverride;
         const rawMessage = (sourceValue || '').trim();
         if (!rawMessage) return;
 
@@ -717,14 +759,18 @@ class QualityCoachUI {
             this.addMessage(displayMessage, 'user', null, null, isFeedback);
         }
 
-        if (usingPrimaryInput) {
+        if (usingPrimaryInput && this.elements.input) {
             this.elements.input.value = '';
             this.elements.input.style.height = 'auto';
         }
 
         if (usingPrimaryInput) {
-            this.elements.input.disabled = true;
-            this.elements.sendButton.disabled = true;
+            if (this.elements.input) {
+                this.elements.input.disabled = true;
+            }
+            if (this.elements.sendButton) {
+                this.elements.sendButton.disabled = true;
+            }
         }
         this.elements.typingIndicator.style.display = 'flex';
 
@@ -800,9 +846,13 @@ class QualityCoachUI {
         })
         .finally(() => {
             if (usingPrimaryInput) {
-                this.elements.input.disabled = false;
-                this.elements.sendButton.disabled = false;
-                this.elements.input.focus();
+                if (this.elements.input) {
+                    this.elements.input.disabled = false;
+                    this.elements.input.focus();
+                }
+                if (this.elements.sendButton) {
+                    this.elements.sendButton.disabled = false;
+                }
             }
         });
     }

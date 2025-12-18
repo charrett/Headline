@@ -2,7 +2,14 @@
 {{!-- Server-side beta access is handled by /api/v1/access/check.
     No API keys or email lists should be injected into the browser. --}}
 
-{{#if @member}}
+{{!-- Quality Coach Researcher - Floating Chat Widget --}}
+{{!-- Server-side beta access is handled by /api/v1/access/check.
+    No API keys or email lists should be injected into the browser. --}}
+
+{{!-- Quality Coach Researcher - Floating Chat Widget --}}
+{{!-- Server-side beta access is handled by /api/v1/access/check.
+    No API keys or email lists should be injected into the browser. --}}
+
     <div id="qc-access-message" class="qc-access-message" role="status"></div>
     
     {{!-- Floating Chat Widget --}}
@@ -94,7 +101,11 @@
             <div id="qc-messages" class="qc-messages">
                 <div class="qc-welcome-message">
                     <p><img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="" class="qc-welcome-book-icon"> <strong>Welcome!</strong> I'll help you explore Anne-Marie's Quality Coach's Handbook.</p>
+                    {{#if @member}}
                     <p class="qc-welcome-hint">Ask me about coaching techniques, quality practices, or what workshop to run.</p>
+                    {{else}}
+                    <p class="qc-welcome-hint">Sign up or sign in to access the AI Coach and ask about coaching techniques, quality practices, or workshops.</p>
+                    {{/if}}
                 </div>
             </div>
 
@@ -107,6 +118,7 @@
 
             {{!-- Input Area --}}
             <div class="qc-input-area">
+                {{#if @member}}
                 <textarea 
                     id="qc-input" 
                     class="qc-input" 
@@ -119,6 +131,12 @@
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
                 </button>
+                {{else}}
+                <div class="qc-signin-container">
+                    <a href="#/portal/signup" class="gh-btn gh-primary-btn" data-portal="signup">Sign up</a>
+                    <a href="#/portal/signin" class="gh-btn" data-portal="signin">Sign in</a>
+                </div>
+                {{/if}}
             </div>
 
             {{!-- Footer --}}
@@ -154,8 +172,3 @@
         });
         </script>
     </div>
-{{else}}
-    <div class="qc-locked-message">
-        The Quality Coach Researcher is available to members only. Sign in to request beta access.
-    </div>
-{{/if}}
