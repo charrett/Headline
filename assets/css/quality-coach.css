@@ -1235,6 +1235,95 @@ body.qc-offset-for-portal {
     opacity: 0.7;
 }
 
+/* Soft Persona Prompt (after first answer) - Progressive Disclosure */
+.qc-soft-persona-prompt {
+    padding: 16px;
+    margin: 12px 0;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #93c5fd;
+    border-left: 4px solid #3b82f6;
+    border-radius: 12px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.qc-soft-persona-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.qc-soft-persona-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1e40af;
+    font-size: 15px;
+}
+
+.qc-soft-persona-icon {
+    font-size: 18px;
+}
+
+.qc-soft-persona-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.qc-soft-persona-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--color-white, #ffffff);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e40af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.qc-soft-persona-btn:hover {
+    border-color: #3b82f6;
+    background: #f0f9ff;
+    transform: translateY(-1px);
+}
+
+.qc-soft-persona-more {
+    color: #64748b;
+    border-color: #cbd5e1;
+}
+
+.qc-soft-persona-more:hover {
+    color: #1e40af;
+    border-color: #3b82f6;
+}
+
+.qc-soft-persona-skip {
+    align-self: flex-start;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.qc-soft-persona-skip:hover {
+    color: #1e40af;
+    text-decoration: underline;
+}
+
+.qc-persona-selector-inline {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
 /* Persona Reminder (after 3rd message) */
 .qc-persona-reminder {
     padding: 12px 16px;
@@ -1434,6 +1523,11 @@ body.qc-offset-for-portal {
 
 .qc-fade-out {
     animation: qc-fade-out 0.3s ease-out forwards;
+}
+
+@keyframes qc-gentle-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }
 
 /* Sources Attribution */

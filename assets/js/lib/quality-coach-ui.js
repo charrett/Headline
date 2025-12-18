@@ -765,8 +765,8 @@ class QualityCoachUI {
         this.elements.chatButton.setAttribute('aria-expanded', 'true');
         this.elements.chatButton.setAttribute('aria-label', 'Close Quality Coach Researcher');
 
-        // Show persona prompt if not yet confirmed
-        this.showPersonaPromptIfNeeded();
+        // Don't show persona prompt upfront - let user ask first
+        // Progressive disclosure: show after first answer instead
 
         this.elements.input.focus();
 
@@ -901,13 +901,9 @@ class QualityCoachUI {
                     // Increment message count for reminder logic
                     this.messageCount++;
 
-                    // THEN show confirmation below (non-blocking)
-                    const needsConfirmation = data.persona &&
-                                            !this.hasShownPersonaConfirmation &&
-                                            !localStorage.getItem('qc_persona_confirmed');
-
-                    if (needsConfirmation) {
-                        this.showPersonaConfirmation(data.persona);
+                    // Progressive disclosure: Show soft persona prompt after FIRST answer
+                    if (this.messageCount === 1 && !localStorage.getItem('qc_persona_confirmed')) {
+                        this.showSoftPersonaPrompt();
                     }
 
                     // Show persona reminder after 3rd message (if persona is set)
@@ -987,6 +983,168 @@ class QualityCoachUI {
         } catch (e) {}
     }
     
+    showSoftPersonaPrompt() {
+        // Progressive disclosure: soft prompt after first answer
+        const softPromptDiv = document.createElement('div');
+        softPromptDiv.className = 'qc-soft-persona-prompt';
+        softPromptDiv.innerHTML = `
+            <div class="qc-soft-persona-content">
+                <div class="qc-soft-persona-header">
+                    <span class="qc-soft-persona-icon">💡</span>
+                    <strong>I can tailor advice to your role</strong>
+                </div>
+                <div class="qc-soft-persona-options">
+                    <button class="qc-soft-persona-btn" data-persona="ENGINEERING_MANAGER">
+                        <span class="qc-persona-icon">👔</span>
+                        <span>Manager</span>
+                    </button>
+                    <button class="qc-soft-persona-btn" data-persona="SOFTWARE_ENGINEER">
+                        <span class="qc-persona-icon">💻</span>
+                        <span>Engineer</span>
+                    </button>
+                    <button class="qc-soft-persona-btn" data-persona="QUALITY_COACH">
+                        <span class="qc-persona-icon">🎯</span>
+                        <span>Coach</span>
+                    </button>
+                    <button class="qc-soft-persona-btn" data-persona="TEST_LEAD">
+                        <span class="qc-persona-icon">🧪</span>
+                        <span>Test Lead</span>
+                    </button>
+                    <button class="qc-soft-persona-btn" data-persona="DELIVERY_LEAD">
+                        <span class="qc-persona-icon">📊</span>
+                        <span>Delivery Lead</span>
+                    </button>
+                    <button class="qc-soft-persona-btn qc-soft-persona-more" data-action="show-more">
+                        <span>More ▼</span>
+                    </button>
+                </div>
+                <button class="qc-soft-persona-skip">Skip for now</button>
+            </div>
+        `;
+
+        // Handle selection clicks
+        softPromptDiv.querySelectorAll('.qc-soft-persona-btn[data-persona]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const selectedPersona = btn.dataset.persona;
+
+                // Save selection
+                try {
+                    localStorage.setItem('qc_persona_choice', selectedPersona);
+                    localStorage.setItem('qc_persona_confirmed', 'true');
+                } catch (err) {}
+
+                // Update UI
+                this.currentPersona = selectedPersona;
+                this.updatePersonaDropdown(selectedPersona, true);
+
+                // Remove prompt
+                softPromptDiv.classList.add('qc-fade-out');
+                setTimeout(() => softPromptDiv.remove(), 300);
+
+                // Track selection
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'persona_selected_after_first_answer', {
+                        'persona': selectedPersona
+                    });
+                }
+            });
+        });
+
+        // Handle "More" button - show full selector
+        const moreBtn = softPromptDiv.querySelector('[data-action="show-more"]');
+        if (moreBtn) {
+            moreBtn.addEventListener('click', () => {
+                this.showFullPersonaSelector(softPromptDiv);
+            });
+        }
+
+        // Handle skip
+        const skipBtn = softPromptDiv.querySelector('.qc-soft-persona-skip');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                softPromptDiv.classList.add('qc-fade-out');
+                setTimeout(() => softPromptDiv.remove(), 300);
+            });
+        }
+
+        this.elements.messages.appendChild(softPromptDiv);
+
+        // Add subtle bounce animation to hint at presence (no auto-scroll)
+        setTimeout(() => {
+            softPromptDiv.style.animation = 'qc-gentle-bounce 1s ease-in-out';
+        }, 2000); // Small delay before hint animation
+    }
+
+    showFullPersonaSelector(softPromptDiv) {
+        // Replace soft prompt with full 6-option selector
+        softPromptDiv.innerHTML = `
+            <div class="qc-soft-persona-content">
+                <div class="qc-soft-persona-header">
+                    <strong>What's your role?</strong>
+                </div>
+                <div class="qc-persona-selector qc-persona-selector-inline">
+                    <button class="qc-persona-select-option" data-persona="QUALITY_COACH">
+                        <span class="qc-persona-icon">🎯</span>
+                        <span>Quality Coach</span>
+                    </button>
+                    <button class="qc-persona-select-option" data-persona="ENGINEERING_MANAGER">
+                        <span class="qc-persona-icon">👔</span>
+                        <span>Engineering Manager</span>
+                    </button>
+                    <button class="qc-persona-select-option" data-persona="DELIVERY_LEAD">
+                        <span class="qc-persona-icon">📊</span>
+                        <span>Delivery Lead</span>
+                    </button>
+                    <button class="qc-persona-select-option" data-persona="CEO_EXECUTIVE">
+                        <span class="qc-persona-icon">💼</span>
+                        <span>CEO/Executive</span>
+                    </button>
+                    <button class="qc-persona-select-option" data-persona="SOFTWARE_ENGINEER">
+                        <span class="qc-persona-icon">💻</span>
+                        <span>Software Engineer</span>
+                    </button>
+                    <button class="qc-persona-select-option" data-persona="TEST_LEAD">
+                        <span class="qc-persona-icon">🧪</span>
+                        <span>Test Lead</span>
+                    </button>
+                </div>
+                <button class="qc-soft-persona-skip">Skip for now</button>
+            </div>
+        `;
+
+        // Re-attach handlers for full selector
+        softPromptDiv.querySelectorAll('.qc-persona-select-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const selectedPersona = btn.dataset.persona;
+
+                try {
+                    localStorage.setItem('qc_persona_choice', selectedPersona);
+                    localStorage.setItem('qc_persona_confirmed', 'true');
+                } catch (err) {}
+
+                this.currentPersona = selectedPersona;
+                this.updatePersonaDropdown(selectedPersona, true);
+
+                softPromptDiv.classList.add('qc-fade-out');
+                setTimeout(() => softPromptDiv.remove(), 300);
+
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'persona_selected_from_full_selector', {
+                        'persona': selectedPersona
+                    });
+                }
+            });
+        });
+
+        const skipBtn = softPromptDiv.querySelector('.qc-soft-persona-skip');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                softPromptDiv.classList.add('qc-fade-out');
+                setTimeout(() => softPromptDiv.remove(), 300);
+            });
+        }
+    }
+
     showPersonaReminder() {
         if (this.hasShownPersonaReminder) return;
         this.hasShownPersonaReminder = true;
@@ -1356,7 +1514,15 @@ class QualityCoachUI {
         }
 
         this.elements.messages.appendChild(messageDiv);
-        this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
+
+        // Scroll to show the TOP of the message (especially important for long assistant answers)
+        if (role === 'assistant') {
+            // Use scrollIntoView to show the start of the answer
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // For user messages, scroll to bottom as usual
+            this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
+        }
     }
 
     handleFeedback(messageDiv, rating, btn) {
