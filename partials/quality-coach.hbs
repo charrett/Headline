@@ -100,13 +100,62 @@
             {{!-- Messages Area --}}
             <div id="qc-messages" class="qc-messages">
                 <div class="qc-welcome-message">
-                    <p><img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="" class="qc-welcome-book-icon"> <strong>Welcome!</strong> I'll help you explore Anne-Marie's Quality Coach's Handbook.</p>
+                    <p><img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="" class="qc-welcome-book-icon"> <strong>Welcome{{#if @member.name}}, {{@member.name}}{{/if}}!</strong> I'll help you explore Anne-Marie's Quality Coach's Handbook.</p>
                     {{#if @member}}
-                    <p class="qc-welcome-hint">Ask me about coaching techniques, quality practices, or what workshop to run.</p>
+                    <p class="qc-welcome-hint">Try asking:</p>
+                    <div class="qc-example-questions">
+                        <button class="qc-example-question" data-question="How do I start quality coaching in my team?">How do I start quality coaching in my team?</button>
+                        <button class="qc-example-question" data-question="What workshop should I run first?">What workshop should I run first?</button>
+                        <button class="qc-example-question" data-question="How can I improve test automation?">How can I improve test automation?</button>
+                    </div>
                     {{else}}
-                    <p class="qc-welcome-hint">Sign up or sign in to access the AI Coach and ask about coaching techniques, quality practices, or workshops.</p>
+                    <p class="qc-welcome-hint">Here's what you can ask the Quality Coach's Handbook:</p>
                     {{/if}}
                 </div>
+
+                {{!-- Guest Preview: Show example Q&A pairs for non-members --}}
+                {{#unless @member}}
+                <div class="qc-preview-examples">
+                    {{!-- Example 1 --}}
+                    <div class="qc-message qc-message-user qc-preview-message">
+                        <div class="qc-message-bubble">How do I start quality coaching in my team?</div>
+                    </div>
+                    <div class="qc-message qc-message-assistant qc-preview-message">
+                        <div class="qc-message-bubble">
+                            Start by identifying a team that's open to change and has some autonomy. The handbook recommends beginning with a <strong>Quality Kickoff Workshop</strong> to align on quality goals and values.<br><br>Key first steps:<br>• Observe the team's current practices<br>• Build trust by listening and understanding their challenges<br>• Co-create a quality vision with the team<br>• Start small with one improvement experiment<br><br>Remember: Quality coaching is about enabling teams to own quality, not doing it for them.
+                        </div>
+                        <div class="qc-sources-container">
+                            <div class="qc-sources-badge qc-sources-handbook">
+                                <span class="qc-sources-icon">📚</span>
+                                <span class="qc-sources-label">From the Handbook:</span>
+                                <span class="qc-sources-chapters">Coaching, Workshops, Techniques for Team Coaching</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{!-- Example 2 --}}
+                    <div class="qc-message qc-message-user qc-preview-message">
+                        <div class="qc-message-bubble">What's the difference between a Quality Coach and a QA Engineer?</div>
+                    </div>
+                    <div class="qc-message qc-message-assistant qc-preview-message">
+                        <div class="qc-message-bubble">
+                            A <strong>Quality Coach</strong> focuses on teaching teams to own quality, while a <strong>QA Engineer</strong> typically focuses on testing activities.<br><br>The Quality Coach:<br>• Facilitates quality improvement across the team<br>• Coaches others to build quality practices<br>• Works to make themselves redundant<br>• Focuses on systems thinking and continuous improvement<br><br>The QA Engineer:<br>• Performs testing and validation<br>• Writes and executes test cases<br>• Reports on quality metrics<br>• May be a dedicated role on the team<br><br>A Quality Coach might also do testing, but their primary goal is enabling the team to own quality collectively.
+                        </div>
+                        <div class="qc-sources-container">
+                            <div class="qc-sources-badge qc-sources-handbook">
+                                <span class="qc-sources-icon">📚</span>
+                                <span class="qc-sources-label">From the Handbook:</span>
+                                <span class="qc-sources-chapters">Describing the Quality Coach Role, What is a Quality Coach</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{!-- Sign up CTA --}}
+                    <div class="qc-preview-cta">
+                        <p><strong>Sign up to ask your own questions</strong> and get personalized coaching advice from the handbook.</p>
+                    </div>
+                </div>
+                {{/unless}}
             </div>
 
             {{!-- Typing Indicator --}}

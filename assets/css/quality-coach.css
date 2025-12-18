@@ -398,6 +398,68 @@ body.qc-offset-for-portal {
 .qc-welcome-hint {
     color: var(--qc-muted);
     font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.qc-example-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.qc-example-question {
+    padding: 10px 14px;
+    background: var(--color-lighter-gray, #f8fafc);
+    border: 1px solid var(--qc-border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--qc-text);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.qc-example-question:hover {
+    background: var(--color-white, #ffffff);
+    border-color: var(--qc-accent);
+    transform: translateX(2px);
+}
+
+/* Guest Preview Examples */
+.qc-preview-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+    padding-bottom: 16px;
+}
+
+.qc-preview-message {
+    animation: none; /* Disable slide-in animation for preview messages */
+    opacity: 0.95; /* Slightly muted to indicate they're examples */
+}
+
+.qc-preview-cta {
+    margin-top: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--qc-accent) 0%, var(--qc-accent-strong) 100%);
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.qc-preview-cta p {
+    color: var(--color-white, #ffffff);
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.qc-preview-cta strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
 }
 
 /* Message Bubbles */
@@ -759,13 +821,25 @@ body.qc-offset-for-portal {
         height: min(500px, calc(100vh - var(--qc-extra-offset) - 48px));
         min-height: 300px;
     }
-    
+
     .qc-header-title {
         font-size: 15px;
     }
-    
-    .qc-persona-badge {
-        display: none; /* Hide on tablet to prevent header overflow */
+
+    /* Show compact persona badge on tablet */
+    .qc-persona-button {
+        padding: 6px 8px;
+        min-width: 32px;
+    }
+
+    /* Hide text label on tablet, show icon only */
+    .qc-persona-button #qc-persona-label {
+        display: none;
+    }
+
+    /* Keep dropdown arrow visible */
+    .qc-persona-button svg {
+        margin: 0;
     }
 }
 

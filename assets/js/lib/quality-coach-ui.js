@@ -18,7 +18,7 @@ class QualityCoachUI {
         this.ACCESS_CACHE_PREFIX = 'qc_access_cache:';
         this.ACCESS_CACHE_MIN_VALID_MS = 30 * 1000;
         this.ACCESS_REFRESH_BUFFER_MS = 5 * 60 * 1000;
-        this.ACCESS_LAG_MESSAGE_MS = 4000;
+        this.ACCESS_LAG_MESSAGE_MS = 500; // Reduced from 4000ms for faster feedback
         this.PORTAL_SELECTORS = [
             '.gh-portal-triggerbtn',
             '.gh-portal-triggerbtn-root',
@@ -267,6 +267,20 @@ class QualityCoachUI {
                 }, 150);
             });
         }
+
+        // Handle example question clicks
+        document.addEventListener('click', (e) => {
+            const exampleBtn = e.target.closest && e.target.closest('.qc-example-question');
+            if (!exampleBtn) return;
+
+            const question = exampleBtn.dataset.question;
+            if (question && this.elements.input) {
+                this.elements.input.value = question;
+                this.elements.input.focus();
+                // Auto-send the question
+                this.sendMessage();
+            }
+        });
 
         // Guest Signin/Signup Tracking
         const guestLinks = document.querySelectorAll('.qc-signin-container a');
@@ -788,38 +802,32 @@ class QualityCoachUI {
 
             if (data.answer) {
                 if (!isFeedback) {
-                    const needsConfirmation = data.persona && 
-                                            !this.hasShownPersonaConfirmation && 
-                                            !localStorage.getItem('qc_persona_confirmed');
-
-                    if (needsConfirmation) {
-                        this.currentPersona = data.persona;
-                        this.currentPersonaConfidence = data.persona_confidence;
-                        this.detectedPersonaMessage = cleanedMessage;
-                        
-                        this.updatePersonaDropdown(data.persona, false);
-                        
-                        this.showPersonaConfirmation(data.persona, data.persona_confidence, {
-                            answer: data.answer,
-                            sources: data.sources,
-                            originalMessage: cleanedMessage,
-                            lowRelevance: data.low_relevance,
-                            messageId: data.message_id
-                        });
-                        return;
-                    }
-
+                    // Update persona state first (don't show badge yet if confirmation needed)
                     if (data.persona) {
                         this.currentPersona = data.persona;
                         this.currentPersonaConfidence = data.persona_confidence;
                         this.detectedPersonaMessage = cleanedMessage;
-                        
-                        this.updatePersonaDropdown(data.persona);
+
+                        const needsConfirmation = !this.hasShownPersonaConfirmation &&
+                                                !localStorage.getItem('qc_persona_confirmed');
+
+                        // Only show badge in header if confirmation NOT needed (i.e., already confirmed)
+                        this.updatePersonaDropdown(data.persona, !needsConfirmation);
                     }
-                    
+
+                    // ALWAYS show the answer immediately (no blocking)
                     this.addMessage(data.answer, 'assistant', data.sources, false, data.low_relevance, data.message_id);
                     this.conversationHistory.push({ role: 'user', content: cleanedMessage });
                     this.conversationHistory.push({ role: 'assistant', content: data.answer });
+
+                    // THEN show confirmation below (non-blocking)
+                    const needsConfirmation = data.persona &&
+                                            !this.hasShownPersonaConfirmation &&
+                                            !localStorage.getItem('qc_persona_confirmed');
+
+                    if (needsConfirmation) {
+                        this.showPersonaConfirmation(data.persona);
+                    }
                 }
                 
                 if (isFeedback && typeof gtag !== 'undefined') {
@@ -866,7 +874,7 @@ class QualityCoachUI {
     
     updatePersonaDropdown(persona, isConfirmed = true) {
         if (!persona) return;
-        
+
         const options = document.querySelectorAll('.qc-persona-option');
         options.forEach(opt => {
             if (opt.dataset.persona === persona) {
@@ -875,12 +883,13 @@ class QualityCoachUI {
                 opt.classList.remove('is-active');
             }
         });
-        
+
         if (this.elements.personaLabel) {
             this.elements.personaLabel.textContent = this.personaNames[persona] || persona;
         }
 
-        if (this.elements.personaBadge) {
+        // Only show the header badge if the persona is confirmed
+        if (this.elements.personaBadge && isConfirmed) {
             this.elements.personaBadge.style.display = 'flex';
         }
 
@@ -892,18 +901,13 @@ class QualityCoachUI {
         } catch (e) {}
     }
     
-    showPersonaConfirmation(persona, confidence, deferredData = null) {
+    showPersonaConfirmation(persona) {
         const hasConfirmed = localStorage.getItem('qc_persona_confirmed');
-        
+
         if (this.hasShownPersonaConfirmation || hasConfirmed) {
-            if (deferredData && deferredData.answer) {
-                 this.addMessage(deferredData.answer, 'assistant', deferredData.sources, false, deferredData.lowRelevance, deferredData.messageId);
-                 this.conversationHistory.push({ role: 'user', content: deferredData.originalMessage });
-                 this.conversationHistory.push({ role: 'assistant', content: deferredData.answer });
-            }
             return;
         }
-        
+
         this.hasShownPersonaConfirmation = true;
         
         const displayName = this.personaNames[persona] || persona;
@@ -930,27 +934,22 @@ class QualityCoachUI {
         `;
         
         this.elements.messages.appendChild(confirmDiv);
-        this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
-        confirmDiv.focus();
+        // Don't auto-scroll or focus - let answer remain in view
         
         confirmDiv.querySelector('[data-action="confirm"]').addEventListener('click', () => {
             this.confirmPersona(persona);
             confirmDiv.classList.add('qc-fade-out');
             setTimeout(() => confirmDiv.remove(), 300);
 
-            if (deferredData && deferredData.answer) {
-                 this.addMessage(deferredData.answer, 'assistant', deferredData.sources, false, deferredData.lowRelevance);
-                 this.conversationHistory.push({ role: 'user', content: deferredData.originalMessage });
-                 this.conversationHistory.push({ role: 'assistant', content: deferredData.answer });
-            }
+            // Note: Answer already shown above, no need to defer display
         });
         
         confirmDiv.querySelector('[data-action="change"]').addEventListener('click', () => {
-            this.showPersonaSelector(confirmDiv, persona, deferredData);
+            this.showPersonaSelector(confirmDiv);
         });
     }
-    
-    showPersonaSelector(confirmDiv, originalPersona, deferredData = null) {
+
+    showPersonaSelector(confirmDiv) {
         confirmDiv.innerHTML = `
             <div class="qc-persona-confirmation-content">
                 <div class="qc-persona-confirmation-text">
@@ -997,12 +996,7 @@ class QualityCoachUI {
                 confirmDiv.classList.add('qc-fade-out');
                 setTimeout(() => confirmDiv.remove(), 300);
 
-                if (deferredData && deferredData.originalMessage) {
-                    this.sendMessage({
-                        messageOverride: deferredData.originalMessage,
-                        skipUserMessage: true
-                    });
-                }
+                // Note: Answer already shown above, persona preference updated for next time
             });
         });
     }
