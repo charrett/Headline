@@ -102,11 +102,43 @@
                 <div class="qc-welcome-message">
                     <p><img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="" class="qc-welcome-book-icon"> <strong>Welcome{{#if @member.name}}, {{@member.name}}{{/if}}!</strong> I'll help you explore Anne-Marie's Quality Coach's Handbook.</p>
                     {{#if @member}}
-                    <p class="qc-welcome-hint">Try asking:</p>
-                    <div class="qc-example-questions">
-                        <button class="qc-example-question" data-question="How do I start quality coaching in my team?">How do I start quality coaching in my team?</button>
-                        <button class="qc-example-question" data-question="What workshop should I run first?">What workshop should I run first?</button>
-                        <button class="qc-example-question" data-question="How can I improve test automation?">How can I improve test automation?</button>
+                    <div class="qc-persona-selection-prompt" id="qc-persona-prompt" style="display: none;">
+                        <p class="qc-welcome-hint"><strong>To give you the most relevant advice, what's your role?</strong></p>
+                        <div class="qc-persona-selector qc-persona-selector-welcome">
+                            <button class="qc-persona-select-option" data-persona="QUALITY_COACH">
+                                <span class="qc-persona-icon">🎯</span>
+                                <span>Quality Coach</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="ENGINEERING_MANAGER">
+                                <span class="qc-persona-icon">👔</span>
+                                <span>Engineering Manager</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="DELIVERY_LEAD">
+                                <span class="qc-persona-icon">📊</span>
+                                <span>Delivery Lead</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="CEO_EXECUTIVE">
+                                <span class="qc-persona-icon">💼</span>
+                                <span>CEO/Executive</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="SOFTWARE_ENGINEER">
+                                <span class="qc-persona-icon">💻</span>
+                                <span>Software Engineer</span>
+                            </button>
+                            <button class="qc-persona-select-option" data-persona="TEST_LEAD">
+                                <span class="qc-persona-icon">🧪</span>
+                                <span>Test Lead</span>
+                            </button>
+                        </div>
+                        <button class="qc-persona-skip" id="qc-persona-skip">Skip - I'll choose later</button>
+                    </div>
+                    <div id="qc-example-questions-container" style="display: none;">
+                        <p class="qc-welcome-hint">Try asking:</p>
+                        <div class="qc-example-questions">
+                            <button class="qc-example-question" data-question="How do I start quality coaching in my team?">How do I start quality coaching in my team?</button>
+                            <button class="qc-example-question" data-question="What workshop should I run first?">What workshop should I run first?</button>
+                            <button class="qc-example-question" data-question="How can I improve test automation?">How can I improve test automation?</button>
+                        </div>
                     </div>
                     {{else}}
                     <p class="qc-welcome-hint">Here's what you can ask the Quality Coach's Handbook:</p>

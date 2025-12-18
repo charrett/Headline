@@ -46,6 +46,16 @@ class QualityCoachUI {
             'OTHER': 'Other'
         };
 
+        this.personaFocus = {
+            'QUALITY_COACH': ['Facilitating workshops', 'Coaching techniques', 'Role definition'],
+            'ENGINEERING_MANAGER': ['Team leadership', 'Quality strategy', 'Cross-team consistency'],
+            'DELIVERY_LEAD': ['Delivery processes', 'Sprint planning', 'Release quality'],
+            'CEO_EXECUTIVE': ['Strategic alignment', 'ROI and business value', 'Organizational quality'],
+            'SOFTWARE_ENGINEER': ['Developer experience', 'Technical practices', 'Reducing technical debt'],
+            'TEST_LEAD': ['Testing techniques', 'Test strategy', 'Transition to coaching'],
+            'OTHER': ['General coaching guidance']
+        };
+
         // State
         this.accessToken = null;
         this.hasAccess = false;
@@ -65,6 +75,8 @@ class QualityCoachUI {
         this.currentPersonaConfidence = 0;
         this.detectedPersonaMessage = '';
         this.hasShownPersonaConfirmation = false;
+        this.messageCount = 0;
+        this.hasShownPersonaReminder = false;
 
         // DOM Elements (initialized in init)
         this.elements = {};
@@ -238,7 +250,7 @@ class QualityCoachUI {
                 }
             });
             
-            // Handle persona option clicks
+            // Handle persona option clicks (dropdown in header)
             document.addEventListener('click', (e) => {
                 const opt = e.target.closest && e.target.closest('.qc-persona-option');
                 if (!opt) return;
@@ -265,6 +277,40 @@ class QualityCoachUI {
                         localStorage.setItem('qc_persona_confirmed', 'true');
                     } catch (err) {}
                 }, 150);
+            });
+
+            // Handle persona option clicks (welcome screen selector)
+            document.addEventListener('click', (e) => {
+                const selectOption = e.target.closest && e.target.closest('.qc-persona-select-option');
+                if (!selectOption) return;
+                const personaPrompt = document.getElementById('qc-persona-prompt');
+                if (!personaPrompt || !personaPrompt.contains(selectOption)) return;
+
+                const selectedPersona = selectOption.dataset.persona;
+
+                // Save selection
+                try {
+                    localStorage.setItem('qc_persona_choice', selectedPersona);
+                    localStorage.setItem('qc_persona_confirmed', 'true');
+                } catch (err) {}
+
+                // Update UI
+                this.currentPersona = selectedPersona;
+                this.updatePersonaDropdown(selectedPersona, true);
+
+                // Hide persona prompt, show example questions
+                personaPrompt.style.display = 'none';
+                const exampleQuestionsContainer = document.getElementById('qc-example-questions-container');
+                if (exampleQuestionsContainer) {
+                    exampleQuestionsContainer.style.display = 'block';
+                }
+
+                // Track selection
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'persona_selected_upfront', {
+                        'persona': selectedPersona
+                    });
+                }
             });
         }
 
@@ -718,6 +764,10 @@ class QualityCoachUI {
         this.elements.chatButton.classList.add('is-open');
         this.elements.chatButton.setAttribute('aria-expanded', 'true');
         this.elements.chatButton.setAttribute('aria-label', 'Close Quality Coach Researcher');
+
+        // Show persona prompt if not yet confirmed
+        this.showPersonaPromptIfNeeded();
+
         this.elements.input.focus();
 
         if (typeof gtag !== 'undefined') {
@@ -725,6 +775,34 @@ class QualityCoachUI {
                 'post_slug': this.config.postSlug,
                 'post_title': this.config.postTitle
             });
+        }
+    }
+
+    showPersonaPromptIfNeeded() {
+        const hasConfirmed = localStorage.getItem('qc_persona_confirmed');
+        const personaPrompt = document.getElementById('qc-persona-prompt');
+        const exampleQuestionsContainer = document.getElementById('qc-example-questions-container');
+
+        if (!hasConfirmed && personaPrompt && exampleQuestionsContainer) {
+            // Show persona prompt, hide example questions
+            personaPrompt.style.display = 'block';
+            exampleQuestionsContainer.style.display = 'none';
+
+            // Setup skip button handler
+            const skipBtn = document.getElementById('qc-persona-skip');
+            if (skipBtn && !skipBtn.dataset.handlerAttached) {
+                skipBtn.dataset.handlerAttached = 'true';
+                skipBtn.addEventListener('click', () => {
+                    personaPrompt.style.display = 'none';
+                    exampleQuestionsContainer.style.display = 'block';
+                });
+            }
+        } else if (exampleQuestionsContainer) {
+            // Already confirmed, show example questions
+            exampleQuestionsContainer.style.display = 'block';
+            if (personaPrompt) {
+                personaPrompt.style.display = 'none';
+            }
         }
     }
 
@@ -820,6 +898,9 @@ class QualityCoachUI {
                     this.conversationHistory.push({ role: 'user', content: cleanedMessage });
                     this.conversationHistory.push({ role: 'assistant', content: data.answer });
 
+                    // Increment message count for reminder logic
+                    this.messageCount++;
+
                     // THEN show confirmation below (non-blocking)
                     const needsConfirmation = data.persona &&
                                             !this.hasShownPersonaConfirmation &&
@@ -827,6 +908,11 @@ class QualityCoachUI {
 
                     if (needsConfirmation) {
                         this.showPersonaConfirmation(data.persona);
+                    }
+
+                    // Show persona reminder after 3rd message (if persona is set)
+                    if (this.messageCount === 3 && !this.hasShownPersonaReminder && this.currentPersona) {
+                        this.showPersonaReminder();
                     }
                 }
                 
@@ -901,6 +987,43 @@ class QualityCoachUI {
         } catch (e) {}
     }
     
+    showPersonaReminder() {
+        if (this.hasShownPersonaReminder) return;
+        this.hasShownPersonaReminder = true;
+
+        const displayName = this.personaNames[this.currentPersona] || this.currentPersona;
+
+        const reminderDiv = document.createElement('div');
+        reminderDiv.className = 'qc-persona-reminder';
+        reminderDiv.innerHTML = `
+            <div class="qc-persona-reminder-content">
+                <span class="qc-persona-reminder-icon">💡</span>
+                <div class="qc-persona-reminder-text">
+                    <strong>Tip:</strong> I'm tailoring advice for ${displayName}s.
+                    Not quite right? Click the badge in the header to change it.
+                </div>
+                <button class="qc-persona-reminder-dismiss" aria-label="Dismiss">×</button>
+            </div>
+        `;
+
+        const dismissBtn = reminderDiv.querySelector('.qc-persona-reminder-dismiss');
+        dismissBtn.addEventListener('click', () => {
+            reminderDiv.classList.add('qc-fade-out');
+            setTimeout(() => reminderDiv.remove(), 300);
+        });
+
+        // Auto-dismiss after 8 seconds
+        setTimeout(() => {
+            if (reminderDiv.parentNode) {
+                reminderDiv.classList.add('qc-fade-out');
+                setTimeout(() => reminderDiv.remove(), 300);
+            }
+        }, 8000);
+
+        this.elements.messages.appendChild(reminderDiv);
+        this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
+    }
+
     showPersonaConfirmation(persona) {
         const hasConfirmed = localStorage.getItem('qc_persona_confirmed');
 
@@ -909,8 +1032,11 @@ class QualityCoachUI {
         }
 
         this.hasShownPersonaConfirmation = true;
-        
+
         const displayName = this.personaNames[persona] || persona;
+        const focusAreas = this.personaFocus[persona] || this.personaFocus['OTHER'];
+        const focusList = focusAreas.map(area => `• ${area}`).join('\n');
+
         const confirmDiv = document.createElement('div');
         confirmDiv.className = 'qc-persona-confirmation';
         confirmDiv.setAttribute('tabindex', '-1');
@@ -923,8 +1049,9 @@ class QualityCoachUI {
                     </svg>
                 </div>
                 <div class="qc-persona-confirmation-text">
-                    <strong>I'm responding as if you're a ${displayName}.</strong>
-                    <span>Is that right?</span>
+                    <strong>I'm responding as if you're a ${displayName}, so I'll focus on:</strong>
+                    <div class="qc-persona-focus-list">${focusList}</div>
+                    <span class="qc-persona-confirm-question">Is that right?</span>
                 </div>
                 <div class="qc-persona-confirmation-actions">
                     <button class="qc-persona-confirm-yes" data-action="confirm">Yes, that's right</button>

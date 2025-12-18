@@ -426,6 +426,61 @@ body.qc-offset-for-portal {
     transform: translateX(2px);
 }
 
+/* Persona Selection Prompt (Welcome Screen) */
+.qc-persona-selection-prompt {
+    margin-top: 16px;
+}
+
+.qc-persona-selector-welcome {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.qc-persona-selector-welcome .qc-persona-select-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    background: var(--qc-surface);
+    border: 2px solid var(--qc-border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--qc-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.qc-persona-selector-welcome .qc-persona-select-option:hover {
+    border-color: var(--qc-accent);
+    background: var(--color-lighter-gray, #f8fafc);
+    transform: translateY(-2px);
+}
+
+.qc-persona-selector-welcome .qc-persona-icon {
+    font-size: 24px;
+}
+
+.qc-persona-skip {
+    margin-top: 12px;
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: var(--qc-muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.qc-persona-skip:hover {
+    color: var(--qc-text);
+    text-decoration: underline;
+}
+
 /* Guest Preview Examples */
 .qc-preview-examples {
     display: flex;
@@ -1180,6 +1235,62 @@ body.qc-offset-for-portal {
     opacity: 0.7;
 }
 
+/* Persona Reminder (after 3rd message) */
+.qc-persona-reminder {
+    padding: 12px 16px;
+    margin: 12px 0;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fbbf24;
+    border-left: 4px solid #f59e0b;
+    border-radius: 12px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.qc-persona-reminder-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.qc-persona-reminder-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.qc-persona-reminder-text {
+    flex: 1;
+    color: #78350f;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.qc-persona-reminder-text strong {
+    color: #92400e;
+    font-weight: 600;
+}
+
+.qc-persona-reminder-dismiss {
+    background: transparent;
+    border: none;
+    color: #78350f;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.qc-persona-reminder-dismiss:hover {
+    background: rgba(120, 53, 15, 0.1);
+}
+
 /* Inline Persona Confirmation - Progressive Disclosure */
 .qc-persona-confirmation {
     padding: 16px;
@@ -1215,6 +1326,24 @@ body.qc-offset-for-portal {
     color: var(--qc-text);
     font-size: 16px;
     line-height: 1.5;
+}
+
+.qc-persona-focus-list {
+    margin: 10px 0;
+    padding: 12px 16px;
+    background: var(--color-lighter-gray, #f8fafc);
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--qc-muted);
+    white-space: pre-line;
+}
+
+.qc-persona-confirm-question {
+    display: block;
+    margin-top: 8px;
+    font-weight: 500;
+    color: var(--qc-text);
 }
 
 .qc-persona-confirmation-text strong {
