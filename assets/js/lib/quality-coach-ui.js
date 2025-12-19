@@ -894,7 +894,7 @@ class QualityCoachUI {
                     }
 
                     // ALWAYS show the answer immediately (no blocking)
-                    this.addMessage(data.answer, 'assistant', data.sources, false, data.low_relevance, data.message_id);
+                    this.addMessage(data.answer, 'assistant', data.sources, false, data.low_relevance, data.message_id, data.external_links || []);
                     this.conversationHistory.push({ role: 'user', content: cleanedMessage });
                     this.conversationHistory.push({ role: 'assistant', content: data.answer });
 
@@ -1389,7 +1389,7 @@ class QualityCoachUI {
         }
     }
 
-    addMessage(content, role, sources, isFeedbackMessage = false, lowRelevance = false, messageId = null) {
+    addMessage(content, role, sources, isFeedbackMessage = false, lowRelevance = false, messageId = null, externalLinks = []) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'qc-message qc-message-' + role;
         if (messageId) {
@@ -1475,7 +1475,53 @@ class QualityCoachUI {
                     </div>
                 `;
             }
-            
+
+            // Add external links if provided and low relevance
+            if (externalLinks && externalLinks.length > 0 && (lowRelevance || llmDisclaimedHandbook)) {
+                const externalLinksDiv = document.createElement('div');
+                externalLinksDiv.className = 'qc-sources-badge qc-sources-external';
+                externalLinksDiv.innerHTML = `
+                    <span class="qc-sources-icon">🔗</span>
+                    <span class="qc-sources-label">Further Reading:</span>
+                `;
+
+                const linksContainer = document.createElement('div');
+                linksContainer.className = 'qc-external-links-list';
+
+                externalLinks.forEach(link => {
+                    const linkElement = document.createElement('a');
+                    linkElement.href = link.url;
+                    linkElement.target = '_blank';
+                    linkElement.rel = 'noopener noreferrer';
+                    linkElement.className = 'qc-external-link';
+                    linkElement.title = link.description;
+                    linkElement.innerHTML = `
+                        ${link.title}
+                        <svg class="qc-external-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                    `;
+                    linksContainer.appendChild(linkElement);
+                });
+
+                externalLinksDiv.appendChild(linksContainer);
+                sourcesDiv.appendChild(externalLinksDiv);
+
+                // Track external link clicks
+                linksContainer.querySelectorAll('.qc-external-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'external_link_clicked', {
+                                'link_url': link.href,
+                                'link_title': link.textContent.trim()
+                            });
+                        }
+                    });
+                });
+            }
+
             messageDiv.appendChild(sourcesDiv);
         }
 

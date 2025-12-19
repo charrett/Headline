@@ -1581,6 +1581,54 @@ body.qc-offset-for-portal {
     opacity: 0.9;
 }
 
+/* External Links Badge */
+.qc-sources-external {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd;
+    border-left: 3px solid #0ea5e9;
+    margin-top: 8px;
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.qc-external-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.qc-external-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #0369a1;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    padding: 2px 0;
+}
+
+.qc-external-link:hover {
+    color: #075985;
+    text-decoration: underline;
+}
+
+.qc-external-icon {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.qc-external-link:hover .qc-external-icon {
+    opacity: 1;
+}
+
 /* Guest Signin Container */
 .qc-signin-container {
     display: flex;
