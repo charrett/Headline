@@ -1563,8 +1563,13 @@ class QualityCoachUI {
 
         // Scroll to show the TOP of the message (especially important for long assistant answers)
         if (role === 'assistant') {
-            // Use scrollIntoView to show the start of the answer
-            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Scroll to the answer bubble specifically, not the whole message (which includes sources)
+            const bubble = messageDiv.querySelector('.qc-message-bubble');
+            if (bubble) {
+                bubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         } else {
             // For user messages, scroll to bottom as usual
             this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
