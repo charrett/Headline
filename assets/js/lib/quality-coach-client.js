@@ -97,16 +97,17 @@ class QualityCoachClient {
 
     /**
      * Check access permission for the user.
+     * Email is optional - when not provided, checks guest access.
      */
     async checkAccess(email) {
-        if (!email) throw new Error('Email is required');
-        
+        const body = email ? { email } : {};
+
         const response = await this.fetchWithRetry(`${this.apiBase}/api/v1/access/check`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email })
+            body: JSON.stringify(body)
         });
 
         return await response.json();
