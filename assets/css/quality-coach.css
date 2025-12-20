@@ -881,20 +881,24 @@ body.qc-offset-for-portal {
         font-size: 15px;
     }
 
-    /* Show compact persona badge on tablet */
+    /* Compact persona badge on tablet */
     .qc-persona-button {
-        padding: 6px 8px;
-        min-width: 32px;
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
-    /* Hide text label on tablet, show icon only */
-    .qc-persona-button #qc-persona-label {
+    /* Hide "Tailored for:" prefix on tablet */
+    .qc-persona-prefix {
         display: none;
     }
 
-    /* Keep dropdown arrow visible */
-    .qc-persona-button svg {
+    .qc-persona-icon {
         margin: 0;
+    }
+
+    /* Smaller popover on tablet */
+    .qc-persona-popover {
+        width: 200px;
     }
 }
 
@@ -954,11 +958,23 @@ body.qc-offset-for-portal {
         min-height: 48px;
     }
     
-    /* Prevent persona dropdown from overflowing screen */
-    .qc-persona-dropdown {
-        right: 0;
+    /* Prevent persona popover from overflowing screen */
+    .qc-persona-popover {
+        right: 8px;
         left: auto;
         max-width: calc(100vw - 32px);
+        width: auto;
+        min-width: 200px;
+    }
+
+    /* Compact persona button on mobile */
+    .qc-persona-button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .qc-persona-prefix {
+        display: none;
     }
 }
 
@@ -1091,9 +1107,10 @@ body.qc-offset-for-portal {
 }
 
 /* Persona Badge */
+/* Persona Badge - Always Visible */
 .qc-persona-badge {
     position: relative;
-    display: none;
+    display: block;
     margin-left: auto;
     margin-right: 8px;
 }
@@ -1102,12 +1119,12 @@ body.qc-offset-for-portal {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 20px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
     color: var(--color-white, #ffffff);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1115,90 +1132,189 @@ body.qc-offset-for-portal {
 }
 
 .qc-persona-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
 }
 
-.qc-persona-button svg {
+.qc-persona-prefix {
+    opacity: 0.85;
+    font-size: 12px;
+}
+
+.qc-persona-current {
+    font-weight: 600;
+}
+
+.qc-persona-icon {
+    opacity: 0.7;
     transition: transform 0.2s ease;
 }
 
-.qc-persona-button[aria-expanded="true"] svg {
+.qc-persona-button[aria-expanded="true"] .qc-persona-icon {
     transform: rotate(180deg);
 }
 
-.qc-persona-dropdown {
+/* Not set state */
+.qc-persona-button.not-set {
+    background: rgba(255, 255, 255, 0.1);
+    border-style: dashed;
+}
+
+.qc-persona-button.not-set .qc-gear-icon {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Compact List Popover */
+.qc-persona-popover {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: var(--qc-surface);
-    border: 1px solid var(--qc-border);
-    border-radius: 12px;
-    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.15);
-    padding: 8px;
-    min-width: 200px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+    width: 220px;
     z-index: 10000;
     animation: slideDown 0.2s ease-out;
 }
 
-.qc-persona-dropdown-header {
+.qc-popover-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 12px;
-    font-size: 14px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.qc-popover-title {
+    font-size: 13px;
     font-weight: 600;
-    color: var(--qc-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid var(--qc-border);
-    margin-bottom: 4px;
+    color: #374151;
 }
 
-.qc-persona-close {
-    background: transparent;
+.qc-popover-close {
+    background: none;
     border: none;
-    color: var(--qc-muted);
+    color: #9ca3af;
     cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: all 0.15s ease;
+    padding: 2px;
+    line-height: 1;
+    transition: color 0.2s;
 }
 
-.qc-persona-close:hover {
-    background: var(--color-lighter-gray, #f1f5f9);
-    color: var(--qc-text);
+.qc-popover-close:hover {
+    color: #4b5563;
+}
+
+.qc-persona-list {
+    padding: 4px 0;
 }
 
 .qc-persona-option {
-    display: block;
-    width: 100%;
-    padding: 10px 12px;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    text-align: left;
-    font-size: 16px;
-    color: var(--qc-text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background 0.15s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    color: #374151;
 }
 
 .qc-persona-option:hover {
-    background: var(--color-lighter-gray, #f8fafc);
+    background: #f3f4f6;
 }
 
 .qc-persona-option.is-active {
-    background: var(--qc-accent);
-    color: var(--color-white, #ffffff);
-    font-weight: 600;
+    background: #ede9fe;
+    color: #667eea;
+    font-weight: 500;
 }
 
-.qc-persona-option.is-active:hover {
-    background: var(--qc-accent-strong);
+.qc-option-emoji {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.qc-option-name {
+    flex: 1;
+}
+
+.qc-option-check {
+    font-size: 12px;
+    color: #667eea;
+    opacity: 0;
+}
+
+.qc-persona-option.is-active .qc-option-check {
+    opacity: 1;
+}
+
+/* Inline Persona Suggestion */
+.qc-persona-suggestion {
+    margin: 16px 0;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.qc-suggestion-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.qc-suggestion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.qc-suggestion-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #92400e;
+    margin: 0;
+}
+
+.qc-suggestion-text strong {
+    color: #78350f;
+}
+
+.qc-suggestion-link {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+.qc-suggestion-link:hover {
+    color: #5a67d8;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Footer Persona Badge - Subtle & Persistent */
@@ -1229,6 +1345,380 @@ body.qc-offset-for-portal {
     background: var(--color-lighter-gray, #f8fafc);
     border-color: var(--qc-accent);
     color: var(--qc-accent);
+}
+
+/* ========================================
+   IMPROVED FEEDBACK SYSTEM - Inline Banner
+   ======================================== */
+
+/* Inline Feedback Banner - Compact & Subtle */
+.qc-feedback-banner {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.qc-feedback-banner.qc-fade-out {
+    animation: fadeOut 0.3s ease-out;
+    opacity: 0;
+}
+
+.qc-feedback-banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.qc-feedback-banner-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.qc-feedback-icon {
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.8;
+}
+
+.qc-feedback-banner-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.qc-feedback-btn {
+    padding: 5px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    color: #374151;
+}
+
+.qc-feedback-btn:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+.qc-feedback-positive:hover {
+    border-color: #10b981;
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.qc-feedback-negative:hover {
+    border-color: #ef4444;
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.qc-feedback-emoji {
+    font-size: 14px;
+    line-height: 1;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Feedback Follow-up (for thumbs down) */
+.qc-feedback-followup {
+    margin-top: 12px;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 500px;
+    }
+}
+
+.qc-followup-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+/* Quick Tag Buttons */
+.qc-followup-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.qc-followup-tag {
+    padding: 6px 12px;
+    background: white;
+    border: 1.5px solid #d1d5db;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.qc-followup-tag:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+.qc-followup-tag.selected {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+/* Optional Comment Textarea */
+.qc-followup-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 12px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #374151;
+    resize: vertical;
+    margin-bottom: 12px;
+    transition: border-color 0.15s ease;
+}
+
+.qc-followup-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.qc-followup-textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* Sticky Submit Area (Always visible - no scrolling needed) */
+.qc-followup-submit-area {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1.5px solid #e5e7eb;
+    padding: 12px 16px;
+    margin: 0 -16px -16px -16px;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Character Counter */
+.qc-followup-char-counter {
+    font-size: 12px;
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+
+/* Hint Text */
+.qc-followup-hint {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-right: 8px;
+}
+
+/* Submit Button */
+.qc-followup-submit {
+    padding: 8px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.qc-followup-submit:hover {
+    background: #2563eb;
+}
+
+.qc-followup-submit:active {
+    transform: scale(0.98);
+}
+
+.qc-followup-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Toast Notification System */
+.qc-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 10001;
+    animation: qc-toast-in 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes qc-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes qc-toast-out {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+}
+
+.qc-toast-success {
+    border-left: 4px solid #10b981;
+}
+
+.qc-toast-error {
+    border-left: 4px solid #ef4444;
+}
+
+.qc-toast-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.qc-toast-message {
+    color: #374151;
+}
+
+/* Mobile Responsiveness for Feedback */
+@media (max-width: 640px) {
+    /* Feedback Banner - Keep horizontal on mobile, just smaller */
+    .qc-feedback-banner {
+        padding: 7px 10px;
+    }
+
+    .qc-feedback-banner-text {
+        font-size: 12px;
+        gap: 5px;
+    }
+
+    .qc-feedback-icon {
+        font-size: 13px;
+    }
+
+    .qc-feedback-banner-actions {
+        gap: 5px;
+    }
+
+    .qc-feedback-btn {
+        padding: 4px 10px;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .qc-feedback-emoji {
+        font-size: 13px;
+    }
+
+    .qc-feedback-label {
+        font-size: 12px;
+    }
+
+    /* Toast */
+    .qc-toast {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        font-size: 13px;
+        padding: 10px 16px;
+    }
+
+    /* Follow-up form */
+    .qc-followup-tags {
+        gap: 6px;
+    }
+
+    .qc-followup-tag {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+    .qc-followup-textarea {
+        min-height: 70px;
+        font-size: 13px;
+    }
+
+    .qc-followup-submit-area {
+        flex-wrap: wrap;
+        padding: 10px 12px;
+    }
+
+    .qc-followup-char-counter {
+        order: 1;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 6px;
+    }
+
+    .qc-followup-hint {
+        display: none; /* Hide hint on mobile */
+    }
+
+    .qc-followup-submit {
+        width: 100%;
+        padding: 10px 16px;
+    }
 }
 
 .qc-footer-persona svg {

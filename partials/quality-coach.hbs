@@ -61,31 +61,58 @@
                         <img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="Quality Coach Handbook" class="qc-header-book-icon">
                         <h3 class="qc-header-title">Quality Coach <span class="qc-header-subtitle">Researcher</span></h3>
                     </div>
-                    {{!-- Persona Badge --}}
-                    <div class="qc-persona-badge" id="qc-persona-badge" style="display: none;">
+                    {{!-- Persona Badge - Always Visible --}}
+                    <div class="qc-persona-badge" id="qc-persona-badge">
                         <button class="qc-persona-button" id="qc-persona-button" type="button" aria-haspopup="true" aria-expanded="false">
-                            <span id="qc-persona-label">Quality Coach</span>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <span class="qc-persona-prefix" id="qc-persona-prefix">Tailored for:</span>
+                            <span class="qc-persona-current" id="qc-persona-label">Quality Coach</span>
+                            <svg class="qc-persona-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </button>
-                        <div class="qc-persona-dropdown" id="qc-persona-dropdown" style="display: none;">
-                            <div class="qc-persona-dropdown-header">
-                                <span>I am a:</span>
-                                <button class="qc-persona-close" id="qc-persona-close" type="button" aria-label="Close">
+                        {{!-- Compact List Popover --}}
+                        <div class="qc-persona-popover" id="qc-persona-popover" style="display: none;">
+                            <div class="qc-popover-header">
+                                <span class="qc-popover-title">Your role</span>
+                                <button class="qc-popover-close" id="qc-popover-close" type="button" aria-label="Close">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="18" y1="6" x2="6" y2="18"></line>
                                         <line x1="6" y1="6" x2="18" y2="18"></line>
                                     </svg>
                                 </button>
                             </div>
-                            <button class="qc-persona-option" data-persona="QUALITY_COACH" onclick="(function(){try{localStorage.setItem('qc_persona_choice','QUALITY_COACH');localStorage.setItem('qc_persona_confirmed','true');}catch(e){} })()">Quality Coach</button>
-                            <button class="qc-persona-option" data-persona="ENGINEERING_MANAGER" onclick="(function(){try{localStorage.setItem('qc_persona_choice','ENGINEERING_MANAGER');localStorage.setItem('qc_persona_confirmed','true');}catch(e){} })()">Engineering Manager</button>
-                            <button class="qc-persona-option" data-persona="DELIVERY_LEAD" onclick="(function(){try{localStorage.setItem('qc_persona_choice','DELIVERY_LEAD');localStorage.setItem('qc_persona_confirmed','true');}catch(e){} })()">Delivery Lead</button>
-                            <button class="qc-persona-option" data-persona="CEO_EXECUTIVE" onclick="(function(){try{localStorage.setItem('qc_persona_choice','CEO_EXECUTIVE');localStorage.setItem('qc_persona_confirmed','true');}catch(e){} })()">CEO/Executive</button>
-                            <button class="qc-persona-option" data-persona="SOFTWARE_ENGINEER" onclick="(function(){try{localStorage.setItem('qc_persona_choice','SOFTWARE_ENGINEER');localStorage.setItem('qc_persona_confirmed','true');}catch(e){} })()">Software Engineer</button>
-                            <button class="qc-persona-option" data-persona="TEST_LEAD" onclick="(function(){try{localStorage.setItem('qc_persona_choice','TEST_LEAD');localStorage.setItem('qc_persona_confirmed','true');}catch(e){} })()">Test Lead</button>
-                            <button class="qc-persona-option" data-persona="OTHER" onclick="(function(){try{localStorage.setItem('qc_persona_choice','OTHER');localStorage.setItem('qc_persona_confirmed','true');}catch(e){} })()">Other</button>
+                            <div class="qc-persona-list">
+                                <button class="qc-persona-option" data-persona="QUALITY_COACH">
+                                    <span class="qc-option-emoji">🎯</span>
+                                    <span class="qc-option-name">Quality Coach</span>
+                                    <span class="qc-option-check">✓</span>
+                                </button>
+                                <button class="qc-persona-option" data-persona="ENGINEERING_MANAGER">
+                                    <span class="qc-option-emoji">👔</span>
+                                    <span class="qc-option-name">Engineering Manager</span>
+                                    <span class="qc-option-check">✓</span>
+                                </button>
+                                <button class="qc-persona-option" data-persona="DELIVERY_LEAD">
+                                    <span class="qc-option-emoji">📊</span>
+                                    <span class="qc-option-name">Delivery Lead</span>
+                                    <span class="qc-option-check">✓</span>
+                                </button>
+                                <button class="qc-persona-option" data-persona="CEO_EXECUTIVE">
+                                    <span class="qc-option-emoji">💼</span>
+                                    <span class="qc-option-name">CEO/Executive</span>
+                                    <span class="qc-option-check">✓</span>
+                                </button>
+                                <button class="qc-persona-option" data-persona="SOFTWARE_ENGINEER">
+                                    <span class="qc-option-emoji">💻</span>
+                                    <span class="qc-option-name">Software Engineer</span>
+                                    <span class="qc-option-check">✓</span>
+                                </button>
+                                <button class="qc-persona-option" data-persona="TEST_LEAD">
+                                    <span class="qc-option-emoji">🧪</span>
+                                    <span class="qc-option-name">Test Lead</span>
+                                    <span class="qc-option-check">✓</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -101,37 +128,6 @@
             <div id="qc-messages" class="qc-messages">
                 <div class="qc-welcome-message">
                     <p><img src="https://www.annemariecharrett.com/content/images/size/w720/2025/07/qualitycoachbook.svg" alt="" class="qc-welcome-book-icon"> <strong>Welcome{{#if @member.name}}, {{@member.name}}{{/if}}!</strong> I'll help you explore Anne-Marie's Quality Coach's Handbook.</p>
-                    {{#if @member}}
-                    <div class="qc-persona-selection-prompt" id="qc-persona-prompt" style="display: none;">
-                        <p class="qc-welcome-hint"><strong>To give you the most relevant advice, what's your role?</strong></p>
-                        <div class="qc-persona-selector qc-persona-selector-welcome">
-                            <button class="qc-persona-select-option" data-persona="QUALITY_COACH">
-                                <span class="qc-persona-icon">🎯</span>
-                                <span>Quality Coach</span>
-                            </button>
-                            <button class="qc-persona-select-option" data-persona="ENGINEERING_MANAGER">
-                                <span class="qc-persona-icon">👔</span>
-                                <span>Engineering Manager</span>
-                            </button>
-                            <button class="qc-persona-select-option" data-persona="DELIVERY_LEAD">
-                                <span class="qc-persona-icon">📊</span>
-                                <span>Delivery Lead</span>
-                            </button>
-                            <button class="qc-persona-select-option" data-persona="CEO_EXECUTIVE">
-                                <span class="qc-persona-icon">💼</span>
-                                <span>CEO/Executive</span>
-                            </button>
-                            <button class="qc-persona-select-option" data-persona="SOFTWARE_ENGINEER">
-                                <span class="qc-persona-icon">💻</span>
-                                <span>Software Engineer</span>
-                            </button>
-                            <button class="qc-persona-select-option" data-persona="TEST_LEAD">
-                                <span class="qc-persona-icon">🧪</span>
-                                <span>Test Lead</span>
-                            </button>
-                        </div>
-                        <button class="qc-persona-skip" id="qc-persona-skip">Skip - I'll choose later</button>
-                    </div>
                     <div id="qc-example-questions-container" style="display: none;">
                         <p class="qc-welcome-hint">Try asking:</p>
                         <div class="qc-example-questions">
@@ -139,55 +135,10 @@
                             <button class="qc-example-question" data-question="What workshop should I run first?">What workshop should I run first?</button>
                             <button class="qc-example-question" data-question="How can I improve test automation?">How can I improve test automation?</button>
                         </div>
-                    </div>
-                    {{else}}
-                    <p class="qc-welcome-hint">Here's what you can ask the Quality Coach's Handbook:</p>
-                    {{/if}}
-                </div>
-
-                {{!-- Guest Preview: Show example Q&A pairs for non-members --}}
-                {{#unless @member}}
-                <div class="qc-preview-examples">
-                    {{!-- Example 1 --}}
-                    <div class="qc-message qc-message-user qc-preview-message">
-                        <div class="qc-message-bubble">How do I start quality coaching in my team?</div>
-                    </div>
-                    <div class="qc-message qc-message-assistant qc-preview-message">
-                        <div class="qc-message-bubble">
-                            Start by identifying a team that's open to change and has some autonomy. The handbook recommends beginning with a <strong>Quality Kickoff Workshop</strong> to align on quality goals and values.<br><br>Key first steps:<br>• Observe the team's current practices<br>• Build trust by listening and understanding their challenges<br>• Co-create a quality vision with the team<br>• Start small with one improvement experiment<br><br>Remember: Quality coaching is about enabling teams to own quality, not doing it for them.
-                        </div>
-                        <div class="qc-sources-container">
-                            <div class="qc-sources-badge qc-sources-handbook">
-                                <span class="qc-sources-icon">📚</span>
-                                <span class="qc-sources-label">From the Handbook:</span>
-                                <span class="qc-sources-chapters">Coaching, Workshops, Techniques for Team Coaching</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{!-- Example 2 --}}
-                    <div class="qc-message qc-message-user qc-preview-message">
-                        <div class="qc-message-bubble">What's the difference between a Quality Coach and a QA Engineer?</div>
-                    </div>
-                    <div class="qc-message qc-message-assistant qc-preview-message">
-                        <div class="qc-message-bubble">
-                            A <strong>Quality Coach</strong> focuses on teaching teams to own quality, while a <strong>QA Engineer</strong> typically focuses on testing activities.<br><br>The Quality Coach:<br>• Facilitates quality improvement across the team<br>• Coaches others to build quality practices<br>• Works to make themselves redundant<br>• Focuses on systems thinking and continuous improvement<br><br>The QA Engineer:<br>• Performs testing and validation<br>• Writes and executes test cases<br>• Reports on quality metrics<br>• May be a dedicated role on the team<br><br>A Quality Coach might also do testing, but their primary goal is enabling the team to own quality collectively.
-                        </div>
-                        <div class="qc-sources-container">
-                            <div class="qc-sources-badge qc-sources-handbook">
-                                <span class="qc-sources-icon">📚</span>
-                                <span class="qc-sources-label">From the Handbook:</span>
-                                <span class="qc-sources-chapters">Describing the Quality Coach Role, What is a Quality Coach</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{!-- Sign up CTA --}}
-                    <div class="qc-preview-cta">
-                        <p><strong>Sign up to ask your own questions</strong> and get personalized coaching advice from the handbook.</p>
+                        <p class="qc-welcome-hint" style="margin-top: 12px; font-style: italic; opacity: 0.8;">...or try your own question</p>
                     </div>
                 </div>
-                {{/unless}}
+
             </div>
 
             {{!-- Typing Indicator --}}
@@ -199,10 +150,9 @@
 
             {{!-- Input Area --}}
             <div class="qc-input-area">
-                {{#if @member}}
-                <textarea 
-                    id="qc-input" 
-                    class="qc-input" 
+                <textarea
+                    id="qc-input"
+                    class="qc-input"
                     placeholder="Ask a question..."
                     rows="1"
                     maxlength="500"></textarea>
@@ -212,17 +162,12 @@
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
                 </button>
-                {{else}}
-                <div class="qc-signin-container">
-                    <a href="#/portal/signup" class="gh-btn gh-primary-btn" data-portal="signup">Sign up</a>
-                    <a href="#/portal/signin" class="gh-btn" data-portal="signin">Sign in</a>
-                </div>
-                {{/if}}
             </div>
 
             {{!-- Footer --}}
             <div class="qc-window-footer">
                 <span class="qc-footer-disclaimer">Grounded in the Handbook, supplemented by coaching expertise</span>
+                <span id="qc-token-usage" class="qc-token-usage" style="display: none;"></span>
             </div>
         </div>
 

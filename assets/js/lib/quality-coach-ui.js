@@ -62,6 +62,8 @@ class QualityCoachUI {
         this.isOpen = false;
         this.isLocked = false;
         this.conversationHistory = [];
+        this.questionCount = 0;  // Track questions asked in this session
+        this.personaPromptShown = false;
         this.qcState = this.QC_STATE.INIT;
         
         this.portalObserver = null;
@@ -110,7 +112,9 @@ class QualityCoachUI {
             personaBadge: document.getElementById('qc-persona-badge'),
             personaButton: document.getElementById('qc-persona-button'),
             personaLabel: document.getElementById('qc-persona-label'),
-            personaDropdown: document.getElementById('qc-persona-dropdown')
+            personaPrefix: document.getElementById('qc-persona-prefix'),
+            personaPopover: document.getElementById('qc-persona-popover'),
+            tokenUsage: document.getElementById('qc-token-usage')
         };
 
         if (!this.elements.chatButton || !this.elements.chatWindow || !this.elements.closeButton) {
@@ -145,16 +149,9 @@ class QualityCoachUI {
             this.elements.input.placeholder = this.DEFAULT_PLACEHOLDER;
         }
 
-        if (this.config.memberEmail) {
-            this.initializeAccess();
-        } else {
-            // Guest mode: Widget visible, but input replaced by signin button (handled in HBS)
-            this.setButtonAccessibility({ loading: false });
-            this.setState(this.QC_STATE.READY);
-            if (this.elements.widgetContainer) {
-                this.elements.widgetContainer.classList.remove('qc-widget--initializing');
-            }
-        }
+        // Initialize access for both members and guests
+        this.initializeAccess();
+
         this.monitorPortalTrigger();
         this.restorePersonaBadge();
         this.setupEventListeners();
@@ -223,38 +220,38 @@ class QualityCoachUI {
             this.elements.sendButton.addEventListener('click', () => this.sendMessage());
         }
         
-        // Persona dropdown toggle
-        if (this.elements.personaButton && this.elements.personaDropdown) {
+        // Persona popover toggle
+        if (this.elements.personaButton && this.elements.personaPopover) {
             this.elements.personaButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isVisible = this.elements.personaDropdown.style.display === 'block';
-                this.elements.personaDropdown.style.display = isVisible ? 'none' : 'block';
+                const isVisible = this.elements.personaPopover.style.display === 'block';
+                this.elements.personaPopover.style.display = isVisible ? 'none' : 'block';
                 this.elements.personaButton.setAttribute('aria-expanded', !isVisible);
             });
-            
-            // Close button in dropdown
-            const personaCloseBtn = document.getElementById('qc-persona-close');
+
+            // Close button in popover
+            const personaCloseBtn = document.getElementById('qc-popover-close');
             if (personaCloseBtn) {
                 personaCloseBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    this.elements.personaDropdown.style.display = 'none';
+                    this.elements.personaPopover.style.display = 'none';
                     this.elements.personaButton.setAttribute('aria-expanded', 'false');
                 });
             }
-            
-            // Close dropdown when clicking outside
+
+            // Close popover when clicking outside
             document.addEventListener('click', (e) => {
-                if (!this.elements.personaButton.contains(e.target) && !this.elements.personaDropdown.contains(e.target)) {
-                    this.elements.personaDropdown.style.display = 'none';
+                if (!this.elements.personaButton.contains(e.target) && !this.elements.personaPopover.contains(e.target)) {
+                    this.elements.personaPopover.style.display = 'none';
                     this.elements.personaButton.setAttribute('aria-expanded', 'false');
                 }
             });
-            
-            // Handle persona option clicks (dropdown in header)
+
+            // Handle persona option clicks (popover in header)
             document.addEventListener('click', (e) => {
                 const opt = e.target.closest && e.target.closest('.qc-persona-option');
                 if (!opt) return;
-                if (!this.elements.personaDropdown.contains(opt)) return;
+                if (!this.elements.personaPopover.contains(opt)) return;
 
                 const selectedPersona = opt.dataset.persona;
                 try {
@@ -268,7 +265,7 @@ class QualityCoachUI {
                     console.error('Error calling correctPersona from delegated handler', e);
                 }
 
-                this.elements.personaDropdown.style.display = 'none';
+                this.elements.personaPopover.style.display = 'none';
                 this.elements.personaButton.setAttribute('aria-expanded', 'false');
 
                 setTimeout(() => {
@@ -392,11 +389,23 @@ class QualityCoachUI {
     restorePersonaBadge() {
         const savedPersona = localStorage.getItem('qc_persona_choice');
         const hasConfirmed = localStorage.getItem('qc_persona_confirmed');
-        
-        if (hasConfirmed && savedPersona && this.elements.personaBadge && this.elements.personaLabel) {
-            this.currentPersona = savedPersona;
-            this.elements.personaLabel.textContent = this.personaNames[savedPersona] || savedPersona;
+
+        // Badge is always visible now
+        if (this.elements.personaBadge) {
             this.elements.personaBadge.style.display = 'flex';
+        }
+
+        if (hasConfirmed && savedPersona && this.elements.personaLabel && this.elements.personaPrefix) {
+            // Show selected persona
+            this.currentPersona = savedPersona;
+            this.elements.personaPrefix.textContent = 'Tailored for:';
+            this.elements.personaLabel.textContent = this.personaNames[savedPersona] || savedPersona;
+            this.elements.personaButton.classList.remove('not-set');
+        } else if (this.elements.personaLabel && this.elements.personaPrefix && this.elements.personaButton) {
+            // Show "Personalize" state
+            this.elements.personaPrefix.innerHTML = '<svg class="qc-gear-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m-9-9h6m6 0h6"></path></svg>';
+            this.elements.personaLabel.textContent = 'Personalize';
+            this.elements.personaButton.classList.add('not-set');
         }
     }
 
@@ -452,10 +461,13 @@ class QualityCoachUI {
     }
 
     applyAccessSuccess(data, { source = 'network', skipCache = false } = {}) {
+        console.log('[QC Debug] applyAccessSuccess called', { source, hasData: !!data, hasToken: !!(data && data.access_token) });
         if (!data || !data.access_token) {
+            console.log('[QC Debug] applyAccessSuccess EARLY RETURN - no data or token');
             return;
         }
         this.accessToken = data.access_token;
+        this.hasAccess = true;  // Enable sending messages
         this.client.setAccessToken(this.accessToken);
 
         if (this.elements.widgetContainer) {
@@ -484,7 +496,18 @@ class QualityCoachUI {
         }
         this.scheduleAccessRefresh(data.access_expires_at);
         this.showStatus('');
-        
+
+        // Update token usage display if tier_info is available
+        if (data.tier_info) {
+            this.updateTokenUsageDisplay(data.tier_info);
+        }
+
+        // Show example questions immediately for everyone
+        const exampleQuestionsContainer = document.getElementById('qc-example-questions-container');
+        if (exampleQuestionsContainer) {
+            exampleQuestionsContainer.style.display = 'block';
+        }
+
         this.loadConversationHistory();
     }
 
@@ -655,33 +678,46 @@ class QualityCoachUI {
     }
 
     async initializeAccess() {
-        const restored = this.attemptRestoreCachedAccess();
-        if (restored) {
-            return;
-        }
-
-        if (this.QC_TEST_SKIP_ACCESS) {
-            try {
-                const fakeExpires = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-                const fakeData = {
-                    has_access: true,
-                    access_token: 'qc-test-token',
-                    access_expires_at: fakeExpires,
-                    access_granted_via: 'localtest',
-                    is_beta_tester: true,
-                    is_paid_member: true
-                };
-                this.client.setAccessToken(fakeData.access_token);
-                this.applyAccessSuccess(fakeData, { source: 'localtest', skipCache: true });
+        console.log('[QC Debug] initializeAccess started');
+        try {
+            const restored = this.attemptRestoreCachedAccess();
+            if (restored) {
+                console.log('[QC Debug] Access restored from cache');
                 return;
-            } catch (e) {
-                if (typeof console !== 'undefined' && console.warn) {
-                    console.warn('QC test access shortcut failed, falling back to network check', e);
+            }
+
+            if (this.QC_TEST_SKIP_ACCESS) {
+                try {
+                    const fakeExpires = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+                    const fakeData = {
+                        has_access: true,
+                        access_token: 'qc-test-token',
+                        access_expires_at: fakeExpires,
+                        access_granted_via: 'localtest',
+                        is_beta_tester: true,
+                        is_paid_member: true
+                    };
+                    this.client.setAccessToken(fakeData.access_token);
+                    this.applyAccessSuccess(fakeData, { source: 'localtest', skipCache: true });
+                    return;
+                } catch (e) {
+                    if (typeof console !== 'undefined' && console.warn) {
+                        console.warn('QC test access shortcut failed, falling back to network check', e);
+                    }
                 }
             }
-        }
 
-        await this.performAccessCheck();
+            console.log('[QC Debug] Performing access check');
+            await this.performAccessCheck();
+            console.log('[QC Debug] Access check completed');
+        } catch (error) {
+            console.error('[QC Debug] initializeAccess error:', error);
+            // Ensure widget is accessible even if access check fails
+            this.setButtonAccessibility({ loading: false });
+            if (this.elements.widgetContainer) {
+                this.elements.widgetContainer.classList.remove('qc-widget--initializing');
+            }
+        }
     }
 
     async performAccessCheck({ silent = false } = {}) {
@@ -768,7 +804,9 @@ class QualityCoachUI {
         // Don't show persona prompt upfront - let user ask first
         // Progressive disclosure: show after first answer instead
 
-        this.elements.input.focus();
+        if (this.elements.input) {
+            this.elements.input.focus();
+        }
 
         if (typeof gtag !== 'undefined') {
             gtag('event', 'qc_chat_opened', {
@@ -778,31 +816,38 @@ class QualityCoachUI {
         }
     }
 
-    showPersonaPromptIfNeeded() {
-        const hasConfirmed = localStorage.getItem('qc_persona_confirmed');
-        const personaPrompt = document.getElementById('qc-persona-prompt');
-        const exampleQuestionsContainer = document.getElementById('qc-example-questions-container');
+    showPersonaSuggestion() {
+        // Show inline suggestion after 3rd answer
+        this.personaPromptShown = true;
 
-        if (!hasConfirmed && personaPrompt && exampleQuestionsContainer) {
-            // Show persona prompt, hide example questions
-            personaPrompt.style.display = 'block';
-            exampleQuestionsContainer.style.display = 'none';
+        // Create inline suggestion message
+        const suggestion = document.createElement('div');
+        suggestion.className = 'qc-persona-suggestion';
+        suggestion.innerHTML = `
+            <div class="qc-suggestion-content">
+                <span class="qc-suggestion-icon">💡</span>
+                <p class="qc-suggestion-text">
+                    <strong>Tip:</strong> I can tailor my responses to your role. Check the settings in the header if you'd like to try it.
+                </p>
+            </div>
+        `;
 
-            // Setup skip button handler
-            const skipBtn = document.getElementById('qc-persona-skip');
-            if (skipBtn && !skipBtn.dataset.handlerAttached) {
-                skipBtn.dataset.handlerAttached = 'true';
-                skipBtn.addEventListener('click', () => {
-                    personaPrompt.style.display = 'none';
-                    exampleQuestionsContainer.style.display = 'block';
-                });
-            }
-        } else if (exampleQuestionsContainer) {
-            // Already confirmed, show example questions
-            exampleQuestionsContainer.style.display = 'block';
-            if (personaPrompt) {
-                personaPrompt.style.display = 'none';
-            }
+        // Add to messages area
+        if (this.elements.messages) {
+            this.elements.messages.appendChild(suggestion);
+
+            // Scroll to show suggestion
+            setTimeout(() => {
+                suggestion.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Track analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'qc_persona_suggestion_shown', {
+                'trigger': 'third_question',
+                'post_slug': this.config.postSlug
+            });
         }
     }
 
@@ -898,17 +943,15 @@ class QualityCoachUI {
                     this.conversationHistory.push({ role: 'user', content: cleanedMessage });
                     this.conversationHistory.push({ role: 'assistant', content: data.answer });
 
-                    // Increment message count for reminder logic
-                    this.messageCount++;
+                    // Increment question count
+                    this.questionCount++;
 
-                    // Progressive disclosure: Show soft persona prompt after FIRST answer
-                    if (this.messageCount === 1 && !localStorage.getItem('qc_persona_confirmed')) {
-                        this.showSoftPersonaPrompt();
-                    }
-
-                    // Show persona reminder after 3rd message (if persona is set)
-                    if (this.messageCount === 3 && !this.hasShownPersonaReminder && this.currentPersona) {
-                        this.showPersonaReminder();
+                    // Show inline suggestion after 3rd answer
+                    const personaConfirmed = localStorage.getItem('qc_persona_confirmed');
+                    if (this.questionCount === 3 && !this.personaPromptShown && !personaConfirmed) {
+                        setTimeout(() => {
+                            this.showPersonaSuggestion();
+                        }, 1500);
                     }
                 }
                 
@@ -1527,36 +1570,49 @@ class QualityCoachUI {
 
         if (role === 'assistant') {
             this.lastAssistantMessage = messageDiv;
-            
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'qc-message-actions';
-            
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'qc-action-btn';
-            copyBtn.title = 'Copy to clipboard';
-            copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(content);
-                copyBtn.classList.add('is-active');
-                setTimeout(() => copyBtn.classList.remove('is-active'), 1000);
-            };
-            
-            const upBtn = document.createElement('button');
-            upBtn.className = 'qc-action-btn';
-            upBtn.title = 'Helpful';
-            upBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>';
-            upBtn.onclick = () => this.handleFeedback(messageDiv, 'positive', upBtn);
 
-            const downBtn = document.createElement('button');
-            downBtn.className = 'qc-action-btn';
-            downBtn.title = 'Not helpful';
-            downBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>';
-            downBtn.onclick = () => this.handleFeedback(messageDiv, 'negative', downBtn);
+            // Add inline feedback banner (much more visible than icon buttons)
+            const feedbackBanner = document.createElement('div');
+            feedbackBanner.className = 'qc-feedback-banner';
+            feedbackBanner.innerHTML = `
+                <div class="qc-feedback-banner-content">
+                    <div class="qc-feedback-banner-text">
+                        <span class="qc-feedback-icon">💬</span>
+                        <span class="qc-feedback-question">Was this helpful?</span>
+                    </div>
+                    <div class="qc-feedback-banner-actions">
+                        <button class="qc-feedback-btn qc-feedback-positive" data-rating="positive">
+                            <span class="qc-feedback-emoji">👍</span>
+                            <span class="qc-feedback-label">Yes, helpful</span>
+                        </button>
+                        <button class="qc-feedback-btn qc-feedback-negative" data-rating="negative">
+                            <span class="qc-feedback-emoji">👎</span>
+                            <span class="qc-feedback-label">Needs work</span>
+                        </button>
+                    </div>
+                </div>
+            `;
 
-            actionsDiv.appendChild(copyBtn);
-            actionsDiv.appendChild(upBtn);
-            actionsDiv.appendChild(downBtn);
-            messageDiv.appendChild(actionsDiv);
+            // Add click handlers for feedback buttons
+            const positiveBtn = feedbackBanner.querySelector('.qc-feedback-positive');
+            const negativeBtn = feedbackBanner.querySelector('.qc-feedback-negative');
+
+            positiveBtn.onclick = () => this.handleFeedback(messageDiv, 'positive', feedbackBanner);
+            negativeBtn.onclick = () => this.handleFeedback(messageDiv, 'negative', feedbackBanner);
+
+            messageDiv.appendChild(feedbackBanner);
+
+            // Auto-collapse banner after 10 seconds if no interaction
+            setTimeout(() => {
+                if (feedbackBanner.parentNode && !feedbackBanner.classList.contains('is-responded')) {
+                    feedbackBanner.classList.add('qc-fade-out');
+                    setTimeout(() => {
+                        if (feedbackBanner.parentNode) {
+                            feedbackBanner.style.display = 'none';
+                        }
+                    }, 300);
+                }
+            }, 10000);
         }
 
         this.elements.messages.appendChild(messageDiv);
@@ -1576,58 +1632,190 @@ class QualityCoachUI {
         }
     }
 
-    handleFeedback(messageDiv, rating, btn) {
-        const existingForm = messageDiv.querySelector('.qc-inline-feedback');
+    handleFeedback(messageDiv, rating, feedbackBanner) {
+        // Remove any existing feedback form
+        const existingForm = messageDiv.querySelector('.qc-feedback-followup');
         if (existingForm) existingForm.remove();
 
-        const buttons = messageDiv.querySelectorAll('.qc-action-btn');
-        buttons.forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
+        // Mark banner as responded (prevents auto-collapse)
+        feedbackBanner.classList.add('is-responded');
 
+        // Hide the banner (it's served its purpose)
+        feedbackBanner.classList.add('qc-fade-out');
+        setTimeout(() => {
+            if (feedbackBanner.parentNode) {
+                feedbackBanner.style.display = 'none';
+            }
+        }, 300);
+
+        if (rating === 'positive') {
+            // Thumbs up: Just show toast and submit
+            this.showToast('Thanks for your feedback!', 'success');
+            const messageId = messageDiv.dataset.messageId;
+            this.submitFeedback(rating, '', messageId);
+
+            // Track analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'feedback_positive', {
+                    'message_id': messageId,
+                    'post_slug': this.config.postSlug
+                });
+            }
+        } else {
+            // Thumbs down: Show improved follow-up form
+            setTimeout(() => {
+                this.showFeedbackFollowup(messageDiv);
+            }, 400);
+        }
+    }
+
+    showFeedbackFollowup(messageDiv) {
         const form = document.createElement('div');
-        form.className = 'qc-inline-feedback';
-        
+        form.className = 'qc-feedback-followup';
+
+        const title = document.createElement('div');
+        title.className = 'qc-followup-title';
+        title.textContent = 'What went wrong? (optional)';
+
+        const tags = document.createElement('div');
+        tags.className = 'qc-followup-tags';
+
+        const tagOptions = [
+            'Off-topic',
+            'Too vague',
+            'Inaccurate',
+            'Missing context',
+            'Other'
+        ];
+
+        const selectedTags = new Set();
+
+        tagOptions.forEach(tagText => {
+            const tag = document.createElement('button');
+            tag.className = 'qc-followup-tag';
+            tag.textContent = tagText;
+            tag.onclick = () => {
+                tag.classList.toggle('selected');
+                if (tag.classList.contains('selected')) {
+                    selectedTags.add(tagText);
+                } else {
+                    selectedTags.delete(tagText);
+                }
+            };
+            tags.appendChild(tag);
+        });
+
         const textarea = document.createElement('textarea');
-        textarea.placeholder = rating === 'positive' ? 'What was helpful? (Optional)' : 'How can we improve this? (Optional)';
-        
-        const actions = document.createElement('div');
-        actions.className = 'qc-inline-actions';
-        
-        const cancelBtn = document.createElement('button');
-        cancelBtn.className = 'qc-btn-xs qc-btn-ghost';
-        cancelBtn.textContent = 'Cancel';
-        cancelBtn.onclick = () => {
-            form.remove();
-            btn.classList.remove('is-active');
-        };
+        textarea.className = 'qc-followup-textarea';
+        textarea.placeholder = 'Any additional details? (optional - press Enter to submit)';
+        textarea.maxLength = 500;
+
+        // Character counter
+        const charCounter = document.createElement('div');
+        charCounter.className = 'qc-followup-char-counter';
+        charCounter.textContent = '0 / 500';
+
+        // Update character counter on input
+        textarea.addEventListener('input', () => {
+            const length = textarea.value.length;
+            charCounter.textContent = `${length} / 500`;
+        });
+
+        // Sticky submit area
+        const submitArea = document.createElement('div');
+        submitArea.className = 'qc-followup-submit-area';
 
         const submitBtn = document.createElement('button');
-        submitBtn.className = 'qc-btn-xs qc-btn-primary';
-        submitBtn.textContent = 'Send Feedback';
-        submitBtn.onclick = () => {
-            const comment = textarea.value.trim();
+        submitBtn.className = 'qc-followup-submit';
+        submitBtn.textContent = 'Send feedback';
+
+        const hint = document.createElement('span');
+        hint.className = 'qc-followup-hint';
+        hint.textContent = 'Press Enter ↵';
+
+        const submitHandler = () => {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
-            
+
             const messageId = messageDiv.dataset.messageId;
-            this.submitFeedback(rating, comment, messageId).then(() => {
-                form.innerHTML = '<div style="color: var(--qc-accent); font-size: 13px; font-weight: 500;">Thanks for your feedback!</div>';
+            const comment = textarea.value.trim();
+            const tagsArray = Array.from(selectedTags);
+            const fullComment = tagsArray.length > 0
+                ? `Tags: ${tagsArray.join(', ')}${comment ? `\n${comment}` : ''}`
+                : comment;
+
+            this.submitFeedback('negative', fullComment, messageId).then(() => {
+                form.innerHTML = '<div style="color: #16a34a; font-weight: 500; font-size: 13px;">✓ Feedback received. Thank you!</div>';
+                this.showToast('Feedback received. Thank you!', 'success');
                 setTimeout(() => {
                     form.remove();
                 }, 2000);
+
+                // Track analytics
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'feedback_negative', {
+                        'message_id': messageId,
+                        'tags': tagsArray.join(','),
+                        'has_comment': !!comment,
+                        'post_slug': this.config.postSlug
+                    });
+                }
             }).catch(() => {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Send Feedback';
+                submitBtn.textContent = 'Send feedback';
+                this.showToast('Failed to send feedback. Please try again.', 'error');
             });
         };
 
-        actions.appendChild(cancelBtn);
-        actions.appendChild(submitBtn);
+        // Add Enter key support (submit on Enter, Shift+Enter for new line)
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitHandler();
+            }
+        });
+
+        // Add click handler to submit button
+        submitBtn.onclick = submitHandler;
+
+        // Assemble submit area
+        submitArea.appendChild(charCounter);
+        submitArea.appendChild(hint);
+        submitArea.appendChild(submitBtn);
+
+        // Assemble form
+        form.appendChild(title);
+        form.appendChild(tags);
         form.appendChild(textarea);
-        form.appendChild(actions);
-        
+        form.appendChild(submitArea);
+
         messageDiv.appendChild(form);
-        textarea.focus();
+
+        // Scroll to show the follow-up
+        setTimeout(() => {
+            form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+
+    showToast(message, type = 'success') {
+        // Remove any existing toast
+        const existing = document.querySelector('.qc-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `qc-toast qc-toast-${type}`;
+        toast.innerHTML = `
+            <span class="qc-toast-icon">${type === 'success' ? '✓' : '⚠️'}</span>
+            <span class="qc-toast-message">${message}</span>
+        `;
+
+        document.body.appendChild(toast);
+
+        // Animate out and remove after 3 seconds
+        setTimeout(() => {
+            toast.style.animation = 'qc-toast-out 0.3s ease-out forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     submitFeedback(rating, comment, messageId) {
@@ -1637,6 +1825,83 @@ class QualityCoachUI {
             feedbackRating: rating,
             messageId: messageId
         });
+    }
+
+    /**
+     * Update token usage display with progressive disclosure.
+     * Shows usage after first query, with upgrade prompts at thresholds.
+     */
+    updateTokenUsageDisplay(tierInfo) {
+        if (!this.elements.tokenUsage || !tierInfo) return;
+
+        const { tokens_used_today, daily_limit, tier, has_capacity } = tierInfo;
+
+        // Don't show for unlimited tiers
+        if (daily_limit === -1) {
+            this.elements.tokenUsage.style.display = 'none';
+            return;
+        }
+
+        const percentUsed = (tokens_used_today / daily_limit) * 100;
+        const tokensRemaining = daily_limit - tokens_used_today;
+
+        // Progressive disclosure based on usage
+        // Different strategies: Guests (convert early) vs Free (respect, upgrade late)
+        let message = '';
+        let showUpgrade = false;
+
+        if (percentUsed < 30) {
+            // Low usage: Just show remaining subtly for everyone
+            message = `${tokensRemaining} tokens remaining today`;
+        } else if (percentUsed < 80) {
+            // Medium usage:
+            // - Guests: Encourage signup (they haven't converted yet)
+            // - Free: Just show count (don't nag existing customers)
+            message = `${tokensRemaining} tokens left`;
+            if (tier === 'guest') {
+                showUpgrade = true;
+                message += ' • <a href="#/portal/signup" data-portal="signup">Sign up for 5x more</a>';
+            }
+        } else if (has_capacity) {
+            // High usage (80-100%):
+            // - Guests: Stronger signup prompt
+            // - Free: Gentle upgrade suggestion
+            message = `⚠️ Running low: ${tokensRemaining} tokens left`;
+            if (tier === 'guest') {
+                showUpgrade = true;
+                message += ' • <a href="#/portal/signup" data-portal="signup" style="font-weight: 600;">Sign up to continue</a>';
+            } else if (tier === 'free') {
+                showUpgrade = true;
+                message += ' • <a href="#/portal/upgrade" data-portal="upgrade">Upgrade for unlimited</a>';
+            }
+        } else {
+            // No capacity (100%): Clear upgrade CTA for everyone
+            message = '⛔ Daily limit reached';
+            if (tier === 'guest') {
+                message += ' • <a href="#/portal/signup" data-portal="signup" style="font-weight: 600;">Sign up for 5x more questions</a>';
+            } else if (tier === 'free') {
+                message += ' • <a href="#/portal/upgrade" data-portal="upgrade" style="font-weight: 600;">Upgrade for unlimited</a>';
+            }
+        }
+
+        this.elements.tokenUsage.innerHTML = message;
+        this.elements.tokenUsage.style.display = 'block';
+
+        // Add click tracking for signup links
+        if (showUpgrade || !has_capacity) {
+            const links = this.elements.tokenUsage.querySelectorAll('[data-portal]');
+            links.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'qc_upgrade_prompt_clicked', {
+                            'trigger': has_capacity ? 'usage_warning' : 'limit_reached',
+                            'percent_used': percentUsed.toFixed(1),
+                            'tier': tier
+                        });
+                    }
+                });
+            });
+        }
     }
 }
 
