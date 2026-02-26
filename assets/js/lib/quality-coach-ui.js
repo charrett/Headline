@@ -1495,26 +1495,17 @@ class QualityCoachUI {
                     </div>
                 `;
             } else if (hasRelatedTopics) {
-                const relatedChapters = [...new Set(
-                    handbookSources.map(s => s.section || s.label || s.chapter || 'Handbook')
-                )].slice(0, 2);
-                
                 sourcesDiv.innerHTML = `
                     <div class="qc-sources-badge qc-sources-general">
-                        <span class="qc-sources-icon">💡</span>
-                        <span class="qc-sources-label">General coaching guidance</span>
-                    </div>
-                    <div class="qc-sources-badge qc-sources-related">
-                        <span class="qc-sources-icon">📖</span>
-                        <span class="qc-sources-label">Related content from the Handbook:</span>
-                        <span class="qc-sources-chapters">${relatedChapters.join(', ')}</span>
+                        <span class="qc-sources-icon">ℹ️</span>
+                        <span class="qc-sources-label">Outside the Handbook's scope</span>
                     </div>
                 `;
             } else {
                 sourcesDiv.innerHTML = `
                     <div class="qc-sources-badge qc-sources-general">
-                        <span class="qc-sources-icon">💡</span>
-                        <span class="qc-sources-label">General coaching guidance</span>
+                        <span class="qc-sources-icon">ℹ️</span>
+                        <span class="qc-sources-label">Outside the Handbook's scope</span>
                     </div>
                 `;
             }
