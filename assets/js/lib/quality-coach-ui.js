@@ -1480,8 +1480,6 @@ class QualityCoachUI {
             const llmDisclaimedHandbook = disclaimerPhrases.some(phrase => contentLower.includes(phrase));
             
             const hasHandbookSources = !lowRelevance && !llmDisclaimedHandbook && handbookSources && handbookSources.length > 0;
-            const hasRelatedTopics = llmDisclaimedHandbook && handbookSources && handbookSources.length > 0;
-            
             if (hasHandbookSources) {
                 const chapterNames = [...new Set(
                     handbookSources.map(s => s.section || s.label || s.chapter || 'Handbook')
@@ -1492,20 +1490,6 @@ class QualityCoachUI {
                         <span class="qc-sources-icon">📚</span>
                         <span class="qc-sources-label">From the Handbook:</span>
                         <span class="qc-sources-chapters">${chapterNames.join(', ')}</span>
-                    </div>
-                `;
-            } else if (hasRelatedTopics) {
-                sourcesDiv.innerHTML = `
-                    <div class="qc-sources-badge qc-sources-general">
-                        <span class="qc-sources-icon">ℹ️</span>
-                        <span class="qc-sources-label">Outside the Handbook's scope</span>
-                    </div>
-                `;
-            } else {
-                sourcesDiv.innerHTML = `
-                    <div class="qc-sources-badge qc-sources-general">
-                        <span class="qc-sources-icon">ℹ️</span>
-                        <span class="qc-sources-label">Outside the Handbook's scope</span>
                     </div>
                 `;
             }
