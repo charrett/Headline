@@ -52,14 +52,35 @@ class QualityCoachClient {
         try {
             const response = await fetch(url, options);
             
-            // Handle 429 Too Many Requests specifically
+            // Handle 429 Too Many Requests
             if (response.status === 429) {
-                const retryAfter = response.headers.get('Retry-After');
-                const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : backoff;
+                let errorData = {};
+                try { errorData = await response.json(); } catch (e) { /* ignore */ }
+
+                const detail = errorData.detail;
+                const isTokenLimit = detail && typeof detail === 'object' && detail.error === 'Daily token limit exceeded';
+
+                if (isTokenLimit) {
+                    // Token limit — do NOT retry, surface structured data to UI
+                    const error = new Error(detail.upgrade_message || 'Daily limit reached');
+                    error.status = 429;
+                    error.tokenLimit = detail;
+                    throw error;
+                }
+
+                // Rate limit — retry with backoff
                 if (retries > 0) {
+                    const retryAfter = response.headers.get('Retry-After');
+                    const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : backoff;
                     await new Promise(resolve => setTimeout(resolve, waitTime));
                     return this.fetchWithRetry(url, options, retries - 1, backoff * 2);
                 }
+
+                // Out of retries for rate limit
+                const error = new Error(typeof detail === 'string' ? detail : 'Too many requests. Please try again later.');
+                error.status = 429;
+                error.rateLimit = true;
+                throw error;
             }
 
             // Handle 5xx Server Errors
@@ -73,12 +94,14 @@ class QualityCoachClient {
                 let errorMessage = `Request failed: ${response.status}`;
                 try {
                     const errorData = await response.json();
-                    if (errorData.detail) errorMessage = errorData.detail;
+                    const detail = errorData.detail;
+                    if (typeof detail === 'string') errorMessage = detail;
+                    else if (detail && detail.error) errorMessage = detail.error;
                     else if (errorData.message) errorMessage = errorData.message;
                 } catch (e) {
                     // Ignore JSON parse error
                 }
-                
+
                 const error = new Error(errorMessage);
                 error.status = response.status;
                 throw error;

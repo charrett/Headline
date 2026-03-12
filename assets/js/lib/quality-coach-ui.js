@@ -968,7 +968,22 @@ class QualityCoachUI {
         .catch(error => {
             this.elements.typingIndicator.style.display = 'none';
             
-            if (error.message.includes('401') || error.message.includes('403')) {
+            if (error.tokenLimit) {
+                // Daily token limit exceeded — show upgrade prompt
+                const tl = error.tokenLimit;
+                let msg;
+                if (tl.tier === 'guest') {
+                    msg = '⛔ You\'ve reached the daily question limit. <a href="#/portal/signup" data-portal="signup">Sign up for a free account</a> to get 5x more questions per day!';
+                } else if (tl.tier === 'free') {
+                    msg = '⛔ You\'ve reached your daily question limit. <a href="#/portal/upgrade" data-portal="upgrade">Upgrade to a paid plan</a> for unlimited questions!';
+                } else {
+                    msg = '⛔ Daily limit reached. Please try again tomorrow.';
+                }
+                this.addMessage(msg, 'error');
+            } else if (error.rateLimit) {
+                // Rate limiter — temporary, suggest waiting
+                this.addMessage('You\'re sending messages too quickly. Please wait a moment and try again.', 'error');
+            } else if (error.message.includes('401') || error.message.includes('403')) {
                 this.hasAccess = false;
                 this.isLocked = true;
                 this.showStatus('Your access expired. Refresh the page to continue.', 'warning');
