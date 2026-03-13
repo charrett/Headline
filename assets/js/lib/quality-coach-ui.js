@@ -580,6 +580,31 @@ class QualityCoachUI {
         }
     }
 
+    /**
+     * Detect if the user logged in via Ghost Portal mid-session.
+     * Checks for the ghost-members-ssr cookie and fetches the member email
+     * from Ghost's Members API so performAccessCheck uses the correct identity.
+     */
+    async detectMemberChange() {
+        const hasSSRCookie = document.cookie.split(';').some(c => c.trim().startsWith('ghost-members-ssr='));
+        if (hasSSRCookie && !this.config.memberEmail) {
+            try {
+                const response = await fetch(
+                    new URL('/members/api/member', window.location.origin),
+                    { credentials: 'include' }
+                );
+                if (response.ok) {
+                    const member = await response.json();
+                    if (member && member.email) {
+                        this.config.memberEmail = member.email;
+                    }
+                }
+            } catch (e) {
+                // Best effort — performAccessCheck will proceed with guest access
+            }
+        }
+    }
+
     canUseCachedAccess(entry) {
         if (!entry || !entry.access_token || !entry.access_expires_at) {
             return false;
@@ -969,25 +994,73 @@ class QualityCoachUI {
             this.elements.typingIndicator.style.display = 'none';
             
             if (error.tokenLimit) {
-                // Daily token limit exceeded — show upgrade prompt
+                // Daily token limit exceeded
                 const tl = error.tokenLimit;
-                let msg;
-                if (tl.tier === 'guest') {
-                    msg = '⛔ You\'ve reached the daily question limit. <a href="#/portal/signup" data-portal="signup">Sign up for a free account</a> to get 5x more questions per day!';
-                } else if (tl.tier === 'free') {
-                    msg = '⛔ You\'ve reached your daily question limit. <a href="#/portal/upgrade" data-portal="upgrade">Upgrade to a paid plan</a> for unlimited questions!';
+
+                // Check if user logged in mid-session but is still being treated as guest
+                const hasSSRCookie = document.cookie.split(';').some(c => c.trim().startsWith('ghost-members-ssr='));
+                if (tl.tier === 'guest' && hasSSRCookie && !this._isReauthenticating) {
+                    // User logged in via Ghost Portal but widget still has guest JWT — re-auth
+                    this._isReauthenticating = true;
+                    this.showStatus('Updating your account access…', 'info');
+                    this.detectMemberChange()
+                        .then(() => {
+                            this.clearAccessCache();
+                            return this.performAccessCheck({ silent: true });
+                        })
+                        .then(success => {
+                            this._isReauthenticating = false;
+                            if (success) {
+                                this.sendMessage(options);
+                            } else {
+                                this.addMessage('⛔ You\'ve reached the daily question limit. <a href="#/portal/signup" data-portal="signup">Sign up for a free account</a> to get 5x more questions per day!', 'error');
+                            }
+                        })
+                        .catch(() => {
+                            this._isReauthenticating = false;
+                            this.addMessage('⛔ You\'ve reached the daily question limit. <a href="#/portal/signup" data-portal="signup">Sign up for a free account</a> to get 5x more questions per day!', 'error');
+                        });
                 } else {
-                    msg = '⛔ Daily limit reached. Please try again tomorrow.';
+                    // Genuinely hit the limit — show upgrade prompt
+                    let msg;
+                    if (tl.tier === 'guest') {
+                        msg = '⛔ You\'ve reached the daily question limit. <a href="#/portal/signup" data-portal="signup">Sign up for a free account</a> to get 5x more questions per day!';
+                    } else if (tl.tier === 'free') {
+                        msg = '⛔ You\'ve reached your daily question limit. <a href="#/portal/upgrade" data-portal="upgrade">Upgrade to a paid plan</a> for unlimited questions!';
+                    } else {
+                        msg = '⛔ Daily limit reached. Please try again tomorrow.';
+                    }
+                    this.addMessage(msg, 'error');
                 }
-                this.addMessage(msg, 'error');
             } else if (error.rateLimit) {
                 // Rate limiter — temporary, suggest waiting
                 this.addMessage('You\'re sending messages too quickly. Please wait a moment and try again.', 'error');
-            } else if (error.message.includes('401') || error.message.includes('403')) {
-                this.hasAccess = false;
-                this.isLocked = true;
-                this.showStatus('Your access expired. Refresh the page to continue.', 'warning');
-                this.setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Access expired - refresh to continue.' });
+            } else if (error.status === 401 || error.status === 403) {
+                if (!this._isReauthenticating) {
+                    this._isReauthenticating = true;
+                    this.showStatus('Reconnecting…', 'info');
+                    this.detectMemberChange()
+                        .then(() => {
+                            this.clearAccessCache();
+                            return this.performAccessCheck({ silent: true });
+                        })
+                        .then(success => {
+                            this._isReauthenticating = false;
+                            if (success) {
+                                this.sendMessage(options);
+                            } else {
+                                this.hasAccess = false;
+                                this.showStatus('Your access expired. Refresh the page to continue.', 'warning');
+                                this.setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Access expired - refresh to continue.' });
+                            }
+                        })
+                        .catch(() => {
+                            this._isReauthenticating = false;
+                            this.hasAccess = false;
+                            this.showStatus('Your access expired. Refresh the page to continue.', 'warning');
+                            this.setButtonAccessibility({ disabled: true, loading: false, tooltip: 'Access expired - refresh to continue.' });
+                        });
+                }
             } else {
                 this.addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'error');
             }
